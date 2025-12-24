@@ -141,7 +141,7 @@ public class SettingsScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClearColor(0.46f, 0.23f, 0.21f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         handleInput();
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));

@@ -15,23 +15,17 @@ public class Player extends GameObj {
     private float speed = 1;
     private Color tint = Color.WHITE;
 
-    private final TextureRegion right, left, up, down;
+    private final TextureRegion right, left;
     private TextureRegion current;
 
     public Player(float x, float y) {
-        super(x, y, "assets/player.png");
+        super(x, y, 7, 0);
         this.w = TILE;
         this.h = TILE;
 
-        int fw = texture.getWidth() / 4;  // 4 columns
-        int fh = texture.getHeight();
-
-        TextureRegion[][] tmp = TextureRegion.split(texture, fw, fh);
-
-        right = tmp[0][0];
-        left = tmp[0][1];
-        up = tmp[0][2];
-        down = tmp[0][3];
+        right = new TextureRegion(texture);
+        left = new TextureRegion(texture);
+        left.flip(true, false);
 
         current = right;
     }
@@ -47,11 +41,7 @@ public class Player extends GameObj {
     }
 
     public void update(float delta) {
-        if(Math.abs(lookY) > Math.abs(lookX)) {
-            current = (lookY > 0) ? up : down;
-        } else {
-            current = (lookX > 0) ? right : left;
-        }
+        current = (lookX > 0) ? right : left;
 
         if(attackTimer > 0f) {
             attackTimer -= delta;
@@ -77,7 +67,7 @@ public class Player extends GameObj {
 
     public void loseLife(int n) {
         hp -= n;
-        setTint(Color.RED);
+        setTint(Color.PINK);
     }
 
     public void loseLife() {

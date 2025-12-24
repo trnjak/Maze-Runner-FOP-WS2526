@@ -12,29 +12,23 @@ public abstract class Enemy extends GameObj {
     //speed in pixels per second
     //attack timer times the attack to only attack in attackInterval time
     //attack range in pixels
-    protected float speed = 75, timer = 0, range = TILE * 1.5f;
+    protected float speed = 75, timer = 0, range = TILE * 1.1f;
     protected final float interval = 1; //attack once per second
     protected int hp = 3;
     protected boolean alive = true;
     protected float lookX, lookY;
 
-    protected final TextureRegion right, left, up, down;
+    protected final TextureRegion right, left;
     protected TextureRegion current;
 
-    public Enemy(int x, int y, String path) {
-        super(x * TILE, y * TILE, path);
+    public Enemy(int x, int y, int tileY, int tileX) {
+        super(x * TILE, y * TILE, tileY, tileX);
         this.w = TILE;
         this.h = TILE;
 
-        int fw = texture.getWidth() / 4;  // 4 columns
-        int fh = texture.getHeight();
-
-        TextureRegion[][] tmp = TextureRegion.split(texture, fw, fh);
-
-        right = tmp[0][0];
-        left = tmp[0][1];
-        up = tmp[0][2];
-        down = tmp[0][3];
+        right = new TextureRegion(texture);
+        left = new TextureRegion(texture);
+        left.flip(true, false);
 
         current = right;
     }
@@ -46,11 +40,7 @@ public abstract class Enemy extends GameObj {
             return;
         }
 
-        if(Math.abs(lookY) > Math.abs(lookX)) {
-            current = (lookY > 0) ? up : down;
-        } else {
-            current = (lookX > 0) ? right : left;
-        }
+        current = (lookX > 0) ? right : left;
 
         move(delta, player, map);
 

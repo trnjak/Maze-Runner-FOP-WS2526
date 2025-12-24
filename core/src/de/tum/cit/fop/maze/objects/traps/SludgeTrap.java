@@ -7,14 +7,14 @@ public class SludgeTrap extends Trap {
     private final float mult;
 
     public SludgeTrap(int x, int y, float mult) {
-        super(x, y, "assets/key.png");
+        super(x, y, 3, 6);
         this.mult = mult;
     }
 
     @Override
     public void update(Player player, float delta) {
         if(player.getBounds().overlaps(getBounds())) {
-            player.speedEffect(mult, 0.1f, Color.BLUE);
+            player.speedEffect(mult, 0.1f, Color.SKY);
         }
     }
 }

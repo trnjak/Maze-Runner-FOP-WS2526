@@ -5,8 +5,8 @@ import com.badlogic.gdx.math.Rectangle;
 import de.tum.cit.fop.maze.objects.*;
 
 public abstract class Powerup extends GameObj {
-    public Powerup(float x, float y, String path) {
-        super(x, y, path);
+    public Powerup(float x, float y, int tileY, int tileX) {
+        super(x, y, tileY, tileX);
     }
 
     public abstract void update(Player player, float delta);

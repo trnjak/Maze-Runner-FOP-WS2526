@@ -1,20 +1,20 @@
 package de.tum.cit.fop.maze.objects;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
+import de.tum.cit.fop.maze.GameMap;
 
 public abstract class GameObj {
     public static final int TILE = 32;
     protected float x, y;
     protected float w, h;
-    protected final Texture texture;
+    protected final TextureRegion texture;
 
-    public GameObj(float x, float y, String path) {
+    public GameObj(float x, float y, int tileY, int tileX) {
         this.x = x;
         this.y = y;
-        this.texture = new Texture(path);
+        this.texture = GameMap.TEXTURE_REGION[tileY][tileX];
     }
 
     protected void renderStaticObj(SpriteBatch batch) {

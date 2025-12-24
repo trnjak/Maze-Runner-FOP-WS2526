@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 
 import de.tum.cit.fop.maze.objects.*;
@@ -15,12 +16,15 @@ import java.io.*;
 import java.util.*;
 
 public class GameMap {
+    private static final Texture TILE_SHEET = new Texture("main_tilemap.png");
+    public static final TextureRegion[][] TEXTURE_REGION = TextureRegion.split(TILE_SHEET, TILE_SHEET.getWidth()/12, TILE_SHEET.getHeight()/11);
+
     private int w, h;
     private final Map<String, Integer> tiles = new HashMap<>();
     private int ex, ey;
-    private final Texture wall = new Texture("assets/wall.png"),
-            entry = new Texture("assets/entry.png"),
-            floor = new Texture("assets/entry.png");
+    private final TextureRegion wall = TEXTURE_REGION[3][4],
+            floor[] = {TEXTURE_REGION[4][0], TEXTURE_REGION[4][1]},
+            entry = TEXTURE_REGION[4][0];
     private final List<Trap> traps = new ArrayList<>();
     private final List<Key> keys = new ArrayList<>();
     private final List<Enemy> enemies = new ArrayList<>();
@@ -76,14 +80,14 @@ public class GameMap {
         for(int y = 0; y < h; y++) {
             for(int x = 0; x < w; x++) {
                 Integer v = tiles.get(x + "," + y);
-                Texture t;
+                TextureRegion t;
                 if(v == null) {
-                    t = floor;
+                    t = floor[1];
                 } else {
                     t = switch(v) {
                         case 0 -> wall;
                         case 1 -> entry;
-                        default -> floor;
+                        default -> floor[1];
                     };
                 }
                 batch.draw(t, x * GameObj.TILE, y * GameObj.TILE, GameObj.TILE, GameObj.TILE);
@@ -176,7 +180,7 @@ public class GameMap {
                             sb.append(i).append(",").append(j).append("=").append(what).append("\n");
                             trap++;
                         }
-                        break;  // ← prevents fall-through
+                        break;
                     case 4:
                         if(enemy < 5 && (i > 3 && j > 3)) {
                             sb.append(i).append(",").append(j).append("=").append(what).append("\n");

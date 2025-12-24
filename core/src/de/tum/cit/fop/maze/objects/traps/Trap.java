@@ -5,8 +5,8 @@ import com.badlogic.gdx.math.Rectangle;
 import de.tum.cit.fop.maze.objects.*;
 
 public abstract class Trap extends GameObj {
-    public Trap(int x, int y, String path) {
-        super(x, y, path);
+    public Trap(int x, int y, int tileY, int tileX) {
+        super(x, y, tileY, tileX);
     }
 
     public abstract void update(Player player, float delta);
