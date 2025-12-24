@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.*;
 import de.tum.cit.fop.maze.objects.*;
 import de.tum.cit.fop.maze.objects.enemies.*;
@@ -16,7 +17,7 @@ import de.tum.cit.fop.maze.objects.powerups.*;
 import de.tum.cit.fop.maze.objects.traps.*;
 
 import java.io.IOException;
-import java.util.Iterator;
+import java.util.*;
 
 public class GameScreen implements Screen {
     private final MazeRunnerGame game;
@@ -28,19 +29,26 @@ public class GameScreen implements Screen {
     private boolean paused = false, gameOver = false, victory = false;
 
     private float score = 0, time = 300; // 300 seconds to finish
+    private int maxHearts;
 
     private final KeyBindings binds = KeyBindings.load();
 
     private final ShapeRenderer sr = new ShapeRenderer();
 
-    private Stage pauseStage, gameOverStage, victoryStage;
-    private Table pauseTable, gameOverTable, victoryTable;
-    private Image pauseBg, gameOverBg, victoryBg;
-    private Label gameOverScore, victoryScore;
+    private Stage pauseStage, gameOverStage, victoryStage, consoleStage;
+    private Table pauseTable, gameOverTable, victoryTable, consoleTable;
+    private Image pauseBg, gameOverBg, victoryBg, consoleBg;
+    private Label gameOverScore, victoryScore, consoleOutputLabel;
+    private TextField consoleTextField;
+    private ScrollPane consoleScrollPane;
 
     private static final Texture TILE_SHEET = new Texture("hud_tilemap.png");
     public static final TextureRegion[][] TEXTURE_REGION = TextureRegion.split(TILE_SHEET, TILE_SHEET.getWidth() / 16, TILE_SHEET.getHeight() / 10);
     private static final TextureRegion ARROW_TEXTURE = TEXTURE_REGION[6][3];
+
+    private boolean consoleOpen = false;
+    private String consoleOutput = "";
+    private final Map<String, Object> consoleVariables = new HashMap<>();
 
     public GameScreen(MazeRunnerGame game, String path) {
         this.game = game;
@@ -56,10 +64,12 @@ public class GameScreen implements Screen {
         map.load(path);
 
         player = new Player(map.getEx() * GameObj.TILE, map.getEy() * GameObj.TILE);
+        maxHearts = player.getHp();
 
         initPauseMenu();
         initGameOverMenu();
         initVictoryMenu();
+        initDeveloperConsole();
     }
 
     public GameScreen(MazeRunnerGame game) {
@@ -80,10 +90,12 @@ public class GameScreen implements Screen {
         }
 
         player = new Player(map.getEx() * GameObj.TILE, map.getEy() * GameObj.TILE);
+        maxHearts = player.getHp();
 
         initPauseMenu();
         initGameOverMenu();
         initVictoryMenu();
+        initDeveloperConsole();
     }
 
     @Override
@@ -93,7 +105,7 @@ public class GameScreen implements Screen {
 
         globalInput();
 
-        if(!paused && !gameOver && !victory) {
+        if(!paused && !gameOver && !victory && !consoleOpen) {
             time -= delta;
 
             player.update(delta);
@@ -171,7 +183,7 @@ public class GameScreen implements Screen {
         // draw HUD
         game.getSpriteBatch().setProjectionMatrix(hudCam.combined);
         game.getSpriteBatch().begin();
-        int maxHearts = 5, currentLives = player.getHp();
+        int currentLives = player.getHp();
         float heartX = 20, heartY = hudVp.getWorldHeight() - 40;
         for(int i = 0; i < maxHearts; i++) {
             if(i < currentLives) {
@@ -179,6 +191,12 @@ public class GameScreen implements Screen {
             } else {
                 game.getSpriteBatch().draw(TEXTURE_REGION[6][4], heartX + i * GameObj.TILE, heartY, GameObj.TILE, GameObj.TILE);
             }
+        }
+        if(currentLives > maxHearts) {
+            for(int i = maxHearts; i < currentLives; i++) {
+                game.getSpriteBatch().draw(TEXTURE_REGION[6][6], heartX + i * GameObj.TILE, heartY, GameObj.TILE, GameObj.TILE);
+            }
+            maxHearts = currentLives;
         }
         Exit exit = map.getExit();
         if(exit != null) {
@@ -195,7 +213,12 @@ public class GameScreen implements Screen {
         game.getSpriteBatch().end();
 
         //update & render stages
-        if(paused && !gameOver && !victory) {
+        if(consoleOpen) {
+            consoleBg.setVisible(true);
+            consoleTable.setVisible(true);
+            consoleStage.act(delta);
+            consoleStage.draw();
+        } else if(paused && !gameOver && !victory) {
             pauseBg.setVisible(true);
             pauseTable.setVisible(true);
             pauseStage.act(delta);
@@ -212,6 +235,8 @@ public class GameScreen implements Screen {
             victoryStage.draw();
         } else {
             // Hide all backgrounds when no menu is active
+            consoleBg.setVisible(false);
+            consoleTable.setVisible(false);
             pauseBg.setVisible(false);
             pauseTable.setVisible(false);
             gameOverBg.setVisible(false);
@@ -306,6 +331,75 @@ public class GameScreen implements Screen {
         initMenuStep2("YOU WON!", victoryStage, victoryBg, victoryTable, victoryScore);
     }
 
+    private void initDeveloperConsole() {
+        consoleStage = new Stage(new ScreenViewport(), game.getSpriteBatch());
+        consoleBg = new Image(new Texture(Gdx.files.internal("white.png")));
+        consoleBg.setColor(0, 0, 0, 0.5f);
+        consoleBg.setFillParent(true);
+        consoleBg.setVisible(false);
+
+        consoleTable = new Table();
+        consoleTable.setFillParent(true);
+        consoleTable.setVisible(false);
+        consoleTable.top().padTop(100);
+
+        consoleOutputLabel = new Label("", game.getSkin());
+        consoleOutputLabel.setWrap(true);
+        consoleOutputLabel.setAlignment(Align.topLeft);
+
+        consoleScrollPane = new ScrollPane(consoleOutputLabel, game.getSkin());
+        consoleScrollPane.setFadeScrollBars(false); // keep scrollbars always visible
+        consoleScrollPane.setScrollingDisabled(true, false); // only vertical scrolling
+        consoleScrollPane.setForceScroll(false, true); // allow vertical scroll
+
+        consoleTable.add(consoleScrollPane).width(800).height(400).padBottom(10).row();
+
+        consoleTextField = new TextField("", game.getSkin());
+        consoleTextField.setMessageText("Enter command...");
+        consoleTextField.setTextFieldListener((textField, c) -> {
+            if(c == '\r' || c == '\n') {
+                processConsoleCommand(textField.getText());
+                textField.setText("");
+            }
+        });
+
+        consoleTable.add(consoleTextField).width(800).padTop(10);
+
+        consoleStage.addActor(consoleBg);
+        consoleStage.addActor(consoleTable);
+
+        initializeConsoleVariables();
+    }
+
+    private void appendConsoleOutput(String text) {
+        consoleOutput += text;
+
+        if(consoleOutput.length() > 5000) {
+            consoleOutput = consoleOutput.substring(consoleOutput.length() - 5000);
+            int firstNewline = consoleOutput.indexOf('\n');
+            if(firstNewline != -1) {
+                consoleOutput = consoleOutput.substring(firstNewline);
+            }
+        }
+
+        consoleOutputLabel.setText(consoleOutput);
+
+        consoleScrollPane.layout();
+        consoleScrollPane.setScrollPercentY(1);
+    }
+
+    private void initializeConsoleVariables() {
+        consoleVariables.put("health", player.getHp());
+        consoleVariables.put("speed", player.getSpeed());
+        consoleVariables.put("keys", player.getKeys());
+        consoleVariables.put("score", score);
+        consoleVariables.put("time", time);
+        consoleVariables.put("paused", paused);
+
+        consoleOutput = "Console. Type 'help' for list of commands.";
+        consoleOutputLabel.setText(consoleOutput);
+    }
+
     private void handlePauseMenuSelection(String item) {
         switch(item) {
             case "Continue":
@@ -332,9 +426,262 @@ public class GameScreen implements Screen {
         victoryScore.setText("Final score: " + (int) (score + time));
     }
 
+    private void processConsoleCommand(String command) {
+        if(command.trim().isEmpty()) return;
+
+        String[] parts = command.trim().split("\\s+");
+        String cmd = parts[0].toLowerCase();
+
+        try {
+            switch(cmd) {
+                case "help":
+                    showHelp();
+                    break;
+                case "set":
+                    handleSetCommand(parts);
+                    break;
+                case "get":
+                    handleGetCommand(parts);
+                    break;
+                case "give":
+                    handleGiveCommand(parts);
+                    break;
+                case "kill":
+                    handleKillCommand(parts);
+                    break;
+                case "heal":
+                    handleHealCommand(parts);
+                    break;
+                case "teleport":
+                    handleTeleportCommand(parts);
+                    break;
+                case "list":
+                    handleListCommand();
+                    break;
+                case "clear":
+                    consoleOutput = "";
+                    consoleOutputLabel.setText(consoleOutput);
+                    break;
+                case "exit":
+                    consoleOpen = false;
+                    Gdx.input.setInputProcessor(null);
+                    break;
+                default:
+                    appendConsoleOutput("\nUnknown command: " + cmd + ". Type 'help' for available commands.");
+            }
+        } catch (Exception e) {
+            appendConsoleOutput("\nError executing command: " + e.getMessage());
+        }
+    }
+
+    private void showHelp() {
+        String helpText = """
+                
+                Available Commands:
+                
+                help - Show this help message
+                set [variable] [value] - Set a game variable
+                get [variable] - Get a variable's value
+                give [item] [amount] - Give items to player
+                kill [all|enemies] - Kill enemies
+                heal [amount] - Heal player
+                teleport [x] [y] - Teleport player
+                list - List all variables
+                clear - Clear console output
+                exit - Close console
+                
+                """;
+
+        appendConsoleOutput(helpText);
+    }
+
+    private void handleSetCommand(String[] parts) {
+        if(parts.length < 3) {
+            appendConsoleOutput("\nUsage: set [variable] [value]");
+            return;
+        }
+
+        String varName = parts[1];
+        String valueStr = parts[2];
+
+        try {
+            try {
+                int intValue = Integer.parseInt(valueStr);
+                consoleVariables.put(varName, intValue);
+                applyVariableChange(varName, intValue);
+                appendConsoleOutput("\nSet " + varName + " = " + intValue);
+            } catch (NumberFormatException e) {
+                try {
+                    float floatValue = Float.parseFloat(valueStr);
+                    consoleVariables.put(varName, floatValue);
+                    applyVariableChange(varName, floatValue);
+                    appendConsoleOutput("\nSet " + varName + " = " + floatValue);
+                } catch (NumberFormatException e2) {
+                    if(valueStr.equalsIgnoreCase("true") || valueStr.equalsIgnoreCase("false")) {
+                        boolean boolValue = Boolean.parseBoolean(valueStr);
+                        consoleVariables.put(varName, boolValue);
+                        applyVariableChange(varName, boolValue);
+                        appendConsoleOutput("\nSet " + varName + " = " + boolValue);
+                    } else {
+                        consoleVariables.put(varName, valueStr);
+                        appendConsoleOutput("\nSet " + varName + " = \"" + valueStr + "\"");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            appendConsoleOutput("\nError setting variable: " + e.getMessage());
+        }
+    }
+
+    private void handleGetCommand(String[] parts) {
+        if(parts.length < 2) {
+            appendConsoleOutput("\nUsage: get [variable]");
+            return;
+        }
+
+        String varName = parts[1];
+        Object value = consoleVariables.get(varName);
+
+        if(value != null) {
+            appendConsoleOutput("\n" + varName + " = " + value);
+        } else {
+            appendConsoleOutput("\nVariable not found: " + varName);
+        }
+    }
+
+    private void handleGiveCommand(String[] parts) {
+        if(parts.length < 2) {
+            appendConsoleOutput("\nUsage: give [item] [amount]");
+            return;
+        }
+
+        String item = parts[1].toLowerCase();
+        int amount = parts.length > 2 ? Integer.parseInt(parts[2]) : 1;
+
+        switch(item) {
+            case "key", "keys":
+                for(int i = 0; i < amount; i++) {
+                    player.collectKey();
+                }
+                consoleVariables.put("keys", player.getKeys());
+                appendConsoleOutput("\nGiven " + amount + " key(s) to player");
+                break;
+            case "health", "hp":
+                player.setHp(player.getHp() + amount);
+                consoleVariables.put("health", player.getHp());
+                appendConsoleOutput("\nGiven " + amount + " health to player");
+                break;
+            case "score":
+                score += amount;
+                consoleVariables.put("score", score);
+                appendConsoleOutput("\nAdded " + amount + " to score");
+                break;
+            case "time":
+                time += amount;
+                consoleVariables.put("time", time);
+                appendConsoleOutput("\nAdded " + amount + " seconds to timer");
+                break;
+            default:
+                appendConsoleOutput("\nUnknown item: " + item);
+        }
+    }
+
+    private void handleKillCommand(String[] parts) {
+        if(parts.length > 1 && parts[1].equalsIgnoreCase("all")) {
+            int count = 0;
+            for(Enemy enemy : map.getEnemies()) {
+                if(enemy.isAlive()) {
+                    enemy.takeDamage(1234567890);
+                    count++;
+                }
+            }
+            for(Enemy e : map.getEnemies().stream().filter(e -> !e.isAlive()).toList()) {
+                if(!e.isAlive()) {
+                    map.getEnemies().remove(e);
+                }
+            }
+            appendConsoleOutput("\nKilled " + count + " enemies");
+        } else {
+            player.attack(map.getEnemies());
+            appendConsoleOutput("\nAttacked enemies in range");
+        }
+    }
+
+    private void handleHealCommand(String[] parts) {
+        int amount = parts.length > 1 ? Integer.parseInt(parts[1]) : 5;
+        player.setHp(Math.min(5, player.getHp() + amount));
+        consoleVariables.put("health", player.getHp());
+        appendConsoleOutput("\nHealed player to " + player.getHp() + " HP");
+    }
+
+    private void handleTeleportCommand(String[] parts) {
+        if(parts.length < 3) {
+            appendConsoleOutput("\nUsage: teleport [x] [y]");
+            return;
+        }
+
+        try {
+            float x = Float.parseFloat(parts[1]) * GameObj.TILE;
+            float y = Float.parseFloat(parts[2]) * GameObj.TILE;
+
+            Rectangle testRect = new Rectangle(x, y, GameObj.TILE, GameObj.TILE);
+            if(!map.collidesWithWall(testRect)) {
+                player.move(x - player.getX(), y - player.getY());
+                centerCameraOnPlayer();
+                appendConsoleOutput("\nTeleported player to (" + parts[1] + ", " + parts[2] + ")");
+            } else {
+                appendConsoleOutput("\nCannot teleport to wall at (" + parts[1] + ", " + parts[2] + ")");
+            }
+        } catch (NumberFormatException e) {
+            appendConsoleOutput("\nInvalid coordinates");
+        }
+    }
+
+    private void handleListCommand() {
+        StringBuilder listOutput = new StringBuilder("\nGame Variables:");
+        for(Map.Entry<String, Object> entry : consoleVariables.entrySet()) {
+            listOutput.append("\n").append(entry.getKey()).append(" = ").append(entry.getValue());
+        }
+        appendConsoleOutput(listOutput.toString());
+    }
+
+    private void applyVariableChange(String varName, Object value) {
+        switch(varName) {
+            case "health":
+                player.setHp((Integer) value);
+                break;
+            case "speed", "keys":
+                break;
+            case "score":
+                score = ((Number) value).floatValue();
+                break;
+            case "time":
+                time = ((Number) value).floatValue();
+                break;
+            case "paused":
+                paused = (Boolean) value;
+                if(paused) {
+                    Gdx.input.setInputProcessor(pauseStage);
+                } else {
+                    Gdx.input.setInputProcessor(null);
+                }
+                break;
+        }
+    }
+
     private void globalInput() {
-        // toggle pause
-        if(!gameOver && !victory && Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+        if(!gameOver && !victory && Gdx.input.isKeyJustPressed(Input.Keys.F1)) {
+            consoleOpen = !consoleOpen;
+            if(consoleOpen) {
+                Gdx.input.setInputProcessor(consoleStage);
+                consoleTextField.setFocusTraversal(true);
+                consoleStage.setKeyboardFocus(consoleTextField);
+            } else {
+                Gdx.input.setInputProcessor(null);
+            }
+        }
+
+        if(!consoleOpen && !gameOver && !victory && Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             paused = !paused;
             if(paused) {
                 Gdx.input.setInputProcessor(pauseStage);
@@ -343,15 +690,13 @@ public class GameScreen implements Screen {
             }
         }
 
-        //set input processor for game over/victory screens
-        if(gameOver && Gdx.input.getInputProcessor() != gameOverStage) {
+        if(!consoleOpen && gameOver && Gdx.input.getInputProcessor() != gameOverStage) {
             Gdx.input.setInputProcessor(gameOverStage);
-        } else if(victory && Gdx.input.getInputProcessor() != victoryStage) {
+        } else if(!consoleOpen && victory && Gdx.input.getInputProcessor() != victoryStage) {
             Gdx.input.setInputProcessor(victoryStage);
         }
 
-        // camera zoom (only when not in any menu)
-        if(!paused && !gameOver && !victory) {
+        if(!consoleOpen && !paused && !gameOver && !victory) {
             if(Gdx.input.isKeyPressed(Input.Keys.PLUS) || Gdx.input.isKeyPressed(Input.Keys.EQUALS))
                 camera.zoom = Math.max(0.5f, camera.zoom - 0.02f);
             if(Gdx.input.isKeyPressed(Input.Keys.MINUS)) camera.zoom = Math.min(2.0f, camera.zoom + 0.02f);
@@ -420,6 +765,7 @@ public class GameScreen implements Screen {
         pauseStage.getViewport().update(width, height, true);
         gameOverStage.getViewport().update(width, height, true);
         victoryStage.getViewport().update(width, height, true);
+        consoleStage.getViewport().update(width, height, true);
     }
 
     @Override
@@ -442,5 +788,6 @@ public class GameScreen implements Screen {
         pauseStage.dispose();
         gameOverStage.dispose();
         victoryStage.dispose();
+        consoleStage.dispose();
     }
 }

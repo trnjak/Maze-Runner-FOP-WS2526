@@ -66,6 +66,22 @@ public class MazeRunnerGame extends Game {
     }
 
     /**
+     * Switches to the leaderboard screen.
+     */
+    public void goToLeaderboard() {
+        //TODO: implement leaderboards
+        if(gameScreen != null) {
+            gameScreen.dispose();
+            gameScreen = null;
+        }
+        if(menuScreen != null) {
+            menuScreen.dispose();
+            menuScreen = null;
+        }
+    }
+
+
+    /**
      * Switches to the settings screen.
      */
     public void goToSettings() {
