@@ -201,3 +201,4 @@ $RECYCLE.BIN/
 !gradle/wrapper/gradle-wrapper.jar
 /maps/endless.properties
 /keybinds.json
+/player_stats.json

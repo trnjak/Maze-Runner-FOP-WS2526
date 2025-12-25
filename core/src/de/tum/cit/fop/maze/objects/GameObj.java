@@ -11,6 +11,8 @@ public abstract class GameObj {
     protected float w, h;
     protected final TextureRegion texture;
 
+    protected static final float P = -5; //padding for a more generous collision detection
+
     public GameObj(float x, float y, int tileY, int tileX) {
         this.x = x;
         this.y = y;
@@ -28,11 +30,15 @@ public abstract class GameObj {
     public abstract void render(SpriteBatch batch);
 
     protected Rectangle getBoundsStaticObj() {
-        return new Rectangle(x * TILE, y * TILE, TILE, TILE);
+        return new Rectangle(
+                x * TILE - P, y * TILE - P,TILE + 2 * P, TILE + 2 * P
+        );
     }
 
     protected Rectangle getBoundsMovingObj() {
-        return new Rectangle(x, y, w, h);
+        return new Rectangle(
+                x - P, y - P, w + 2 * P, h + 2 * P
+        );
     }
 
     public abstract Rectangle getBounds();

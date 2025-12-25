@@ -12,7 +12,7 @@ public class Speedup extends Powerup {
     @Override
     public void update(Player player, float delta) {
         if(player.getBounds().overlaps(getBounds())) {
-            player.speedEffect(1.5f, 2.5f, Color.GREEN); // 1.5x speed for 2.5s
+            player.speedEffect(1.25f, 2f, Color.GREEN); // 1.25x speed for 2s
         }
     }
 

@@ -64,7 +64,7 @@ public class GameMap {
                 }
                 case 2 -> exit = new Exit(x, y);
                 case 3 -> traps.add(Math.round(Math.random()) == 0 ? //random trap type
-                        new SludgeTrap(x, y, 0.2f) : new DamageTrap(x, y, 1f));
+                        new SludgeTrap(x, y, 0.33f) : new DamageTrap(x, y, 1f));
                 case 4 -> enemies.add(Math.round(Math.random()) == 0 ? //random enemy type
                         new ChaserEnemy(x, y) : new PatrolEnemy(x, y, Math.round(Math.random()) == 0));
                 case 5 -> keys.add(new Key(x, y));

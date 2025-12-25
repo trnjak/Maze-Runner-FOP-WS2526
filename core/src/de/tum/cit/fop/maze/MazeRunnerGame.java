@@ -6,6 +6,7 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import de.tum.cit.fop.maze.screens.*;
 import games.spooky.gdx.nativefilechooser.NativeFileChooser;
 import games.spooky.gdx.nativefilechooser.NativeFileChooserCallback;
 import games.spooky.gdx.nativefilechooser.NativeFileChooserConfiguration;
@@ -15,6 +16,8 @@ import games.spooky.gdx.nativefilechooser.NativeFileChooserConfiguration;
  * It manages the screens and global resources like SpriteBatch and Skin.
  */
 public class MazeRunnerGame extends Game {
+    public float WIDTH = 1024, HEIGHT = 768;
+
     // Screens
     private MenuScreen menuScreen;
     private GameScreen gameScreen;
@@ -70,6 +73,21 @@ public class MazeRunnerGame extends Game {
      */
     public void goToLeaderboard() {
         //TODO: implement leaderboards
+        if(gameScreen != null) {
+            gameScreen.dispose();
+            gameScreen = null;
+        }
+        if(menuScreen != null) {
+            menuScreen.dispose();
+            menuScreen = null;
+        }
+    }
+
+    /**
+     * Switches to the stats screen.
+     */
+    public void goToUpgrades() {
+        setScreen(new UpgradeScreen(this));
         if(gameScreen != null) {
             gameScreen.dispose();
             gameScreen = null;

@@ -4,16 +4,19 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
+import de.tum.cit.fop.maze.PlayerStats;
 import de.tum.cit.fop.maze.objects.enemies.*;
 
 import java.util.List;
 
 public class Player extends GameObj {
-    private int hp = 5, keys = 0;
+    private int hp, keys = 0;
     private float tintTimer = 0, attackTimer = 0, effectTimer = 0;
     private float lookX, lookY;
-    private float speed = 1;
+    private float speedMult = 1.0f;
     private Color tint = Color.WHITE;
+
+    private final PlayerStats playerStats;
 
     private final TextureRegion right, left;
     private TextureRegion current;
@@ -23,6 +26,9 @@ public class Player extends GameObj {
         this.w = TILE;
         this.h = TILE;
 
+        playerStats = PlayerStats.getInstance();
+        hp = playerStats.getMaxHp();
+
         right = new TextureRegion(texture);
         left = new TextureRegion(texture);
         left.flip(true, false);
@@ -31,8 +37,11 @@ public class Player extends GameObj {
     }
 
     public void move(float dx, float dy) {
-        x += dx;
-        y += dy;
+        float currentSpeed = playerStats.getBaseSpeed() * speedMult;
+
+        x += dx * currentSpeed;
+        y += dy * currentSpeed;
+
         if(dx != 0 || dy != 0) {
             float len = (float) Math.sqrt(dx * dx + dy * dy);
             lookX = dx / len;
@@ -50,14 +59,13 @@ public class Player extends GameObj {
         if(effectTimer > 0) {
             effectTimer -= delta;
             if(effectTimer <= 0) {
-                speed = 1f;
+                speedMult = 1.0f;
                 setTint(tint);
             }
         }
 
         if(!tint.equals(Color.WHITE)) {
             tintTimer += delta;
-            // Tint player for 0.25 seconds.
             if(tintTimer >= 0.25f) {
                 tint = Color.WHITE;
                 tintTimer = 0f;
@@ -75,6 +83,7 @@ public class Player extends GameObj {
     }
 
     public void attack(List<Enemy> e) {
+        float attackCooldown = playerStats.getAttackCooldown();
         if(attackTimer > 0f) {
             return;
         }
@@ -84,7 +93,7 @@ public class Player extends GameObj {
         float cy = y + h / 2f;
 
         boolean hit = false;
-        float cosHalfAngle = (float) Math.cos(Math.toRadians(90)); //half angle for cone, so 180 degrees damage radius
+        float cosHalfAngle = (float) Math.cos(Math.toRadians(90));
 
         for(Enemy enemy : e) {
             if(!enemy.isAlive()) {
@@ -97,17 +106,16 @@ public class Player extends GameObj {
 
             float vx = ex - cx;
             float vy = ey - cy;
-            float d = (float) Math.sqrt(Math.pow(vx, 2) + Math.pow(vy, 2)); //distance between two points
+            float d = (float) Math.sqrt(vx * vx + vy * vy);
             if(d > range) {
                 continue;
             }
 
-            float len = (float) Math.sqrt(d);
-            float nx = len == 0 ? 0 : vx / len; //vector normalisation
-            float ny = len == 0 ? 0 : vy / len;
+            float nx = d == 0 ? 0 : vx / d;
+            float ny = d == 0 ? 0 : vy / d;
             float dot = nx * lookX + ny * lookY;
 
-            if(len == 0f || dot >= cosHalfAngle) {
+            if(d == 0f || dot >= cosHalfAngle) {
                 enemy.takeDamage(1);
                 hit = true;
             }
@@ -119,12 +127,11 @@ public class Player extends GameObj {
             setTint(Color.ORANGE);
         }
 
-        // Attack cooldown duration in seconds.
-        attackTimer = 0.25f;
+        attackTimer = attackCooldown;
     }
 
     public void speedEffect(float mult, float t, Color tint) {
-        speed = mult;
+        speedMult = mult;
         effectTimer = t;
         setTint(tint);
     }
@@ -136,6 +143,10 @@ public class Player extends GameObj {
 
     public int getHp() {
         return hp;
+    }
+
+    public int getMaxHealth() {
+        return playerStats.getMaxHp();
     }
 
     public void setHp(int hp) {
@@ -154,8 +165,8 @@ public class Player extends GameObj {
         return keys;
     }
 
-    public float getSpeed() {
-        return speed;
+    public float getCurrentSpeed() {
+        return playerStats.getBaseSpeed() * speedMult;
     }
 
     @Override

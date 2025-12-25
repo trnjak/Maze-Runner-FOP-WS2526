@@ -1,4 +1,4 @@
-package de.tum.cit.fop.maze;
+package de.tum.cit.fop.maze.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -10,8 +10,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import de.tum.cit.fop.maze.MazeRunnerGame;
 
 /**
  * MenuScreen implemented with Scene2D UI.
@@ -27,9 +27,7 @@ public class MenuScreen implements Screen {
      */
     public MenuScreen(MazeRunnerGame game) {
         var camera = new OrthographicCamera();
-
-        Viewport viewport = new ScreenViewport(camera);
-        stage = new Stage(viewport, game.getSpriteBatch());
+        stage = new Stage(new FitViewport(game.WIDTH, game.HEIGHT, camera), game.getSpriteBatch());
 
         Table table = new Table();
         table.setFillParent(true);
@@ -38,7 +36,7 @@ public class MenuScreen implements Screen {
         Label title = new Label("AWESOME GAME", game.getSkin(), "title");
         table.add(title).padBottom(80).row();
 
-        String[] menuItems = {"Start", "Endless", "Leaderboard", "Settings", "Exit"};
+        String[] menuItems = {"Start", "Endless", "Stats", "Leaderboard", "Settings", "Exit"};
 
         for(String item : menuItems) {
             TextButton button = new TextButton(item, game.getSkin());
@@ -50,6 +48,7 @@ public class MenuScreen implements Screen {
                     switch(item) {
                         case "Start" -> game.goToGame();
                         case "Endless" -> game.goToEndlessGame();
+                        case "Stats" -> game.goToUpgrades();
                         case "Leaderboard" -> game.goToLeaderboard();
                         case "Settings" -> game.goToSettings();
                         case "Exit" -> Gdx.app.exit();

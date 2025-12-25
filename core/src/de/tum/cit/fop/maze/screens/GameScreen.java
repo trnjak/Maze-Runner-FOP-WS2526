@@ -1,4 +1,4 @@
-package de.tum.cit.fop.maze;
+package de.tum.cit.fop.maze.screens;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.*;
+import de.tum.cit.fop.maze.*;
 import de.tum.cit.fop.maze.objects.*;
 import de.tum.cit.fop.maze.objects.enemies.*;
 import de.tum.cit.fop.maze.objects.powerups.*;
@@ -54,17 +55,16 @@ public class GameScreen implements Screen {
         this.game = game;
 
         camera = new OrthographicCamera();
-        viewport = new ExtendViewport(1024, 768, camera);
-        camera.setToOrtho(false, 1024, 768);
+        viewport = new ExtendViewport(game.WIDTH, game.HEIGHT, camera);
 
         hudCam = new OrthographicCamera();
-        hudVp = new ScreenViewport(hudCam);
+        hudVp = new FitViewport(game.WIDTH, game.HEIGHT, hudCam);
 
         map = new GameMap();
         map.load(path);
 
         player = new Player(map.getEx() * GameObj.TILE, map.getEy() * GameObj.TILE);
-        maxHearts = player.getHp();
+        maxHearts = player.getMaxHealth();
 
         initPauseMenu();
         initGameOverMenu();
@@ -76,11 +76,10 @@ public class GameScreen implements Screen {
         this.game = game;
 
         camera = new OrthographicCamera();
-        viewport = new ExtendViewport(1024, 768, camera);
-        camera.setToOrtho(false, 1024, 768);
+        viewport = new ExtendViewport(game.WIDTH, game.HEIGHT, camera);
 
         hudCam = new OrthographicCamera();
-        hudVp = new ScreenViewport(hudCam);
+        hudVp = new FitViewport(game.WIDTH, game.HEIGHT, hudCam);
 
         map = new GameMap();
         try {
@@ -90,7 +89,7 @@ public class GameScreen implements Screen {
         }
 
         player = new Player(map.getEx() * GameObj.TILE, map.getEy() * GameObj.TILE);
-        maxHearts = player.getHp();
+        maxHearts = player.getMaxHealth();
 
         initPauseMenu();
         initGameOverMenu();
@@ -170,8 +169,11 @@ public class GameScreen implements Screen {
             updateGameOverScore();
         }
 
-        // draw map and entities
+        viewport.apply();
+        camera.update();
         game.getSpriteBatch().setProjectionMatrix(camera.combined);
+
+        // draw map and entities
         game.getSpriteBatch().begin();
         map.render(game.getSpriteBatch());
         player.render(game.getSpriteBatch());
@@ -180,8 +182,10 @@ public class GameScreen implements Screen {
         }
         game.getSpriteBatch().end();
 
-        // draw HUD
+        hudVp.apply();
+        hudCam.update();
         game.getSpriteBatch().setProjectionMatrix(hudCam.combined);
+
         game.getSpriteBatch().begin();
         int currentLives = player.getHp();
         float heartX = 20, heartY = hudVp.getWorldHeight() - 40;
@@ -202,7 +206,7 @@ public class GameScreen implements Screen {
         if(exit != null) {
             float arrowRotation = computeArrow(player.getX(), player.getY(), exit.getX() * GameObj.TILE, exit.getY() * GameObj.TILE);
             if(arrowRotation >= 0) {
-                float arrowX = 20, arrowY = hudVp.getWorldHeight() - 80;
+                float arrowX = 20, arrowY = game.HEIGHT - 80;
                 float originX = (float) GameObj.TILE / 2, originY = (float) GameObj.TILE / 2;
                 game.getSpriteBatch().draw(ARROW_TEXTURE, arrowX, arrowY, originX, originY, GameObj.TILE, GameObj.TILE, 1, 1, arrowRotation);
             }
@@ -212,29 +216,31 @@ public class GameScreen implements Screen {
         game.getSkin().getFont("font").draw(game.getSpriteBatch(), "Time: " + (int) time, hudVp.getWorldWidth()-650, hudVp.getWorldHeight()-50);
         game.getSpriteBatch().end();
 
-        //update & render stages
         if(consoleOpen) {
+            consoleStage.getViewport().apply();
             consoleBg.setVisible(true);
             consoleTable.setVisible(true);
             consoleStage.act(delta);
             consoleStage.draw();
         } else if(paused && !gameOver && !victory) {
+            pauseStage.getViewport().apply();
             pauseBg.setVisible(true);
             pauseTable.setVisible(true);
             pauseStage.act(delta);
             pauseStage.draw();
         } else if(gameOver) {
+            gameOverStage.getViewport().apply();
             gameOverBg.setVisible(true);
             gameOverTable.setVisible(true);
             gameOverStage.act(delta);
             gameOverStage.draw();
         } else if(victory) {
+            victoryStage.getViewport().apply();
             victoryBg.setVisible(true);
             victoryTable.setVisible(true);
             victoryStage.act(delta);
             victoryStage.draw();
         } else {
-            // Hide all backgrounds when no menu is active
             consoleBg.setVisible(false);
             consoleTable.setVisible(false);
             pauseBg.setVisible(false);
@@ -247,7 +253,7 @@ public class GameScreen implements Screen {
     }
 
     private void initMenu(Table t, Image bg) {
-        bg.setColor(0, 0, 0, 0.5f);
+        bg.setColor(0, 0, 0, 0.7f);
         bg.setFillParent(true);
         bg.setVisible(false);
 
@@ -256,7 +262,7 @@ public class GameScreen implements Screen {
     }
 
     private void initPauseMenu() {
-        pauseStage = new Stage(new ScreenViewport(), game.getSpriteBatch());
+        pauseStage = new Stage(hudVp, game.getSpriteBatch());
         pauseBg = new Image(new Texture(Gdx.files.internal("white.png")));
         pauseTable = new Table();
         initMenu(pauseTable, pauseBg);
@@ -314,7 +320,7 @@ public class GameScreen implements Screen {
     }
 
     private void initGameOverMenu() {
-        gameOverStage = new Stage(new ScreenViewport(), game.getSpriteBatch());
+        gameOverStage = new Stage(hudVp, game.getSpriteBatch());
         gameOverBg = new Image(new Texture(Gdx.files.internal("white.png")));
         gameOverTable = new Table();
         initMenu(gameOverTable, gameOverBg);
@@ -323,7 +329,7 @@ public class GameScreen implements Screen {
     }
 
     private void initVictoryMenu() {
-        victoryStage = new Stage(new ScreenViewport(), game.getSpriteBatch());
+        victoryStage = new Stage(hudVp, game.getSpriteBatch());
         victoryBg = new Image(new Texture(Gdx.files.internal("white.png")));
         victoryTable = new Table();
         initMenu(victoryTable, victoryBg);
@@ -332,9 +338,9 @@ public class GameScreen implements Screen {
     }
 
     private void initDeveloperConsole() {
-        consoleStage = new Stage(new ScreenViewport(), game.getSpriteBatch());
+        consoleStage = new Stage(hudVp, game.getSpriteBatch());
         consoleBg = new Image(new Texture(Gdx.files.internal("white.png")));
-        consoleBg.setColor(0, 0, 0, 0.5f);
+        consoleBg.setColor(0, 0, 0, 0.7f);
         consoleBg.setFillParent(true);
         consoleBg.setVisible(false);
 
@@ -348,9 +354,9 @@ public class GameScreen implements Screen {
         consoleOutputLabel.setAlignment(Align.topLeft);
 
         consoleScrollPane = new ScrollPane(consoleOutputLabel, game.getSkin());
-        consoleScrollPane.setFadeScrollBars(false); // keep scrollbars always visible
-        consoleScrollPane.setScrollingDisabled(true, false); // only vertical scrolling
-        consoleScrollPane.setForceScroll(false, true); // allow vertical scroll
+        consoleScrollPane.setFadeScrollBars(false);
+        consoleScrollPane.setScrollingDisabled(true, false);
+        consoleScrollPane.setForceScroll(false, true);
 
         consoleTable.add(consoleScrollPane).width(800).height(400).padBottom(10).row();
 
@@ -390,7 +396,7 @@ public class GameScreen implements Screen {
 
     private void initializeConsoleVariables() {
         consoleVariables.put("health", player.getHp());
-        consoleVariables.put("speed", player.getSpeed());
+        consoleVariables.put("speed", player.getCurrentSpeed());
         consoleVariables.put("keys", player.getKeys());
         consoleVariables.put("score", score);
         consoleVariables.put("time", time);
@@ -420,10 +426,12 @@ public class GameScreen implements Screen {
 
     private void updateGameOverScore() {
         gameOverScore.setText("Final score: " + (int) (score + time));
+        awardExp();
     }
 
     private void updateVictoryScore() {
         victoryScore.setText("Final score: " + (int) (score + time));
+        awardExp();
     }
 
     private void processConsoleCommand(String command) {
@@ -567,6 +575,9 @@ public class GameScreen implements Screen {
                 appendConsoleOutput("\nGiven " + amount + " key(s) to player");
                 break;
             case "health", "hp":
+                if(amount > maxHearts) {
+                    maxHearts = amount;
+                }
                 player.setHp(player.getHp() + amount);
                 consoleVariables.put("health", player.getHp());
                 appendConsoleOutput("\nGiven " + amount + " health to player");
@@ -669,6 +680,13 @@ public class GameScreen implements Screen {
         }
     }
 
+    private void awardExp() {
+        int plusExp = (int)(score / 500);
+        if (plusExp > 0) {
+            PlayerStats.getInstance().addExp(plusExp);
+        }
+    }
+
     private void globalInput() {
         if(!gameOver && !victory && Gdx.input.isKeyJustPressed(Input.Keys.F1)) {
             consoleOpen = !consoleOpen;
@@ -710,7 +728,7 @@ public class GameScreen implements Screen {
 
     private void playerInput(float delta) {
         float baseSpeed = Gdx.input.isKeyPressed(binds.SPRINT) ? 168f : 100f;
-        float speed = baseSpeed * player.getSpeed();
+        float speed = baseSpeed * player.getCurrentSpeed();
         float dx = 0, dy = 0;
         if(Gdx.input.isKeyPressed(binds.LEFT)) dx -= speed * delta;
         if(Gdx.input.isKeyPressed(binds.RIGHT)) dx += speed * delta;
@@ -759,13 +777,8 @@ public class GameScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        camera.setToOrtho(false, width, height);
         viewport.update(width, height);
         hudVp.update(width, height, true);
-        pauseStage.getViewport().update(width, height, true);
-        gameOverStage.getViewport().update(width, height, true);
-        victoryStage.getViewport().update(width, height, true);
-        consoleStage.getViewport().update(width, height, true);
     }
 
     @Override

@@ -6,7 +6,6 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Json;
 
 public class KeyBindings {
-
     public int UP = Input.Keys.UP;
     public int DOWN = Input.Keys.DOWN;
     public int LEFT = Input.Keys.LEFT;
@@ -31,9 +30,5 @@ public class KeyBindings {
         }
         Json json = new Json();
         return json.fromJson(KeyBindings.class, file);
-    }
-
-    public String keyToString(int key) {
-        return Input.Keys.toString(key);
     }
 }

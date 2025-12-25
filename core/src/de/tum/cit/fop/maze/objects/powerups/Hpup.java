@@ -9,7 +9,7 @@ public class Hpup extends Powerup {
 
     @Override
     public void update(Player player, float delta) {
-        if(player.getBounds().overlaps(getBounds())) {
+        if(player.getBounds().overlaps(getBounds()) && player.getHp()+1<=player.getMaxHealth()) {
             player.setHp(player.getHp()+1);
         }
     }
