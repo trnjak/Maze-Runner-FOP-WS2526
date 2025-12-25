@@ -5,7 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import de.tum.cit.fop.maze.screens.*;
 import games.spooky.gdx.nativefilechooser.NativeFileChooser;
 import games.spooky.gdx.nativefilechooser.NativeFileChooserCallback;
@@ -56,7 +56,7 @@ public class MazeRunnerGame extends Game {
         backgroundMusic.setLooping(true);
         //backgroundMusic.play();
 
-        goToMenu(); // Navigate to the menu screen
+        setScreen(new BeginScreen(this));
     }
 
     /**
@@ -88,8 +88,8 @@ public class MazeRunnerGame extends Game {
     /**
      * Switches to the stats screen.
      */
-    public void goToUpgrades() {
-        setScreen(new UpgradeScreen(this));
+    public void goToStats() {
+        setScreen(new StatsScreen(this));
         if(gameScreen != null) {
             gameScreen.pause();
         }

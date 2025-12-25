@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Rectangle;
 import de.tum.cit.fop.maze.GameMap;
 import de.tum.cit.fop.maze.PlayerStats;
 import de.tum.cit.fop.maze.objects.enemies.*;
+import de.tum.cit.fop.maze.screens.BeginScreen;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class Player extends GameObj {
         this.w = TILE;
         this.h = TILE;
 
-        playerStats = PlayerStats.getInstance();
+        playerStats = BeginScreen.STATS;
         hp = playerStats.getMaxHp();
 
         right = new TextureRegion(texture);

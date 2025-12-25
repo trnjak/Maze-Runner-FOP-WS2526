@@ -15,20 +15,23 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import de.tum.cit.fop.maze.MazeRunnerGame;
 import de.tum.cit.fop.maze.PlayerStats;
 
-public class UpgradeScreen implements Screen {
+public class StatsScreen implements Screen {
     private final MazeRunnerGame game;
     private final Stage stage;
     private final SpriteBatch batch;
     private final PlayerStats playerStats;
-    private Label expLabel, healthLabel, speedLabel, attackLabel;
+    private Label expLabel;
+    private Label healthLabel;
+    private Label speedLabel;
+    private Label attackLabel;
 
-    public UpgradeScreen(MazeRunnerGame game) {
+    public StatsScreen(MazeRunnerGame game) {
         this.game = game;
         batch = new SpriteBatch();
         var camera = new OrthographicCamera();
         stage = new Stage(new FitViewport(game.WIDTH, game.HEIGHT, camera), game.getSpriteBatch());
 
-        playerStats = PlayerStats.getInstance();
+        playerStats = BeginScreen.STATS;
 
         Gdx.input.setInputProcessor(stage);
 
@@ -43,6 +46,9 @@ public class UpgradeScreen implements Screen {
         Label title = new Label("UPGRADES", game.getSkin(), "title");
         table.add(title).padBottom(80).colspan(2).row();
 
+        Label scoreLabel = new Label("Score: " + playerStats.getScore(), game.getSkin());
+        table.add(scoreLabel).padBottom(20).colspan(2).row();
+
         expLabel = new Label("EXP: " + playerStats.getExp(), game.getSkin());
         table.add(expLabel).padBottom(20).colspan(2).row();
 
@@ -55,6 +61,7 @@ public class UpgradeScreen implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 if(playerStats.upgradeHp()) {
                     updateLabels();
+                    playerStats.save();
                 }
             }
         });
@@ -69,6 +76,7 @@ public class UpgradeScreen implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 if(playerStats.upgradeSpeed()) {
                     updateLabels();
+                    playerStats.save();
                 }
             }
         });
@@ -83,6 +91,7 @@ public class UpgradeScreen implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 if(playerStats.upgradeAtk()) {
                     updateLabels();
+                    playerStats.save();
                 }
             }
         });
@@ -93,6 +102,7 @@ public class UpgradeScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 game.backToGameOrMenuDependingOnWhetherOrNotThePlayerEnteredTheScreenFromTheGameOrFromTheMenu();
+                playerStats.save();
             }
         });
         table.add(backButton).padTop(50).colspan(2).row();

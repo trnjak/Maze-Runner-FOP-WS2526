@@ -26,6 +26,7 @@ public class GameScreen implements Screen {
     private final Viewport viewport, hudVp;
     private final GameMap map;
     private final Player player;
+    private final PlayerStats playerStats;
     private boolean paused = false, gameOver = false, victory = false;
 
     private float score = 0, time = 300; // 300 seconds to finish
@@ -61,6 +62,7 @@ public class GameScreen implements Screen {
         map.load(path);
 
         player = new Player(map.getEx() * GameObj.TILE, map.getEy() * GameObj.TILE);
+        playerStats = BeginScreen.STATS;
         maxHearts = player.getMaxHealth();
 
         initPauseMenu();
@@ -87,6 +89,7 @@ public class GameScreen implements Screen {
         }
 
         player = new Player(map.getEx() * GameObj.TILE, map.getEy() * GameObj.TILE);
+        playerStats = BeginScreen.STATS;
         maxHearts = player.getMaxHealth();
 
         initPauseMenu();
@@ -202,10 +205,9 @@ public class GameScreen implements Screen {
             maxHearts = currentLives;
         }
         if(player.getKeys() < 1) {
-            game.getSpriteBatch().draw(TEXTURE_REGION[7][4], hudVp.getWorldWidth()-GameObj.TILE-20, hudVp.getWorldHeight() - 40, GameObj.TILE, GameObj.TILE);
-        }
-        else {
-            game.getSpriteBatch().draw(TEXTURE_REGION[5][10], hudVp.getWorldWidth()-GameObj.TILE-20, hudVp.getWorldHeight() - 40, GameObj.TILE, GameObj.TILE);
+            game.getSpriteBatch().draw(TEXTURE_REGION[7][4], hudVp.getWorldWidth() - GameObj.TILE - 20, hudVp.getWorldHeight() - 40, GameObj.TILE, GameObj.TILE);
+        } else {
+            game.getSpriteBatch().draw(TEXTURE_REGION[5][10], hudVp.getWorldWidth() - GameObj.TILE - 20, hudVp.getWorldHeight() - 40, GameObj.TILE, GameObj.TILE);
         }
         Exit exit = map.getExit();
         if(exit != null) {
@@ -332,6 +334,7 @@ public class GameScreen implements Screen {
 
         victoryScore = new Label("", game.getSkin());
         initMenuStep2("YOU WON!", victoryStage, victoryTable, victoryScore);
+
         TextButton newMapButton = new TextButton("Next Endless", game.getSkin());
         victoryTable.add(newMapButton).width(320).padBottom(20).row();
 
@@ -348,13 +351,14 @@ public class GameScreen implements Screen {
                     paused = false;
                     time = 300;
 
+                    resetLevelScore();
+
                     maxHearts = player.getMaxHealth();
-                    scoreLabel.setText((int) score + "");
                     timeLabel.setText((int) time + "");
 
                     centerCameraOnPlayer();
                     Gdx.input.setInputProcessor(null);
-                } catch (IOException e) {
+                } catch(IOException e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -366,7 +370,7 @@ public class GameScreen implements Screen {
         upgradesButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                game.goToUpgrades();
+                game.goToStats();
             }
         });
     }
@@ -442,9 +446,11 @@ public class GameScreen implements Screen {
                 Gdx.input.setInputProcessor(null);
                 break;
             case "New Map":
+                resetLevelScore();
                 game.goToGame();
                 break;
             case "New Endless":
+                resetLevelScore();
                 game.goToEndlessGame();
                 break;
             case "Main Menu":
@@ -453,14 +459,25 @@ public class GameScreen implements Screen {
         }
     }
 
+    private void resetLevelScore() {
+        score = 0;
+        scoreLabel.setText(0 + "");
+    }
+
     private void updateGameOverScore() {
-        gameOverScore.setText("Final score: " + (int) (score + time));
+        int finalScore = (int) (score + time);
+        gameOverScore.setText("Final score: " + finalScore);
         awardExp();
+        playerStats.addScore(finalScore);
+        playerStats.save();
     }
 
     private void updateVictoryScore() {
-        victoryScore.setText("Final score: " + (int) (score + time));
+        int finalScore = (int) (score + time);
+        victoryScore.setText("Final score: " + finalScore);
         awardExp();
+        playerStats.addScore(finalScore);
+        playerStats.save();
     }
 
     private void processConsoleCommand(String command) {
@@ -710,9 +727,10 @@ public class GameScreen implements Screen {
     }
 
     private void awardExp() {
-        int plusExp = (int)(score / 500);
-        if (plusExp > 0) {
-            PlayerStats.getInstance().addExp(plusExp);
+        int plusExp = (int) (score / 500);
+        if(plusExp > 0) {
+            playerStats.addExp(plusExp);
+            playerStats.save();
         }
     }
 

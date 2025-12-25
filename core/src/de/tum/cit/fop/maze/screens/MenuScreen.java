@@ -6,9 +6,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import de.tum.cit.fop.maze.MazeRunnerGame;
@@ -36,7 +34,7 @@ public class MenuScreen implements Screen {
         Label title = new Label("AWESOME GAME", game.getSkin(), "title");
         table.add(title).padBottom(80).row();
 
-        String[] menuItems = {"Start", "Endless", "Upgrades", "Leaderboard", "Settings", "Exit"};
+        String[] menuItems = {"Load Map", "New Endless", "Stats & Upgrades", "Leaderboard", "Settings", "Exit"};
 
         for(String item : menuItems) {
             TextButton button = new TextButton(item, game.getSkin());
@@ -46,9 +44,9 @@ public class MenuScreen implements Screen {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
                     switch(item) {
-                        case "Start" -> game.goToGame();
-                        case "Endless" -> game.goToEndlessGame();
-                        case "Upgrades" -> game.goToUpgrades();
+                        case "Load Map" -> game.goToGame();
+                        case "New Endless" -> game.goToEndlessGame();
+                        case "Stats & Upgrades" -> game.goToStats();
                         case "Leaderboard" -> game.goToLeaderboard();
                         case "Settings" -> game.goToSettings();
                         case "Exit" -> Gdx.app.exit();
