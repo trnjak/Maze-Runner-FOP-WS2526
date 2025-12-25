@@ -17,6 +17,9 @@ public class PatrolEnemy extends Enemy {
     @Override
     protected void move(float delta, Player player, GameMap map) {
         float dx = 0, dy = 0; //direction towards x and y respectively
+        if(inRange(player)) { // stop to attack player
+            return;
+        }
         if(axis) {
             dx = dir * speed * delta; //if it's true (x-axis) move along x
         } else {

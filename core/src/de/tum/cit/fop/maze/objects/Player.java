@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
+import de.tum.cit.fop.maze.GameMap;
 import de.tum.cit.fop.maze.PlayerStats;
 import de.tum.cit.fop.maze.objects.enemies.*;
 
@@ -36,12 +37,22 @@ public class Player extends GameObj {
         current = right;
     }
 
-    public void move(float dx, float dy) {
+    public void move(float dx, float dy, GameMap map) {
         float currentSpeed = playerStats.getBaseSpeed() * speedMult;
-
-        x += dx * currentSpeed;
-        y += dy * currentSpeed;
-
+        if(dx != 0) {
+            float newX = x + dx * currentSpeed;
+            Rectangle tempBoundsX = new Rectangle(newX, y, w, h);
+            if(!map.collidesWithWall(tempBoundsX)) {
+                x = newX;
+            }
+        }
+        if(dy != 0) {
+            float newY = y + dy * currentSpeed;
+            Rectangle tempBoundsY = new Rectangle(x, newY, w, h);
+            if(!map.collidesWithWall(tempBoundsY)) {
+                y = newY;
+            }
+        }
         if(dx != 0 || dy != 0) {
             float len = (float) Math.sqrt(dx * dx + dy * dy);
             lookX = dx / len;

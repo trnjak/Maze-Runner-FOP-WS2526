@@ -22,7 +22,6 @@ import java.util.*;
 
 public class GameScreen implements Screen {
     private final MazeRunnerGame game;
-    // two cameras and viewports because hud stays fixed and player moves
     private final OrthographicCamera camera, hudCam;
     private final Viewport viewport, hudVp;
     private final GameMap map;
@@ -36,16 +35,15 @@ public class GameScreen implements Screen {
 
     private final ShapeRenderer sr = new ShapeRenderer();
 
-    private Stage pauseStage, gameOverStage, victoryStage, consoleStage;
+    private Stage pauseStage, gameOverStage, victoryStage, consoleStage, hudStage;
     private Table pauseTable, gameOverTable, victoryTable, consoleTable;
     private Image pauseBg, gameOverBg, victoryBg, consoleBg;
-    private Label gameOverScore, victoryScore, consoleOutputLabel;
+    private Label gameOverScore, victoryScore, consoleOutputLabel, scoreLabel, timeLabel;
     private TextField consoleTextField;
     private ScrollPane consoleScrollPane;
 
     private static final Texture TILE_SHEET = new Texture("hud_tilemap.png");
     public static final TextureRegion[][] TEXTURE_REGION = TextureRegion.split(TILE_SHEET, TILE_SHEET.getWidth() / 16, TILE_SHEET.getHeight() / 10);
-    private static final TextureRegion ARROW_TEXTURE = TEXTURE_REGION[6][3];
 
     private boolean consoleOpen = false;
     private String consoleOutput = "";
@@ -70,6 +68,7 @@ public class GameScreen implements Screen {
         initGameOverMenu();
         initVictoryMenu();
         initDeveloperConsole();
+        initHud();
     }
 
     public GameScreen(MazeRunnerGame game) {
@@ -95,6 +94,7 @@ public class GameScreen implements Screen {
         initGameOverMenu();
         initVictoryMenu();
         initDeveloperConsole();
+        initHud();
     }
 
     @Override
@@ -202,19 +202,31 @@ public class GameScreen implements Screen {
             }
             maxHearts = currentLives;
         }
+        if(player.getKeys() < 1) {
+            game.getSpriteBatch().draw(TEXTURE_REGION[7][4], hudVp.getWorldWidth()-GameObj.TILE-20, hudVp.getWorldHeight() - 40, GameObj.TILE, GameObj.TILE);
+        }
+        else {
+            game.getSpriteBatch().draw(TEXTURE_REGION[5][10], hudVp.getWorldWidth()-GameObj.TILE-20, hudVp.getWorldHeight() - 40, GameObj.TILE, GameObj.TILE);
+        }
         Exit exit = map.getExit();
         if(exit != null) {
             float arrowRotation = computeArrow(player.getX(), player.getY(), exit.getX() * GameObj.TILE, exit.getY() * GameObj.TILE);
             if(arrowRotation >= 0) {
                 float arrowX = 20, arrowY = game.HEIGHT - 80;
                 float originX = (float) GameObj.TILE / 2, originY = (float) GameObj.TILE / 2;
-                game.getSpriteBatch().draw(ARROW_TEXTURE, arrowX, arrowY, originX, originY, GameObj.TILE, GameObj.TILE, 1, 1, arrowRotation);
+                game.getSpriteBatch().draw(TEXTURE_REGION[6][3], arrowX, arrowY, originX, originY, GameObj.TILE, GameObj.TILE, 1, 1, arrowRotation);
             }
         }
-        game.getSkin().getFont("font").draw(game.getSpriteBatch(), "Key: " + (player.getKeys() > 0 ? "DONE" : "NONE"), hudVp.getWorldWidth()-200, hudVp.getWorldHeight()-10);
-        game.getSkin().getFont("font").draw(game.getSpriteBatch(), "Score: " + (int) score, hudVp.getWorldWidth()-650, hudVp.getWorldHeight()-10);
-        game.getSkin().getFont("font").draw(game.getSpriteBatch(), "Time: " + (int) time, hudVp.getWorldWidth()-650, hudVp.getWorldHeight()-50);
         game.getSpriteBatch().end();
+
+        scoreLabel.setText((int) score + "");
+        timeLabel.setText((int) time + "");
+
+        scoreLabel.setPosition(hudVp.getWorldWidth() / 2 - scoreLabel.getPrefWidth() / 2, hudVp.getWorldHeight() - 100);
+        timeLabel.setPosition(hudVp.getWorldWidth() / 2 - timeLabel.getPrefWidth() / 2, hudVp.getWorldHeight() - 120);
+
+        hudStage.act(delta);
+        hudStage.draw();
 
         if(consoleOpen) {
             consoleStage.getViewport().apply();
@@ -250,6 +262,21 @@ public class GameScreen implements Screen {
             victoryBg.setVisible(false);
             victoryTable.setVisible(false);
         }
+    }
+
+    private void initHud() {
+        hudStage = new Stage(hudVp, game.getSpriteBatch());
+
+        scoreLabel = new Label((int) score + "", game.getSkin(), "title");
+        timeLabel = new Label((int) time + "", game.getSkin());
+
+        scoreLabel.setFontScale(0.5f);
+
+        scoreLabel.setPosition(hudVp.getWorldWidth() / 2 - scoreLabel.getPrefWidth() / 2, hudVp.getWorldHeight() - 100);
+        timeLabel.setPosition(hudVp.getWorldWidth() / 2 - timeLabel.getPrefWidth() / 2, hudVp.getWorldHeight() - 120);
+
+        hudStage.addActor(scoreLabel);
+        hudStage.addActor(timeLabel);
     }
 
     private void initMenu(Table t, Image bg) {
@@ -477,7 +504,7 @@ public class GameScreen implements Screen {
                 default:
                     appendConsoleOutput("\nUnknown command: " + cmd + ". Type 'help' for available commands.");
             }
-        } catch (Exception e) {
+        } catch(Exception e) {
             appendConsoleOutput("\nError executing command: " + e.getMessage());
         }
     }
@@ -518,13 +545,13 @@ public class GameScreen implements Screen {
                 consoleVariables.put(varName, intValue);
                 applyVariableChange(varName, intValue);
                 appendConsoleOutput("\nSet " + varName + " = " + intValue);
-            } catch (NumberFormatException e) {
+            } catch(NumberFormatException e) {
                 try {
                     float floatValue = Float.parseFloat(valueStr);
                     consoleVariables.put(varName, floatValue);
                     applyVariableChange(varName, floatValue);
                     appendConsoleOutput("\nSet " + varName + " = " + floatValue);
-                } catch (NumberFormatException e2) {
+                } catch(NumberFormatException e2) {
                     if(valueStr.equalsIgnoreCase("true") || valueStr.equalsIgnoreCase("false")) {
                         boolean boolValue = Boolean.parseBoolean(valueStr);
                         consoleVariables.put(varName, boolValue);
@@ -536,7 +563,7 @@ public class GameScreen implements Screen {
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch(Exception e) {
             appendConsoleOutput("\nError setting variable: " + e.getMessage());
         }
     }
@@ -637,13 +664,13 @@ public class GameScreen implements Screen {
 
             Rectangle testRect = new Rectangle(x, y, GameObj.TILE, GameObj.TILE);
             if(!map.collidesWithWall(testRect)) {
-                player.move(x - player.getX(), y - player.getY());
+                player.move(x - player.getX(), y - player.getY(), map);
                 centerCameraOnPlayer();
                 appendConsoleOutput("\nTeleported player to (" + parts[1] + ", " + parts[2] + ")");
             } else {
                 appendConsoleOutput("\nCannot teleport to wall at (" + parts[1] + ", " + parts[2] + ")");
             }
-        } catch (NumberFormatException e) {
+        } catch(NumberFormatException e) {
             appendConsoleOutput("\nInvalid coordinates");
         }
     }
@@ -750,7 +777,9 @@ public class GameScreen implements Screen {
 
         // collision
         Rectangle next = new Rectangle(player.getX() + dx, player.getY() + dy, GameObj.TILE, GameObj.TILE);
-        if(!map.collidesWithWall(next) && !enemyOverlap(next)) player.move(dx, dy);
+        if(!enemyOverlap(next)) {
+            player.move(dx, dy, map);
+        }
     }
 
     private boolean enemyOverlap(Rectangle rect) {
@@ -779,6 +808,9 @@ public class GameScreen implements Screen {
     public void resize(int width, int height) {
         viewport.update(width, height);
         hudVp.update(width, height, true);
+        if(hudStage != null) {
+            hudStage.getViewport().update(width, height, true);
+        }
     }
 
     @Override
@@ -802,5 +834,8 @@ public class GameScreen implements Screen {
         gameOverStage.dispose();
         victoryStage.dispose();
         consoleStage.dispose();
+        if(hudStage != null) {
+            hudStage.dispose();
+        }
     }
 }

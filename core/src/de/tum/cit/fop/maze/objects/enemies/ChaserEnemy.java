@@ -14,6 +14,11 @@ public class ChaserEnemy extends Enemy {
 
     @Override
     protected void move(float delta, Player player, GameMap map) {
+        if(inRange(player)) { // stop to attack player
+            dx = 0;
+            dy = 0;
+            return;
+        }
         //TODO: implement chasing player with a*
         if(inChaseRange(player)) {
             Vector2 dir = new Vector2(player.getX() - x, player.getY() - y); //move towards player
@@ -66,6 +71,6 @@ public class ChaserEnemy extends Enemy {
     }
 
     private boolean inChaseRange(Player player) {
-        return distance(player) <= 200; //chase range 200 pixels
+        return distance(player) <= 128; //chase range 128 pixels
     }
 }

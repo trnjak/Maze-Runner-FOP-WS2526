@@ -36,7 +36,7 @@ public class MenuScreen implements Screen {
         Label title = new Label("AWESOME GAME", game.getSkin(), "title");
         table.add(title).padBottom(80).row();
 
-        String[] menuItems = {"Start", "Endless", "Stats", "Leaderboard", "Settings", "Exit"};
+        String[] menuItems = {"Start", "Endless", "Upgrades", "Leaderboard", "Settings", "Exit"};
 
         for(String item : menuItems) {
             TextButton button = new TextButton(item, game.getSkin());
@@ -48,7 +48,7 @@ public class MenuScreen implements Screen {
                     switch(item) {
                         case "Start" -> game.goToGame();
                         case "Endless" -> game.goToEndlessGame();
-                        case "Stats" -> game.goToUpgrades();
+                        case "Upgrades" -> game.goToUpgrades();
                         case "Leaderboard" -> game.goToLeaderboard();
                         case "Settings" -> game.goToSettings();
                         case "Exit" -> Gdx.app.exit();
