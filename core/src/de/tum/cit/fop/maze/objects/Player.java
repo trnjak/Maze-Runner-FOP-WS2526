@@ -176,6 +176,10 @@ public class Player extends GameObj {
         return keys;
     }
 
+    public void setKeys(int keys) {
+        this.keys = keys;
+    }
+
     public float getCurrentSpeed() {
         return playerStats.getBaseSpeed() * speedMult;
     }

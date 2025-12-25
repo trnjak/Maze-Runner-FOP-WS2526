@@ -11,6 +11,8 @@ import games.spooky.gdx.nativefilechooser.NativeFileChooser;
 import games.spooky.gdx.nativefilechooser.NativeFileChooserCallback;
 import games.spooky.gdx.nativefilechooser.NativeFileChooserConfiguration;
 
+import java.io.IOException;
+
 /**
  * The MazeRunnerGame class represents the core of the Maze Runner game.
  * It manages the screens and global resources like SpriteBatch and Skin.
@@ -89,12 +91,20 @@ public class MazeRunnerGame extends Game {
     public void goToUpgrades() {
         setScreen(new UpgradeScreen(this));
         if(gameScreen != null) {
-            gameScreen.dispose();
-            gameScreen = null;
+            gameScreen.pause();
         }
         if(menuScreen != null) {
             menuScreen.dispose();
             menuScreen = null;
+        }
+    }
+
+    public void backToGameOrMenuDependingOnWhetherOrNotThePlayerEnteredTheScreenFromTheGameOrFromTheMenu() {
+        if(gameScreen != null) {
+            setScreen(gameScreen);
+        }
+        else {
+            goToMenu();
         }
     }
 
@@ -103,9 +113,9 @@ public class MazeRunnerGame extends Game {
      * Switches to the settings screen.
      */
     public void goToSettings() {
-        this.setScreen(new SettingsScreen(this)); // Set the current screen to MenuScreen
+        this.setScreen(new SettingsScreen(this));
         if (gameScreen != null) {
-            gameScreen.dispose(); // Dispose the game screen if it exists
+            gameScreen.dispose();
             gameScreen = null;
         }
     }
@@ -120,9 +130,13 @@ public class MazeRunnerGame extends Game {
         fileChooser.chooseFile(nfconf, new NativeFileChooserCallback() {
             @Override
             public void onFileChosen(FileHandle file) {
-                MazeRunnerGame.this.setScreen(new GameScreen(MazeRunnerGame.this, file.path())); // Set the current screen to GameScreen
+                try {
+                    MazeRunnerGame.this.setScreen(new GameScreen(MazeRunnerGame.this, file.path()));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 if (menuScreen != null) {
-                    menuScreen.dispose(); // Dispose the menu screen if it exists
+                    menuScreen.dispose();
                     menuScreen = null;
                 }
             }
@@ -137,7 +151,8 @@ public class MazeRunnerGame extends Game {
     }
 
     public void goToEndlessGame() {
-        this.setScreen(new GameScreen(this)); // Set the current screen to GameScreen
+        gameScreen = new GameScreen(this);
+        this.setScreen(gameScreen); // Set the current screen to GameScreen
         if (menuScreen != null) {
             menuScreen.dispose(); // Dispose the menu screen if it exists
             menuScreen = null;

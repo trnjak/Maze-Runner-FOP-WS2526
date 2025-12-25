@@ -75,6 +75,22 @@ public abstract class Enemy extends GameObj {
         }
     }
 
+    public float getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(float speed) {
+        this.speed = speed;
+    }
+
+    public int getHp() {
+        return hp;
+    }
+
+    public void setHp(int hp) {
+        this.hp = hp;
+    }
+
     public boolean isAlive() {
         return alive;
     }

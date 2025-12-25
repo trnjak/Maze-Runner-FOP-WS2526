@@ -37,7 +37,6 @@ public class GameScreen implements Screen {
 
     private Stage pauseStage, gameOverStage, victoryStage, consoleStage, hudStage;
     private Table pauseTable, gameOverTable, victoryTable, consoleTable;
-    private Image pauseBg, gameOverBg, victoryBg, consoleBg;
     private Label gameOverScore, victoryScore, consoleOutputLabel, scoreLabel, timeLabel;
     private TextField consoleTextField;
     private ScrollPane consoleScrollPane;
@@ -49,7 +48,7 @@ public class GameScreen implements Screen {
     private String consoleOutput = "";
     private final Map<String, Object> consoleVariables = new HashMap<>();
 
-    public GameScreen(MazeRunnerGame game, String path) {
+    public GameScreen(MazeRunnerGame game, String path) throws IOException {
         this.game = game;
 
         camera = new OrthographicCamera();
@@ -230,36 +229,28 @@ public class GameScreen implements Screen {
 
         if(consoleOpen) {
             consoleStage.getViewport().apply();
-            consoleBg.setVisible(true);
             consoleTable.setVisible(true);
             consoleStage.act(delta);
             consoleStage.draw();
         } else if(paused && !gameOver && !victory) {
             pauseStage.getViewport().apply();
-            pauseBg.setVisible(true);
             pauseTable.setVisible(true);
             pauseStage.act(delta);
             pauseStage.draw();
         } else if(gameOver) {
             gameOverStage.getViewport().apply();
-            gameOverBg.setVisible(true);
             gameOverTable.setVisible(true);
             gameOverStage.act(delta);
             gameOverStage.draw();
         } else if(victory) {
             victoryStage.getViewport().apply();
-            victoryBg.setVisible(true);
             victoryTable.setVisible(true);
             victoryStage.act(delta);
             victoryStage.draw();
         } else {
-            consoleBg.setVisible(false);
             consoleTable.setVisible(false);
-            pauseBg.setVisible(false);
             pauseTable.setVisible(false);
-            gameOverBg.setVisible(false);
             gameOverTable.setVisible(false);
-            victoryBg.setVisible(false);
             victoryTable.setVisible(false);
         }
     }
@@ -279,20 +270,11 @@ public class GameScreen implements Screen {
         hudStage.addActor(timeLabel);
     }
 
-    private void initMenu(Table t, Image bg) {
-        bg.setColor(0, 0, 0, 0.7f);
-        bg.setFillParent(true);
-        bg.setVisible(false);
-
-        t.setFillParent(true);
-        t.setVisible(false);
-    }
-
     private void initPauseMenu() {
         pauseStage = new Stage(hudVp, game.getSpriteBatch());
-        pauseBg = new Image(new Texture(Gdx.files.internal("white.png")));
         pauseTable = new Table();
-        initMenu(pauseTable, pauseBg);
+        pauseTable.setFillParent(true);
+        pauseTable.setVisible(false);
 
         Label title = new Label("PAUSED", game.getSkin(), "title");
         pauseTable.add(title).padBottom(80).row();
@@ -310,11 +292,10 @@ public class GameScreen implements Screen {
             });
         }
 
-        pauseStage.addActor(pauseBg);
         pauseStage.addActor(pauseTable);
     }
 
-    private void initMenuStep2(String title, Stage s, Image bg, Table t, Label sc) {
+    private void initMenuStep2(String title, Stage s, Table t, Label sc) {
         Label la = new Label(title, game.getSkin(), "title");
         t.add(la).padBottom(80).row();
 
@@ -326,50 +307,72 @@ public class GameScreen implements Screen {
         menuButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                game.setScreen(new MenuScreen(game));
+                game.goToMenu();
             }
         });
 
-        if(map.isEndless()) {
-            TextButton newMapButton = new TextButton("Next Endless", game.getSkin());
-            t.add(newMapButton).width(320).padBottom(20).row();
-
-            newMapButton.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    game.setScreen(new GameScreen(game));
-                }
-            });
-        }
-
-        s.addActor(bg);
         s.addActor(t);
     }
 
     private void initGameOverMenu() {
         gameOverStage = new Stage(hudVp, game.getSpriteBatch());
-        gameOverBg = new Image(new Texture(Gdx.files.internal("white.png")));
         gameOverTable = new Table();
-        initMenu(gameOverTable, gameOverBg);
+        gameOverTable.setFillParent(true);
+        gameOverTable.setVisible(false);
+
         gameOverScore = new Label("", game.getSkin());
-        initMenuStep2("YOU DIED!", gameOverStage, gameOverBg, gameOverTable, gameOverScore);
+        initMenuStep2("YOU DIED!", gameOverStage, gameOverTable, gameOverScore);
     }
 
     private void initVictoryMenu() {
         victoryStage = new Stage(hudVp, game.getSpriteBatch());
-        victoryBg = new Image(new Texture(Gdx.files.internal("white.png")));
         victoryTable = new Table();
-        initMenu(victoryTable, victoryBg);
+        victoryTable.setFillParent(true);
+        victoryTable.setVisible(false);
+
         victoryScore = new Label("", game.getSkin());
-        initMenuStep2("YOU WON!", victoryStage, victoryBg, victoryTable, victoryScore);
+        initMenuStep2("YOU WON!", victoryStage, victoryTable, victoryScore);
+        TextButton newMapButton = new TextButton("Next Endless", game.getSkin());
+        victoryTable.add(newMapButton).width(320).padBottom(20).row();
+
+        newMapButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                try {
+                    map.generateMap();
+                    player.setX(map.getEx() * GameObj.TILE);
+                    player.setY(map.getEy() * GameObj.TILE);
+                    player.setKeys(0);
+
+                    victory = false;
+                    paused = false;
+                    time = 300;
+
+                    maxHearts = player.getMaxHealth();
+                    scoreLabel.setText((int) score + "");
+                    timeLabel.setText((int) time + "");
+
+                    centerCameraOnPlayer();
+                    Gdx.input.setInputProcessor(null);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        TextButton upgradesButton = new TextButton("Upgrades", game.getSkin());
+        victoryTable.add(upgradesButton).width(320).padBottom(20).row();
+
+        upgradesButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                game.goToUpgrades();
+            }
+        });
     }
 
     private void initDeveloperConsole() {
         consoleStage = new Stage(hudVp, game.getSpriteBatch());
-        consoleBg = new Image(new Texture(Gdx.files.internal("white.png")));
-        consoleBg.setColor(0, 0, 0, 0.7f);
-        consoleBg.setFillParent(true);
-        consoleBg.setVisible(false);
 
         consoleTable = new Table();
         consoleTable.setFillParent(true);
@@ -398,7 +401,6 @@ public class GameScreen implements Screen {
 
         consoleTable.add(consoleTextField).width(800).padTop(10);
 
-        consoleStage.addActor(consoleBg);
         consoleStage.addActor(consoleTable);
 
         initializeConsoleVariables();

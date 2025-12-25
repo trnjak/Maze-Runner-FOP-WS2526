@@ -88,11 +88,11 @@ public class UpgradeScreen implements Screen {
         });
         table.add(attackButton).pad(10).row();
 
-        TextButton backButton = new TextButton("Back to Game", game.getSkin());
+        TextButton backButton = new TextButton("Back", game.getSkin());
         backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.goToMenu();
+                game.backToGameOrMenuDependingOnWhetherOrNotThePlayerEnteredTheScreenFromTheGameOrFromTheMenu();
             }
         });
         table.add(backButton).padTop(50).colspan(2).row();
