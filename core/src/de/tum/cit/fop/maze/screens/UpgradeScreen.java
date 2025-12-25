@@ -60,7 +60,7 @@ public class UpgradeScreen implements Screen {
         });
         table.add(healthButton).pad(10).row();
 
-        speedLabel = new Label("Speed Lvl: " + playerStats.getSpeedLvl() + " (Speed: " + String.format("%.1f", playerStats.getBaseSpeed()) + ")", game.getSkin());
+        speedLabel = new Label("Speed Lvl: " + playerStats.getSpeedLvl() + " (Speed: " + String.format("%.2f", playerStats.getBaseSpeed()) + ")", game.getSkin());
         table.add(speedLabel).pad(10);
 
         TextButton speedButton = new TextButton("Upgrade (" + (playerStats.getSpeedLvl() * 2) + " EXP)", game.getSkin());
@@ -101,7 +101,7 @@ public class UpgradeScreen implements Screen {
     private void updateLabels() {
         expLabel.setText("EXP: " + playerStats.getExp());
         healthLabel.setText("Health Lvl: " + playerStats.getHpLvl() + " (Max HP: " + playerStats.getMaxHp() + ")");
-        speedLabel.setText("Speed Lvl: " + playerStats.getSpeedLvl() + " (Speed: " + String.format("%.1f", playerStats.getBaseSpeed()) + ")");
+        speedLabel.setText("Speed Lvl: " + playerStats.getSpeedLvl() + " (Speed: " + String.format("%.2f", playerStats.getBaseSpeed()) + ")");
         attackLabel.setText("Attack Lvl: " + playerStats.getAtkLvl() + " (Cooldown: " + String.format("%.2f", playerStats.getAttackCooldown()) + "s)");
     }
 
