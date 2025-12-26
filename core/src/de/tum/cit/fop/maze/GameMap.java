@@ -11,6 +11,7 @@ import de.tum.cit.fop.maze.objects.*;
 import de.tum.cit.fop.maze.objects.enemies.*;
 import de.tum.cit.fop.maze.objects.powerups.*;
 import de.tum.cit.fop.maze.objects.traps.*;
+import de.tum.cit.fop.maze.screens.BeginScreen;
 
 import java.io.*;
 import java.util.*;
@@ -33,7 +34,17 @@ public class GameMap {
 
     private boolean isEndless = false;
 
+    private final PlayerStats playerStats = BeginScreen.STATS;
+
     public void load(String path) {
+        tiles.clear();
+        traps.clear();
+        keys.clear();
+        enemies.clear();
+        powerups.clear();
+        exit = null;
+        //clear just in case they have something (important for endless)
+
         Properties p = new Properties();
         try(BufferedReader r = new BufferedReader(Gdx.files.internal(path).reader())) {
             p.load(r);
@@ -148,7 +159,8 @@ public class GameMap {
 
     //TODO: implement smarter generation
     public void generateMap() throws IOException {
-        int n = 20, key = 0, trap = 0, enemy = 0, power = 0;
+        int level = playerStats.getLevel();
+        int n = Math.min((25 * level / 2), 20), key = 0, trap = 0, enemy = 0, power = 0;
         isEndless = true;
 
         FileHandle file = Gdx.files.local("maps/endless.properties");

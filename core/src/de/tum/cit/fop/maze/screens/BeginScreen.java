@@ -52,7 +52,7 @@ public class BeginScreen implements Screen {
         cancel.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent changeEvent, Actor actor) {
-                dispose();
+                Gdx.app.exit();
             }
         });
 

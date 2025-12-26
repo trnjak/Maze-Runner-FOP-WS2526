@@ -1,5 +1,7 @@
 package de.tum.cit.fop.maze.objects;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -22,6 +24,10 @@ public class Player extends GameObj {
 
     private final TextureRegion right, left;
     private TextureRegion current;
+
+    private final Sound atkMiss = Gdx.audio.newSound(Gdx.files.internal("sounds/attack_miss.ogg")),
+    atkHit = Gdx.audio.newSound(Gdx.files.internal("sounds/attack_hit.ogg")),
+    takeDmg = Gdx.audio.newSound(Gdx.files.internal("sounds/take_dmg.ogg"));
 
     public Player(float x, float y) {
         super(x, y, 7, 0);
@@ -87,6 +93,7 @@ public class Player extends GameObj {
 
     public void loseLife(int n) {
         hp -= n;
+        takeDmg.play(0.2f);
         setTint(Color.PINK);
     }
 
@@ -120,6 +127,7 @@ public class Player extends GameObj {
             float vy = ey - cy;
             float d = (float) Math.sqrt(vx * vx + vy * vy);
             if(d > range) {
+                atkMiss.play(0.2f);
                 continue;
             }
 
@@ -128,6 +136,7 @@ public class Player extends GameObj {
             float dot = nx * lookX + ny * lookY;
 
             if(d == 0f || dot >= cosHalfAngle) {
+                atkHit.play(0.2f);
                 enemy.takeDamage(1);
                 hit = true;
             }

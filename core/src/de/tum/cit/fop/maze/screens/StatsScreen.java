@@ -46,9 +46,6 @@ public class StatsScreen implements Screen {
         Label title = new Label("UPGRADES", game.getSkin(), "title");
         table.add(title).padBottom(80).colspan(2).row();
 
-        Label scoreLabel = new Label("Score: " + playerStats.getScore(), game.getSkin());
-        table.add(scoreLabel).padBottom(20).colspan(2).row();
-
         expLabel = new Label("EXP: " + playerStats.getExp(), game.getSkin());
         table.add(expLabel).padBottom(20).colspan(2).row();
 

@@ -74,7 +74,7 @@ public class MazeRunnerGame extends Game {
      * Switches to the leaderboard screen.
      */
     public void goToLeaderboard() {
-        //TODO: implement leaderboards
+        setScreen(new LeaderboardScreen(this));
         if(gameScreen != null) {
             gameScreen.dispose();
             gameScreen = null;

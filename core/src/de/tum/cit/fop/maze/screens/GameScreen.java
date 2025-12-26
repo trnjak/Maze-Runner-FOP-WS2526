@@ -1,6 +1,7 @@
 package de.tum.cit.fop.maze.screens;
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -48,6 +49,11 @@ public class GameScreen implements Screen {
     private boolean consoleOpen = false;
     private String consoleOutput = "";
     private final Map<String, Object> consoleVariables = new HashMap<>();
+
+    private final Sound scored = Gdx.audio.newSound(Gdx.files.internal("sounds/scored.ogg")),
+            won = Gdx.audio.newSound(Gdx.files.internal("sounds/win.ogg")),
+            lost = Gdx.audio.newSound(Gdx.files.internal("sounds/lose.ogg"));
+    private boolean wonPlayed = false, lostPlayed = false;
 
     public GameScreen(MazeRunnerGame game, String path) throws IOException {
         this.game = game;
@@ -135,7 +141,12 @@ public class GameScreen implements Screen {
                 Key key = it.next();
                 if(player.getBounds().overlaps(key.getBounds())) {
                     player.collectKey();
+                    if(player.getKeys() == 1) {
+                        Sound open = Gdx.audio.newSound(Gdx.files.internal("sounds/door_open.ogg"));
+                        open.play(0.2f);
+                    }
                     score += 100;
+                    scored.play(0.1f);
                     it.remove();
                 }
             }
@@ -146,6 +157,7 @@ public class GameScreen implements Screen {
                 if(player.getBounds().overlaps(p.getBounds())) {
                     p.update(player, delta);
                     score += 50;
+                    scored.play(0.1f);
                     it.remove();
                 }
             }
@@ -240,11 +252,19 @@ public class GameScreen implements Screen {
             pauseStage.act(delta);
             pauseStage.draw();
         } else if(gameOver) {
+            if(!lostPlayed) {
+                lost.play(0.2f);
+                lostPlayed = true;
+            }
             gameOverStage.getViewport().apply();
             gameOverTable.setVisible(true);
             gameOverStage.act(delta);
             gameOverStage.draw();
         } else if(victory) {
+            if(!wonPlayed) {
+                won.play(0.2f);
+                wonPlayed = true;
+            }
             victoryStage.getViewport().apply();
             victoryTable.setVisible(true);
             victoryStage.act(delta);
@@ -342,10 +362,14 @@ public class GameScreen implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 try {
+                    playerStats.incrementLvl();
                     map.generateMap();
                     player.setX(map.getEx() * GameObj.TILE);
                     player.setY(map.getEy() * GameObj.TILE);
                     player.setKeys(0);
+
+                    wonPlayed = false;
+                    lostPlayed = false;
 
                     victory = false;
                     paused = false;
@@ -506,13 +530,13 @@ public class GameScreen implements Screen {
                 case "heal":
                     handleHealCommand(parts);
                     break;
-                case "teleport":
+                case "teleport", "tp":
                     handleTeleportCommand(parts);
                     break;
-                case "list":
+                case "list", "ls":
                     handleListCommand();
                     break;
-                case "clear":
+                case "clear", "cls":
                     consoleOutput = "";
                     consoleOutputLabel.setText(consoleOutput);
                     break;
@@ -788,6 +812,7 @@ public class GameScreen implements Screen {
             for(Enemy e : map.getEnemies().stream().filter(e -> !e.isAlive()).toList()) {
                 if(!e.isAlive()) {
                     score += 100;
+                    scored.play(0.1f);
                     map.getEnemies().remove(e);
                 }
             }

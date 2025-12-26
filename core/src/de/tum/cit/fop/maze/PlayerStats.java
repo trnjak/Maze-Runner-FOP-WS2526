@@ -9,7 +9,7 @@ public class PlayerStats {
     private String name;
     private final String SAVE_FILE;
     private int exp = 0, score = 0;
-    private int hpLvl = 1, speedLvl = 1, atkLvl = 1;
+    private int hpLvl = 1, speedLvl = 1, atkLvl = 1, level = 1;
 
     private static final Json json = new Json();
 
@@ -29,6 +29,7 @@ public class PlayerStats {
 
                 Object nameObj = data.get("name");
                 Object scoreObj = data.get("score");
+                Object levelObj = data.get("level");
                 Object expObj = data.get("exp");
                 Object hpObj = data.get("hpLvl");
                 Object speedObj = data.get("speedLvl");
@@ -36,6 +37,7 @@ public class PlayerStats {
 
                 name = nameObj instanceof String ? (String)nameObj : "Player";
                 score = scoreObj instanceof Number ? ((Number)scoreObj).intValue() : 0;
+                level = scoreObj instanceof Number ? ((Number) levelObj).intValue() : 1;
                 exp = expObj instanceof Number ? ((Number)expObj).intValue() : 0;
                 hpLvl = hpObj instanceof Number ? ((Number)hpObj).intValue() : 1;
                 speedLvl = speedObj instanceof Number ? ((Number)speedObj).intValue() : 1;
@@ -51,6 +53,7 @@ public class PlayerStats {
             ObjectMap<String, Object> data = new ObjectMap<>();
             data.put("name", name);
             data.put("score", score);
+            data.put("level", level);
             data.put("exp", exp);
             data.put("hpLvl", hpLvl);
             data.put("speedLvl", speedLvl);
@@ -65,26 +68,42 @@ public class PlayerStats {
 
     public void addExp(int points) {
         exp += points;
+        save();
     }
 
     public void addScore(int points) {
         score += points;
+        save();
     }
 
     public boolean spendExp(int cost) {
         if(exp >= cost) {
             exp -= cost;
+            save();
             return true;
         }
         return false;
     }
 
-    public int getExp() {
-        return exp;
+    public void incrementLvl() {
+        level++;
+        save();
+    }
+
+    public String getName() {
+        return name;
     }
 
     public int getScore() {
         return score;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public int getExp() {
+        return exp;
     }
 
     public int getHpLvl() {
