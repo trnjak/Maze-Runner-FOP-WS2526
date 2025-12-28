@@ -32,6 +32,8 @@ public class MazeRunnerGame extends Game {
 
     private final NativeFileChooser fileChooser;
 
+    public Music menuMusic;
+
     /**
      * Constructor for MazeRunnerGame.
      *
@@ -52,9 +54,11 @@ public class MazeRunnerGame extends Game {
 
         // Play some background music
         // Background sound
-        Music backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("background.mp3"));
-        backgroundMusic.setLooping(true);
-        //backgroundMusic.play();
+        // music : https://opengameart.org/content/fantasy-good-night
+        menuMusic = Gdx.audio.newMusic(Gdx.files.internal("menu_bg.mp3"));
+        menuMusic.setLooping(true);
+        menuMusic.setVolume(0.2f);
+        menuMusic.play();
 
         setScreen(new BeginScreen(this));
     }
@@ -148,6 +152,7 @@ public class MazeRunnerGame extends Game {
                 System.err.println(e.getMessage());
             }
         });
+        menuMusic.stop();
     }
 
     public void goToEndlessGame() {
@@ -157,6 +162,7 @@ public class MazeRunnerGame extends Game {
             menuScreen.dispose(); // Dispose the menu screen if it exists
             menuScreen = null;
         }
+        menuMusic.stop();
     }
 
     /**

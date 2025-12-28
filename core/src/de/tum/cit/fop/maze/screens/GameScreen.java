@@ -1,6 +1,7 @@
 package de.tum.cit.fop.maze.screens;
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -43,6 +44,7 @@ public class GameScreen implements Screen {
     private TextField consoleTextField;
     private ScrollPane consoleScrollPane;
 
+    // sheet : https://kenney.nl/assets/micro-roguelike
     private static final Texture TILE_SHEET = new Texture("hud_tilemap.png");
     public static final TextureRegion[][] TEXTURE_REGION = TextureRegion.split(TILE_SHEET, TILE_SHEET.getWidth() / 16, TILE_SHEET.getHeight() / 10);
 
@@ -50,6 +52,9 @@ public class GameScreen implements Screen {
     private String consoleOutput = "";
     private final Map<String, Object> consoleVariables = new HashMap<>();
 
+    // music : https://opengameart.org/content/random-battle
+    private final Music gameMusic = Gdx.audio.newMusic(Gdx.files.internal("game_bg.mp3"));
+    // sound : https://kenney.nl/assets/category:Audio
     private final Sound scored = Gdx.audio.newSound(Gdx.files.internal("sounds/scored.ogg")),
             won = Gdx.audio.newSound(Gdx.files.internal("sounds/win.ogg")),
             lost = Gdx.audio.newSound(Gdx.files.internal("sounds/lose.ogg"));
@@ -70,6 +75,10 @@ public class GameScreen implements Screen {
         player = new Player(map.getEx() * GameObj.TILE, map.getEy() * GameObj.TILE);
         playerStats = BeginScreen.STATS;
         maxHearts = player.getMaxHealth();
+
+        gameMusic.setLooping(true);
+        gameMusic.setVolume(0.2f);
+        gameMusic.play();
 
         initPauseMenu();
         initGameOverMenu();
@@ -97,6 +106,10 @@ public class GameScreen implements Screen {
         player = new Player(map.getEx() * GameObj.TILE, map.getEy() * GameObj.TILE);
         playerStats = BeginScreen.STATS;
         maxHearts = player.getMaxHealth();
+
+        gameMusic.setLooping(true);
+        gameMusic.setVolume(0.2f);
+        gameMusic.play();
 
         initPauseMenu();
         initGameOverMenu();
@@ -254,6 +267,8 @@ public class GameScreen implements Screen {
         } else if(gameOver) {
             if(!lostPlayed) {
                 lost.play(0.2f);
+                gameMusic.stop();
+                game.menuMusic.play();
                 lostPlayed = true;
             }
             gameOverStage.getViewport().apply();
@@ -263,6 +278,8 @@ public class GameScreen implements Screen {
         } else if(victory) {
             if(!wonPlayed) {
                 won.play(0.2f);
+                gameMusic.stop();
+                game.menuMusic.play();
                 wonPlayed = true;
             }
             victoryStage.getViewport().apply();
@@ -317,6 +334,32 @@ public class GameScreen implements Screen {
         pauseStage.addActor(pauseTable);
     }
 
+    private void handlePauseMenuSelection(String item) {
+        switch(item) {
+            case "Continue":
+                paused = false;
+                Gdx.input.setInputProcessor(null);
+                game.menuMusic.stop();
+                gameMusic.play();
+                break;
+            case "New Map":
+                resetLevelScore();
+                game.menuMusic.stop();
+                game.goToGame();
+                break;
+            case "New Endless":
+                resetLevelScore();
+                game.menuMusic.stop();
+                game.goToEndlessGame();
+                break;
+            case "Main Menu":
+                gameMusic.stop();
+                game.goToMenu();
+                game.menuMusic.play();
+                break;
+        }
+    }
+
     private void initMenuStep2(String title, Stage s, Table t, Label sc) {
         Label la = new Label(title, game.getSkin(), "title");
         t.add(la).padBottom(80).row();
@@ -329,7 +372,9 @@ public class GameScreen implements Screen {
         menuButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                gameMusic.stop();
                 game.goToMenu();
+                game.menuMusic.play();
             }
         });
 
@@ -374,6 +419,9 @@ public class GameScreen implements Screen {
                     victory = false;
                     paused = false;
                     time = 300;
+
+                    game.menuMusic.stop();
+                    gameMusic.play();
 
                     resetLevelScore();
 
@@ -461,26 +509,6 @@ public class GameScreen implements Screen {
 
         consoleOutput = "Console. Type 'help' for list of commands.";
         consoleOutputLabel.setText(consoleOutput);
-    }
-
-    private void handlePauseMenuSelection(String item) {
-        switch(item) {
-            case "Continue":
-                paused = false;
-                Gdx.input.setInputProcessor(null);
-                break;
-            case "New Map":
-                resetLevelScore();
-                game.goToGame();
-                break;
-            case "New Endless":
-                resetLevelScore();
-                game.goToEndlessGame();
-                break;
-            case "Main Menu":
-                game.goToMenu();
-                break;
-        }
     }
 
     private void resetLevelScore() {
@@ -774,8 +802,12 @@ public class GameScreen implements Screen {
             paused = !paused;
             if(paused) {
                 Gdx.input.setInputProcessor(pauseStage);
+                gameMusic.stop();
+                game.menuMusic.play();
             } else {
                 Gdx.input.setInputProcessor(null);
+                game.menuMusic.stop();
+                gameMusic.play();
             }
         }
 
