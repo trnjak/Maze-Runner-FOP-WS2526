@@ -14,6 +14,9 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import de.tum.cit.fop.maze.*;
 
+/**
+ * The SettingsScreen class allows players to configure key bindings for game controls.
+ */
 public class SettingsScreen implements Screen {
 
     private final MazeRunnerGame game;
@@ -36,6 +39,11 @@ public class SettingsScreen implements Screen {
     private int i = 0;
     private boolean waiting = false;
 
+    /**
+     * Constructor for SettingsScreen.
+     *
+     * @param game The main game instance.
+     */
     public SettingsScreen(MazeRunnerGame game) {
         this.game = game;
         var camera = new OrthographicCamera();
@@ -44,9 +52,6 @@ public class SettingsScreen implements Screen {
         Table table = new Table();
         table.setFillParent(true);
         stage.addActor(table);
-
-        // Label title = new Label("SETTINGS", game.getSkin(), "title");
-        // table.add(title).padBottom(-80).row();
 
         buttons = new TextButton[items.length];
         for(int idx = 0; idx < items.length; idx++) {
@@ -74,17 +79,27 @@ public class SettingsScreen implements Screen {
         updateStatus();
     }
 
+    /**
+     * Generates the text displayed on each key binding button.
+     * @param idx The index of the control in the items array.
+     */
     private String getButtonText(int idx) {
         if(idx == items.length - 1) return items[idx];
         return items[idx] + ": " + Input.Keys.toString(getCurrentBind(idx));
     }
 
+    /**
+     * Updates all button texts.
+     */
     private void updateButtons() {
         for(int idx = 0; idx < items.length; idx++) {
             buttons[idx].setText(getButtonText(idx));
         }
     }
 
+    /**
+     * Updates the status label based on current interaction state.
+     */
     private void updateStatus() {
         if(waiting) {
             statusLabel.setText("Press a key (ESC to cancel)");
@@ -93,6 +108,9 @@ public class SettingsScreen implements Screen {
         }
     }
 
+    /**
+     * Handles keyboard input for navigation and key binding changes.
+     */
     private void handleInput() {
         if(!waiting) {
             if(Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
@@ -117,6 +135,11 @@ public class SettingsScreen implements Screen {
         }
     }
 
+    /**
+     * Applies a new key binding to the specified control.
+     * @param i The index of the control being modified.
+     * @param key The new key code to assign.
+     */
     private void applyBind(int i, int key) {
         switch(i) {
             case 0 -> binds.UP = key;
@@ -128,6 +151,10 @@ public class SettingsScreen implements Screen {
         }
     }
 
+    /**
+     * Retrieves the current key binding for a specified control.
+     * @param i The index of the control.
+     */
     private int getCurrentBind(int i) {
         return switch(i) {
             case 0 -> binds.UP;
@@ -140,6 +167,10 @@ public class SettingsScreen implements Screen {
         };
     }
 
+    /**
+     * Renders the settings screen by processing input and drawing the stage.
+     * @param delta The time in seconds since the last render.
+     */
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0.46f, 0.23f, 0.21f, 1);
@@ -149,11 +180,19 @@ public class SettingsScreen implements Screen {
         stage.draw();
     }
 
+    /**
+     * Handles screen resizing by updating the stage's viewport.
+     * @param width The new screen width.
+     * @param height The new screen height.
+     */
     @Override
     public void resize(int width, int height) {
         stage.getViewport().update(width, height, true);
     }
 
+    /**
+     * Shows the screen and sets the input processor.
+     */
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
@@ -171,6 +210,9 @@ public class SettingsScreen implements Screen {
     public void hide() {
     }
 
+    /**
+     * Disposes of all resources used by the settings screen.
+     */
     @Override
     public void dispose() {
         stage.dispose();

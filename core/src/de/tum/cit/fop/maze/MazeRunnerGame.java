@@ -20,14 +20,10 @@ import java.io.IOException;
 public class MazeRunnerGame extends Game {
     public float WIDTH = 1024, HEIGHT = 768;
 
-    // Screens
     private MenuScreen menuScreen;
     private GameScreen gameScreen;
 
-    // Sprite Batch for rendering
     private SpriteBatch spriteBatch;
-
-    // UI Skin
     private Skin skin;
 
     private final NativeFileChooser fileChooser;
@@ -45,16 +41,15 @@ public class MazeRunnerGame extends Game {
     }
 
     /**
-     * Called when the game is created. Initializes the SpriteBatch and Skin.
+     * Called when the game is created. Initializes the SpriteBatch, Skin and menu music.
+     *
+     * Music from: <a href="https://opengameart.org/content/fantasy-good-night">LINK</a>
      */
     @Override
     public void create() {
-        spriteBatch = new SpriteBatch(); // Create SpriteBatch
-        skin = new Skin(Gdx.files.internal("craft/craftacular-ui.json")); // Load UI skin
+        spriteBatch = new SpriteBatch();
+        skin = new Skin(Gdx.files.internal("craft/craftacular-ui.json"));
 
-        // Play some background music
-        // Background sound
-        // music : https://opengameart.org/content/fantasy-good-night
         menuMusic = Gdx.audio.newMusic(Gdx.files.internal("menu_bg.mp3"));
         menuMusic.setLooping(true);
         menuMusic.setVolume(0.2f);
@@ -67,9 +62,9 @@ public class MazeRunnerGame extends Game {
      * Switches to the menu screen.
      */
     public void goToMenu() {
-        this.setScreen(new MenuScreen(this)); // Set the current screen to MenuScreen
+        this.setScreen(new MenuScreen(this));
         if (gameScreen != null) {
-            gameScreen.dispose(); // Dispose the game screen if it exists
+            gameScreen.dispose();
             gameScreen = null;
         }
     }
@@ -103,6 +98,10 @@ public class MazeRunnerGame extends Game {
         }
     }
 
+    /**
+     * Switches back to the game or menu screen depending on whether the player entered the screen
+     * from the game or from the menu.
+     */
     public void backToGameOrMenuDependingOnWhetherOrNotThePlayerEnteredTheScreenFromTheGameOrFromTheMenu() {
         if(gameScreen != null) {
             setScreen(gameScreen);
@@ -125,7 +124,7 @@ public class MazeRunnerGame extends Game {
     }
 
     /**
-     * Switches to the game screen.
+     * Opens the native file picker to load the game map. Upon choosing, switches to the game screen.
      */
     public void goToGame() {
         NativeFileChooserConfiguration nfconf = new NativeFileChooserConfiguration();
@@ -155,11 +154,14 @@ public class MazeRunnerGame extends Game {
         menuMusic.stop();
     }
 
+    /**
+     * Switches to endless game screen.
+     */
     public void goToEndlessGame() {
         gameScreen = new GameScreen(this);
-        this.setScreen(gameScreen); // Set the current screen to GameScreen
+        this.setScreen(gameScreen);
         if (menuScreen != null) {
-            menuScreen.dispose(); // Dispose the menu screen if it exists
+            menuScreen.dispose();
             menuScreen = null;
         }
         menuMusic.stop();
@@ -170,13 +172,12 @@ public class MazeRunnerGame extends Game {
      */
     @Override
     public void dispose() {
-        getScreen().hide(); // Hide the current screen
-        getScreen().dispose(); // Dispose the current screen
-        spriteBatch.dispose(); // Dispose the spriteBatch
-        skin.dispose(); // Dispose the skin
+        getScreen().hide();
+        getScreen().dispose();
+        spriteBatch.dispose();
+        skin.dispose();
     }
 
-    // Getter methods
     public Skin getSkin() {
         return skin;
     }

@@ -12,16 +12,16 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import de.tum.cit.fop.maze.MazeRunnerGame;
 
 /**
- * MenuScreen implemented with Scene2D UI.
+ * The MenuScreen class provides the main menu interface for the game.
  */
 public class MenuScreen implements Screen {
 
     private final Stage stage;
 
     /**
-     * Constructor for MenuScreen. Sets up the camera, viewport, stage, and UI elements.
+     * Constructor for MenuScreen.
      *
-     * @param game The main game class, used to access global resources and methods.
+     * @param game The main game class.
      */
     public MenuScreen(MazeRunnerGame game) {
         var camera = new OrthographicCamera();
@@ -56,6 +56,10 @@ public class MenuScreen implements Screen {
         }
     }
 
+    /**
+     * Renders the menu screen by clearing the display and drawing the stage.
+     * @param delta The time in seconds since the last render.
+     */
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0.46f, 0.23f, 0.21f, 1);
@@ -65,24 +69,32 @@ public class MenuScreen implements Screen {
         stage.draw();
     }
 
+    /**
+     * Handles screen resizing by updating the stage's viewport.
+     * @param width The new screen width.
+     * @param height The new screen height.
+     */
     @Override
     public void resize(int width, int height) {
         stage.getViewport().update(width, height, true);
     }
 
+    /**
+     * Disposes of all resources used by the menu screen.
+     */
     @Override
     public void dispose() {
-        // Dispose of the stage when screen is disposed
         stage.dispose();
     }
 
+    /**
+     * Shows the screen and sets the input processor.
+     */
     @Override
     public void show() {
-        // Set the input processor so the stage can receive input events
         Gdx.input.setInputProcessor(stage);
     }
 
-    // The following methods are part of the Screen interface but are not used in this screen.
     @Override
     public void pause() {
     }

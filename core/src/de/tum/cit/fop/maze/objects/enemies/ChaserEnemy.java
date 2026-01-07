@@ -5,33 +5,49 @@ import com.badlogic.gdx.math.Vector2;
 import de.tum.cit.fop.maze.GameMap;
 import de.tum.cit.fop.maze.objects.Player;
 
+/**
+ * The ChaserEnemy class represents an enemy that chases the player when within range
+ * and wanders randomly when the player is out of range.
+ */
 public class ChaserEnemy extends Enemy {
-    private float dx = 0, dy = 0, cd = 0; //direction to x, y, and change of direction respectively
+    private float dx = 0, dy = 0, cd = 0;
 
+    /**
+     * Constructor for ChaserEnemy.
+     *
+     * @param x The X coordinate.
+     * @param y The Y coordinate.
+     */
     public ChaserEnemy(int x, int y) {
         super(x, y, 10, 1);
     }
 
+    /**
+     * Moves the enemy, chasing the player when within chase range or wandering randomly otherwise.
+     * TODO: IMPLEMENT SMARTER MOVEMENT
+     * @param delta The time in seconds since the last update.
+     * @param player The player object for chasing and collision detection.
+     * @param map The game map for wall collision detection.
+     */
     @Override
     protected void move(float delta, Player player, GameMap map) {
-        if(inRange(player)) { // stop to attack player
+        if(inRange(player)) {
             dx = 0;
             dy = 0;
             return;
         }
-        //TODO: implement chasing player with a*
+
         if(inChaseRange(player)) {
-            Vector2 dir = new Vector2(player.getX() - x, player.getY() - y); //move towards player
+            Vector2 dir = new Vector2(player.getX() - x, player.getY() - y);
             if(dir.len2() > 0) {
                 dir.nor();
                 dx = dir.x;
                 dy = dir.y;
             }
         } else {
-            // wander randomly if player is outside of range
             cd += delta;
             if(cd > 2) {
-                dx = (int) (Math.random() * 3) - 1; //0,1,2 w/0 the -1, -1,0,1 with, so it's left/stay/right
+                dx = (int) (Math.random() * 3) - 1;
                 dy = (int) (Math.random() * 3) - 1;
                 Vector2 dir = new Vector2(dx, dy);
                 if(dir.len2() > 0) {
@@ -43,23 +59,23 @@ public class ChaserEnemy extends Enemy {
             }
         }
 
-        float sx = dx * speed * delta; //step toward x
-        float sy = dy * speed * delta; //step toward y
+        float sx = dx * speed * delta;
+        float sy = dy * speed * delta;
         Rectangle pb = player.getBounds();
         Rectangle next = new Rectangle(x + sx, y + sy, w, h);
-        // move if no collision, otherwise attempt axis aligned movement
+
         if(!map.collidesWithWall(next) && !next.overlaps(pb)) {
             x += sx;
             y += sy;
         } else {
-            Rectangle tryX = new Rectangle(x + sx, y, w, h); //bounds for next x movement
-            Rectangle tryY = new Rectangle(x, y + sy, w, h); //same for y
+            Rectangle tryX = new Rectangle(x + sx, y, w, h);
+            Rectangle tryY = new Rectangle(x, y + sy, w, h);
 
             if(!map.collidesWithWall(tryX) && !tryX.overlaps(pb)) {
-                x += sx; //move along x if possible
+                x += sx;
             }
             if(!map.collidesWithWall(tryY) && !tryY.overlaps(pb)) {
-                y += sy; //move along y if possible
+                y += sy;
             }
         }
 
@@ -70,7 +86,11 @@ public class ChaserEnemy extends Enemy {
         }
     }
 
+    /**
+     * Checks if the player is within the enemy's chase range.
+     * @param player The player object to check distance against.
+     */
     private boolean inChaseRange(Player player) {
-        return distance(player) <= 128; //chase range 128 pixels
+        return distance(player) <= 128;
     }
 }

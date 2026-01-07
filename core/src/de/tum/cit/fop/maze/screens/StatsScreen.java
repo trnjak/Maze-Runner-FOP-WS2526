@@ -15,6 +15,9 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import de.tum.cit.fop.maze.MazeRunnerGame;
 import de.tum.cit.fop.maze.PlayerStats;
 
+/**
+ * The StatsScreen class displays the player's statistics and upgrade options.
+ */
 public class StatsScreen implements Screen {
     private final MazeRunnerGame game;
     private final Stage stage;
@@ -25,6 +28,11 @@ public class StatsScreen implements Screen {
     private Label speedLabel;
     private Label attackLabel;
 
+    /**
+     * Constructor for StatsScreen.
+     *
+     * @param game The main game instance.
+     */
     public StatsScreen(MazeRunnerGame game) {
         this.game = game;
         batch = new SpriteBatch();
@@ -38,6 +46,11 @@ public class StatsScreen implements Screen {
         createUI();
     }
 
+    /**
+     * Creates the user interface layout for the stats screen.
+     * Adds a title, experience display, upgradeable attributes with labels and buttons
+     * and a back button to return to the previous screen.
+     */
     private void createUI() {
         Table table = new Table();
         table.setFillParent(true);
@@ -64,7 +77,7 @@ public class StatsScreen implements Screen {
         });
         table.add(healthButton).pad(10).row();
 
-        speedLabel = new Label("Speed Lvl: " + playerStats.getSpeedLvl() + " (Speed: " + String.format("%.2f", playerStats.getBaseSpeed()) + ")", game.getSkin());
+        speedLabel = new Label("Speed Lvl: " + playerStats.getSpeedLvl() + " (Speed: " + String.format("%.2f", playerStats.getSpeed()) + ")", game.getSkin());
         table.add(speedLabel).pad(10);
 
         TextButton speedButton = new TextButton("Upgrade (" + (playerStats.getSpeedLvl() * 2) + " EXP)", game.getSkin());
@@ -105,10 +118,13 @@ public class StatsScreen implements Screen {
         table.add(backButton).padTop(50).colspan(2).row();
     }
 
+    /**
+     * Updates all displayed labels with the current player statistics.
+     */
     private void updateLabels() {
         expLabel.setText("EXP: " + playerStats.getExp());
         healthLabel.setText("Health Lvl: " + playerStats.getHpLvl() + " (Max HP: " + playerStats.getMaxHp() + ")");
-        speedLabel.setText("Speed Lvl: " + playerStats.getSpeedLvl() + " (Speed: " + String.format("%.2f", playerStats.getBaseSpeed()) + ")");
+        speedLabel.setText("Speed Lvl: " + playerStats.getSpeedLvl() + " (Speed: " + String.format("%.2f", playerStats.getSpeed()) + ")");
         attackLabel.setText("Attack Lvl: " + playerStats.getAtkLvl() + " (Cooldown: " + String.format("%.2f", playerStats.getAttackCooldown()) + "s)");
     }
 
@@ -116,6 +132,10 @@ public class StatsScreen implements Screen {
     public void show() {
     }
 
+    /**
+     * Renders the stats screen by clearing the display and drawing the stage.
+     * @param delta The time in seconds since the last render.
+     */
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0.46f, 0.23f, 0.21f, 1);
@@ -125,6 +145,11 @@ public class StatsScreen implements Screen {
         stage.draw();
     }
 
+    /**
+     * Handles screen resizing by updating the stage's viewport.
+     * @param width The new screen width.
+     * @param height The new screen height.
+     */
     @Override
     public void resize(int width, int height) {
         stage.getViewport().update(width, height, true);
@@ -142,6 +167,9 @@ public class StatsScreen implements Screen {
     public void hide() {
     }
 
+    /**
+     * Disposes of all resources used by the stats screen.
+     */
     @Override
     public void dispose() {
         stage.dispose();

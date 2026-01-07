@@ -5,6 +5,9 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Json;
 
+/**
+ * The KeyBindings class handles key binds, as well as saving/loading them from a file.
+ */
 public class KeyBindings {
     public int UP = Input.Keys.UP;
     public int DOWN = Input.Keys.DOWN;
@@ -15,12 +18,18 @@ public class KeyBindings {
 
     private static final String PATH = "keybinds.json";
 
+    /**
+     * Saves the binds to a json file.
+     */
     public void save() {
         Json json = new Json();
         FileHandle file = Gdx.files.local(PATH);
         file.writeString(json.prettyPrint(this), false);
     }
 
+    /**
+     * Loads the binds from a json file.
+     */
     public static KeyBindings load() {
         FileHandle file = Gdx.files.local(PATH);
         if(!file.exists()) {

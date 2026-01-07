@@ -4,13 +4,33 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import de.tum.cit.fop.maze.objects.*;
 
+/**
+ * The Powerup abstract class serves as the base class for all powerup objects in the game.
+ */
 public abstract class Powerup extends GameObj {
+    /**
+     * Constructor for Powerup.
+     *
+     * @param x The X coordinate.
+     * @param y The Y coordinate.
+     * @param tileY The row index in the texture tile sheet.
+     * @param tileX The column index in the texture tile sheet.
+     */
     public Powerup(float x, float y, int tileY, int tileX) {
         super(x, y, tileY, tileX);
     }
 
+    /**
+     * Abstract update method that defines the powerup's effect when collected by the player.
+     * @param player The player object to apply the powerup effect to.
+     * @param delta The time in seconds since the last update.
+     */
     public abstract void update(Player player, float delta);
 
+    /**
+     * Renders the powerup using the static object rendering method.
+     * @param batch The SpriteBatch used for rendering.
+     */
     @Override
     public void render(SpriteBatch batch) {
         renderStaticObj(batch);

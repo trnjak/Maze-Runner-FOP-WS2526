@@ -5,6 +5,10 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.ObjectMap;
 
+/**
+ * The PlayerStats class manages the saving and loading of player files.
+ * It also handles incrementing and purchasing stats and setting their price.
+ */
 public class PlayerStats {
     private String name;
     private final String SAVE_FILE;
@@ -13,12 +17,20 @@ public class PlayerStats {
 
     private static final Json json = new Json();
 
+    /**
+     * Constructor for PlayerStats.
+     *
+     * @param name The player's name, input in the starting screen.
+     */
     public PlayerStats(String name) {
         this.name = name;
         SAVE_FILE = "save_" + name + ".json";
         load();
     }
 
+    /**
+     * Handles file loading.
+     */
     @SuppressWarnings("unchecked")
     private void load() {
         try {
@@ -48,6 +60,9 @@ public class PlayerStats {
         }
     }
 
+    /**
+     * Handles file saving.
+     * */
     public void save() {
         try {
             ObjectMap<String, Object> data = new ObjectMap<>();
@@ -66,16 +81,28 @@ public class PlayerStats {
         }
     }
 
-    public void addExp(int points) {
-        exp += points;
+    /**
+     * Increases EXP.
+     * @param n the amount of EXP to be added
+     * */
+    public void addExp(int n) {
+        exp += n;
         save();
     }
 
-    public void addScore(int points) {
-        score += points;
+    /**
+     * Increases the score.
+     * @param n the amount to add to the score
+     * */
+    public void addScore(int n) {
+        score += n;
         save();
     }
 
+    /**
+     * Spends EXP. (Used for purchasing upgrades).
+     * @param cost the cost of the upgrade.
+     * */
     public boolean spendExp(int cost) {
         if(exp >= cost) {
             exp -= cost;
@@ -83,6 +110,56 @@ public class PlayerStats {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Upgrades the player's HP
+     * */
+    public boolean upgradeHp() {
+        int cost = hpLvl * 2;
+        if(spendExp(cost)) {
+            hpLvl++;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Upgrades the player's speed
+     * */
+    public boolean upgradeSpeed() {
+        int cost = speedLvl * 2;
+        if(spendExp(cost)) {
+            speedLvl++;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Upgrades the player's attack
+     * */
+    public boolean upgradeAtk() {
+        int cost = atkLvl * 2;
+        if(spendExp(cost)) {
+            atkLvl++;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Returns player's speed (1 + 2% of speedLvl)
+     * */
+    public float getSpeed() {
+        return 1f + (speedLvl - 1) * 0.02f;
+    }
+
+    /**
+     * Returns player's attack cooldown (0.01 is the smallest possible)
+     * */
+    public float getAttackCooldown() {
+        return Math.max(0.01f, 0.5f - (atkLvl - 1) * 0.005f);
     }
 
     public void incrementLvl() {
@@ -120,40 +197,5 @@ public class PlayerStats {
 
     public int getMaxHp() {
         return 4 + hpLvl;
-    }
-
-    public float getBaseSpeed() {
-        return 1f + (speedLvl - 1) * 0.02f;
-    }
-
-    public float getAttackCooldown() {
-        return Math.max(0.01f, 0.5f - (atkLvl - 1) * 0.02f);
-    }
-
-    public boolean upgradeHp() {
-        int cost = hpLvl * 2;
-        if(spendExp(cost)) {
-            hpLvl++;
-            return true;
-        }
-        return false;
-    }
-
-    public boolean upgradeSpeed() {
-        int cost = speedLvl * 2;
-        if(spendExp(cost)) {
-            speedLvl++;
-            return true;
-        }
-        return false;
-    }
-
-    public boolean upgradeAtk() {
-        int cost = atkLvl * 2;
-        if(spendExp(cost)) {
-            atkLvl++;
-            return true;
-        }
-        return false;
     }
 }

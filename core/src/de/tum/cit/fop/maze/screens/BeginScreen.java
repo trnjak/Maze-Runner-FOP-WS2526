@@ -13,12 +13,21 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import de.tum.cit.fop.maze.MazeRunnerGame;
 import de.tum.cit.fop.maze.PlayerStats;
 
+/**
+ * The BeginScreen class is the initial screen shown when the game starts,
+ * prompting the player to enter their name and initializing their player statistics.
+ */
 public class BeginScreen implements Screen {
     public static PlayerStats STATS;
 
     private final Stage stage;
     private final MazeRunnerGame game;
 
+    /**
+     * Constructor for BeginScreen.
+     *
+     * @param game The main game class, used to access global resources and methods.
+     */
     public BeginScreen(MazeRunnerGame game) {
         this.game = game;
         var camera = new OrthographicCamera();
@@ -31,6 +40,9 @@ public class BeginScreen implements Screen {
         showPlayerNameDialog();
     }
 
+    /**
+     * Displays a dialog box prompting the player to enter their name, with options to proceed or cancel.
+     */
     private void showPlayerNameDialog() {
         Dialog dialog = new Dialog("", game.getSkin());
         dialog.getTitleLabel().setAlignment(Align.center);
@@ -88,7 +100,10 @@ public class BeginScreen implements Screen {
         nameField.setCursorPosition(nameField.getText().length());
     }
 
-
+    /**
+     * Renders the begin screen by clearing the display and drawing the stage.
+     * @param delta The time in seconds since the last render.
+     */
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0.46f, 0.23f, 0.21f, 1);
@@ -98,16 +113,27 @@ public class BeginScreen implements Screen {
         stage.draw();
     }
 
+    /**
+     * Handles screen resizing by updating the stage's viewport.
+     * @param width The new screen width.
+     * @param height The new screen height.
+     */
     @Override
     public void resize(int width, int height) {
         stage.getViewport().update(width, height, true);
     }
 
+    /**
+     * Disposes of all resources used by the begin screen.
+     */
     @Override
     public void dispose() {
         stage.dispose();
     }
 
+    /**
+     * Shows the screen and sets the input processor.
+     */
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);

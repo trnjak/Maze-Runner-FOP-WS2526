@@ -8,12 +8,13 @@ import de.tum.cit.fop.maze.GameMap;
 import de.tum.cit.fop.maze.objects.GameObj;
 import de.tum.cit.fop.maze.objects.Player;
 
+/**
+ * The Enemy abstract class serves as the base class for all enemy types in the game.
+ * It provides common functionality for movement, attack patterns, health management, and rendering.
+ */
 public abstract class Enemy extends GameObj {
-    //speed in pixels per second
-    //attack timer times the attack to only attack in attackInterval time
-    //attack range in pixels
     protected float speed = 75, timer = 0, range = TILE * 1.1f;
-    protected final float interval = 1; //attack once per second
+    protected final float interval = 1;
     protected int hp = 3;
     protected boolean alive = true;
     protected float lookX, lookY;
@@ -21,6 +22,14 @@ public abstract class Enemy extends GameObj {
     protected final TextureRegion right, left;
     protected TextureRegion current;
 
+    /**
+     * Constructor for Enemy.
+     *
+     * @param x The X coordinate.
+     * @param y The Y coordinate.
+     * @param tileY The row index in the texture tile sheet.
+     * @param tileX The column index in the texture tile sheet.
+     */
     public Enemy(int x, int y, int tileY, int tileX) {
         super(x * TILE, y * TILE, tileY, tileX);
         this.w = TILE;
@@ -33,8 +42,20 @@ public abstract class Enemy extends GameObj {
         current = right;
     }
 
+    /**
+     * Abstract method that defines the enemy's movement behavior.
+     * @param delta The time in seconds since the last update.
+     * @param player The player object used for tracking or avoidance.
+     * @param map The game map used for collision detection and navigation.
+     */
     protected abstract void move(float delta, Player player, GameMap map);
 
+    /**
+     * Updates the enemy's state, including movement, attack timing, and orientation.
+     * @param delta The time in seconds since the last update.
+     * @param player The player object for range checking and attacks.
+     * @param map The game map for collision and movement calculations.
+     */
     public void update(float delta, Player player, GameMap map) {
         if(!alive) {
             return;
@@ -57,14 +78,26 @@ public abstract class Enemy extends GameObj {
         }
     }
 
+    /**
+     * Checks if the player is within the enemy's attack range.
+     * @param player The player object to check distance against.
+     */
     public boolean inRange(Player player) {
         return distance(player) <= range;
     }
 
+    /**
+     * Calculates the distance between the enemy and the player in pixels.
+     * @param player The player object to calculate distance to.
+     */
     protected float distance(Player player) {
-        return (float) Math.sqrt(Math.pow((player.getX() - x), 2) + Math.pow((player.getY() - y), 2)); //distance between two points
+        return (float) Math.sqrt(Math.pow((player.getX() - x), 2) + Math.pow((player.getY() - y), 2));
     }
 
+    /**
+     * Applies damage to the enemy.
+     * @param dmg The amount of damage to apply.
+     */
     public void takeDamage(int dmg) {
         if(!alive) {
             return;
@@ -95,6 +128,10 @@ public abstract class Enemy extends GameObj {
         return alive;
     }
 
+    /**
+     * Renders the enemy sprite with the current orientation.
+     * @param batch The SpriteBatch used for rendering.
+     */
     @Override
     public void render(SpriteBatch batch) {
         renderMovingObj(batch, current);

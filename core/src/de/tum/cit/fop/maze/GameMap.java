@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
-
 import de.tum.cit.fop.maze.objects.*;
 import de.tum.cit.fop.maze.objects.enemies.*;
 import de.tum.cit.fop.maze.objects.powerups.*;
@@ -16,8 +15,13 @@ import de.tum.cit.fop.maze.screens.BeginScreen;
 import java.io.*;
 import java.util.*;
 
+/**
+ * The GameMap class represents the game world containing tiles, traps, enemies, powerups, keys, and the exit.
+ * It handles map loading, rendering, collision detection, and procedural generation for endless mode.
+ *
+ * Map textures from: <a href="https://kenney.nl/assets/tiny-dungeon">LINK</a>
+ */
 public class GameMap {
-    // sheet : https://kenney.nl/assets/tiny-dungeon
     private static final Texture TILE_SHEET = new Texture("main_tilemap.png");
     public static final TextureRegion[][] TEXTURE_REGION = TextureRegion.split(TILE_SHEET, TILE_SHEET.getWidth()/12, TILE_SHEET.getHeight()/11);
 
@@ -37,6 +41,12 @@ public class GameMap {
 
     private final PlayerStats playerStats = BeginScreen.STATS;
 
+    /**
+     * Loads a map from a properties file at the specified path.
+     * Clears existing map data and parses tile values to populate the map with walls, entry point, exit,
+     * traps, enemies, keys, and powerups.
+     * @param path The path to the map properties file.
+     */
     public void load(String path) {
         tiles.clear();
         traps.clear();
@@ -44,7 +54,6 @@ public class GameMap {
         enemies.clear();
         powerups.clear();
         exit = null;
-        //clear just in case they have something (important for endless)
 
         Properties p = new Properties();
         try(BufferedReader r = new BufferedReader(Gdx.files.internal(path).reader())) {
@@ -75,12 +84,12 @@ public class GameMap {
                     ey = y;
                 }
                 case 2 -> exit = new Exit(x, y);
-                case 3 -> traps.add(Math.round(Math.random()) == 0 ? //random trap type
+                case 3 -> traps.add(Math.round(Math.random()) == 0 ?
                         new SludgeTrap(x, y, 0.33f) : new DamageTrap(x, y, 1f));
-                case 4 -> enemies.add(Math.round(Math.random()) == 0 ? //random enemy type
+                case 4 -> enemies.add(Math.round(Math.random()) == 0 ?
                         new ChaserEnemy(x, y) : new PatrolEnemy(x, y, Math.round(Math.random()) == 0));
                 case 5 -> keys.add(new Key(x, y));
-                case 6 -> powerups.add(Math.round(Math.random()) == 0 ? //random enemy type
+                case 6 -> powerups.add(Math.round(Math.random()) == 0 ?
                         new Hpup(x, y) : new Speedup(x, y));
             }
         }
@@ -88,6 +97,10 @@ public class GameMap {
         h = maxY + 1;
     }
 
+    /**
+     * Renders the entire map including tiles, traps, keys, enemies, powerups, and the exit.
+     * @param batch The SpriteBatch used for drawing.
+     */
     public void render(SpriteBatch batch) {
         for(int y = 0; y < h; y++) {
             for(int x = 0; x < w; x++) {
@@ -112,23 +125,36 @@ public class GameMap {
         exit.render(batch);
     }
 
+    /**
+     * Retrieves the tile value at the specified coordinates.
+     * Coordinates outside the map boundaries are treated as walls.
+     * @param x The x-coordinate of the tile.
+     * @param y The y-coordinate of the tile.
+     */
     public Integer getTile(int x, int y) {
-        //treat out of bounds as wall tile
         if(x < 0 || x >= w || y < 0 || y >= h) {
             return 0;
         }
         return tiles.get(x + "," + y);
     }
 
+    /**
+     * Checks if the tile at the given coordinates is a wall.
+     * @param x The x-coordinate of the tile.
+     * @param y The y-coordinate of the tile.
+     */
     public boolean isWall(int x, int y) {
         Integer v = getTile(x, y);
         return v != null && v == 0;
     }
 
+    /**
+     * Determines if a given rectangle collides with any wall in the map.
+     * @param r The rectangle to check for collision.
+     */
     public boolean collidesWithWall(Rectangle r) {
         int t = GameObj.TILE;
 
-        // shrink hitbox slightly
         float margin = 0.1f * t;
         Rectangle hitbox = new Rectangle(
                 r.x + margin,
@@ -142,7 +168,6 @@ public class GameMap {
         int minTY = (int) Math.floor(hitbox.y / t);
         int maxTY = (int) Math.ceil((hitbox.y + hitbox.height) / t);
 
-        //check if any part of the hitbox is outside of map boundaries
         if(minTX < 0 || maxTX >= w || minTY < 0 || maxTY >= h) {
             return true;
         }
@@ -158,7 +183,11 @@ public class GameMap {
         return false;
     }
 
-    //TODO: implement smarter generation
+    /**
+     * Generates a procedural map for endless mode based on the player's current level.
+     * The map size and number of objects increase with level, up to a maximum.
+     * Saves the generated map to a local file and loads it.
+     */
     public void generateMap() throws IOException {
         int level = playerStats.getLevel();
         int n = Math.min((25 * level / 2), 20), key = 0, trap = 0, enemy = 0, power = 0;
@@ -172,7 +201,6 @@ public class GameMap {
         StringBuilder sb = new StringBuilder(10000);
         BufferedWriter bw = new BufferedWriter(file.writer(false));
 
-        //outer walls
         for(int i = 0; i < n; i++) {
             sb.append(i).append(",0=0\n");
             sb.append("0,").append(i).append("=0\n");
@@ -180,7 +208,6 @@ public class GameMap {
             sb.append(i).append(",").append(n - 1).append("=0\n");
         }
 
-        //entry,exit
         sb.append("1,1=1\n");
         sb.append((n - 2)).append(",").append(n - 2).append("=2\n");
 

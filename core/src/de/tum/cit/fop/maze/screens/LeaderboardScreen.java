@@ -15,12 +15,20 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import de.tum.cit.fop.maze.MazeRunnerGame;
 import de.tum.cit.fop.maze.PlayerStats;
 
+/**
+ * The LeaderboardScreen class displays a ranked list of all players based on their scores.
+ */
 public class LeaderboardScreen implements Screen {
     private final MazeRunnerGame game;
     private final Stage stage;
     private final SpriteBatch batch;
     private final Array<PlayerStats> stats;
 
+    /**
+     * Constructor for LeaderboardScreen.
+     *
+     * @param game The main game instance.
+     */
     public LeaderboardScreen(MazeRunnerGame game) {
         this.game = game;
         batch = new SpriteBatch();
@@ -34,6 +42,9 @@ public class LeaderboardScreen implements Screen {
         createUI();
     }
 
+    /**
+     * Loads all player statistics from saved game files.
+     */
     private void loadAllPlayerStats() {
         stats.clear();
         FileHandle saveDir = Gdx.files.local("");
@@ -57,6 +68,9 @@ public class LeaderboardScreen implements Screen {
         }
     }
 
+    /**
+     * Creates the user interface layout for the leaderboard screen.
+     */
     private void createUI() {
         Table table = new Table();
         table.setFillParent(true);
@@ -133,6 +147,9 @@ public class LeaderboardScreen implements Screen {
         table.add(back).padTop(20).width(250).height(60).colspan(7).row();
     }
 
+    /**
+     * Shows the screen and refreshes the leaderboard data and UI.
+     */
     @Override
     public void show() {
         loadAllPlayerStats();
@@ -140,6 +157,10 @@ public class LeaderboardScreen implements Screen {
         createUI();
     }
 
+    /**
+     * Renders the leaderboard screen by clearing the display and drawing the stage.
+     * @param delta The time in seconds since the last render.
+     */
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0.46f, 0.23f, 0.21f, 1);
@@ -149,6 +170,11 @@ public class LeaderboardScreen implements Screen {
         stage.draw();
     }
 
+    /**
+     * Handles screen resizing by updating the stage's viewport.
+     * @param width The new screen width.
+     * @param height The new screen height.
+     */
     @Override
     public void resize(int width, int height) {
         stage.getViewport().update(width, height, true);
@@ -166,6 +192,9 @@ public class LeaderboardScreen implements Screen {
     public void hide() {
     }
 
+    /**
+     * Disposes of all resources used by the leaderboard screen.
+     */
     @Override
     public void dispose() {
         stage.dispose();

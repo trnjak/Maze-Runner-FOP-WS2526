@@ -22,6 +22,14 @@ import de.tum.cit.fop.maze.objects.traps.*;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * The GameScreen class is the main gameplay screen that handles map loading, player interaction,
+ * enemy AI, collision detection, scoring, and developer console functionality.
+ *
+ * Hud textures from: <a href="https://kenney.nl/assets/micro-roguelike">LINK</a>
+ * Music from: <a href="https://opengameart.org/content/random-battle">LINK</a>
+ * SFX from: <a href="https://kenney.nl/assets/category:Audio">LINK</a>
+ */
 public class GameScreen implements Screen {
     private final MazeRunnerGame game;
     private final OrthographicCamera camera, hudCam;
@@ -31,7 +39,7 @@ public class GameScreen implements Screen {
     private final PlayerStats playerStats;
     private boolean paused = false, gameOver = false, victory = false;
 
-    private float score = 0, time = 300; // 300 seconds to finish
+    private float score = 0, time = 300;
     private int maxHearts;
 
     private final KeyBindings binds = KeyBindings.load();
@@ -44,7 +52,6 @@ public class GameScreen implements Screen {
     private TextField consoleTextField;
     private ScrollPane consoleScrollPane;
 
-    // sheet : https://kenney.nl/assets/micro-roguelike
     private static final Texture TILE_SHEET = new Texture("hud_tilemap.png");
     public static final TextureRegion[][] TEXTURE_REGION = TextureRegion.split(TILE_SHEET, TILE_SHEET.getWidth() / 16, TILE_SHEET.getHeight() / 10);
 
@@ -52,14 +59,18 @@ public class GameScreen implements Screen {
     private String consoleOutput = "";
     private final Map<String, Object> consoleVariables = new HashMap<>();
 
-    // music : https://opengameart.org/content/random-battle
     private final Music gameMusic = Gdx.audio.newMusic(Gdx.files.internal("game_bg.mp3"));
-    // sound : https://kenney.nl/assets/category:Audio
     private final Sound scored = Gdx.audio.newSound(Gdx.files.internal("sounds/scored.ogg")),
             won = Gdx.audio.newSound(Gdx.files.internal("sounds/win.ogg")),
             lost = Gdx.audio.newSound(Gdx.files.internal("sounds/lose.ogg"));
     private boolean wonPlayed = false, lostPlayed = false;
 
+    /**
+     * Constructor for GameScreen that loads a specific map from a file path.
+     *
+     * @param game The main game instance.
+     * @param path The file path to load the map from.
+     */
     public GameScreen(MazeRunnerGame game, String path) throws IOException {
         this.game = game;
 
@@ -87,6 +98,11 @@ public class GameScreen implements Screen {
         initHud();
     }
 
+    /**
+     * Constructor for GameScreen that generates a random endless map.
+     *
+     * @param game The main game instance.
+     */
     public GameScreen(MazeRunnerGame game) {
         this.game = game;
 
@@ -118,6 +134,10 @@ public class GameScreen implements Screen {
         initHud();
     }
 
+    /**
+     * Main game loop that updates game logic, handles input, renders graphics and UI.
+     * @param delta The time in seconds since the last render.
+     */
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0.46f, 0.23f, 0.21f, 1);
@@ -131,7 +151,6 @@ public class GameScreen implements Screen {
             player.update(delta);
             playerInput(delta);
 
-            // update enemies
             for(Enemy e : map.getEnemies()) {
                 e.update(delta, player, map);
                 if(!player.isAlive()) {
@@ -140,7 +159,6 @@ public class GameScreen implements Screen {
                 }
             }
 
-            // update traps
             for(Trap t : map.getTraps()) {
                 t.update(player, delta);
                 if(!player.isAlive()) {
@@ -149,7 +167,6 @@ public class GameScreen implements Screen {
                 }
             }
 
-            // check keys
             for(Iterator<Key> it = map.getKeys().iterator(); it.hasNext(); ) {
                 Key key = it.next();
                 if(player.getBounds().overlaps(key.getBounds())) {
@@ -164,7 +181,6 @@ public class GameScreen implements Screen {
                 }
             }
 
-            // check powerups
             for(Iterator<Powerup> it = map.getPowerups().iterator(); it.hasNext(); ) {
                 Powerup p = it.next();
                 if(player.getBounds().overlaps(p.getBounds())) {
@@ -175,7 +191,6 @@ public class GameScreen implements Screen {
                 }
             }
 
-            // check exit
             Exit e = map.getExit();
             if(e != null) {
                 e.update(delta);
@@ -200,7 +215,6 @@ public class GameScreen implements Screen {
         camera.update();
         game.getSpriteBatch().setProjectionMatrix(camera.combined);
 
-        // draw map and entities
         game.getSpriteBatch().begin();
         map.render(game.getSpriteBatch());
         player.render(game.getSpriteBatch());
@@ -294,6 +308,9 @@ public class GameScreen implements Screen {
         }
     }
 
+    /**
+     * Initializes the HUD.
+     */
     private void initHud() {
         hudStage = new Stage(hudVp, game.getSpriteBatch());
 
@@ -309,6 +326,9 @@ public class GameScreen implements Screen {
         hudStage.addActor(timeLabel);
     }
 
+    /**
+     * Initializes the pause menu UI.
+     */
     private void initPauseMenu() {
         pauseStage = new Stage(hudVp, game.getSpriteBatch());
         pauseTable = new Table();
@@ -334,6 +354,10 @@ public class GameScreen implements Screen {
         pauseStage.addActor(pauseTable);
     }
 
+    /**
+     * Handles the selection of options from the pause menu.
+     * @param item The selected menu item.
+     */
     private void handlePauseMenuSelection(String item) {
         switch(item) {
             case "Continue":
@@ -360,6 +384,13 @@ public class GameScreen implements Screen {
         }
     }
 
+    /**
+     * Initializes the game over and victory screens with common UI elements.
+     * @param title The title to display on the screen.
+     * @param s The stage to add the table to.
+     * @param t The table containing the UI elements.
+     * @param sc The label to display the score.
+     */
     private void initMenuStep2(String title, Stage s, Table t, Label sc) {
         Label la = new Label(title, game.getSkin(), "title");
         t.add(la).padBottom(80).row();
@@ -381,6 +412,9 @@ public class GameScreen implements Screen {
         s.addActor(t);
     }
 
+    /**
+     * Initializes the game over screen UI.
+     */
     private void initGameOverMenu() {
         gameOverStage = new Stage(hudVp, game.getSpriteBatch());
         gameOverTable = new Table();
@@ -391,6 +425,9 @@ public class GameScreen implements Screen {
         initMenuStep2("YOU DIED!", gameOverStage, gameOverTable, gameOverScore);
     }
 
+    /**
+     * Initializes the victory screen UI.
+     */
     private void initVictoryMenu() {
         victoryStage = new Stage(hudVp, game.getSpriteBatch());
         victoryTable = new Table();
@@ -447,6 +484,9 @@ public class GameScreen implements Screen {
         });
     }
 
+    /**
+     * Initializes the developer console.
+     */
     private void initDeveloperConsole() {
         consoleStage = new Stage(hudVp, game.getSpriteBatch());
 
@@ -482,6 +522,10 @@ public class GameScreen implements Screen {
         initializeConsoleVariables();
     }
 
+    /**
+     * Appends text to the console output display.
+     * @param text The text to append to the console output.
+     */
     private void appendConsoleOutput(String text) {
         consoleOutput += text;
 
@@ -499,6 +543,9 @@ public class GameScreen implements Screen {
         consoleScrollPane.setScrollPercentY(1);
     }
 
+    /**
+     * Initializes default console variables.
+     */
     private void initializeConsoleVariables() {
         consoleVariables.put("health", player.getHp());
         consoleVariables.put("speed", player.getCurrentSpeed());
@@ -511,11 +558,17 @@ public class GameScreen implements Screen {
         consoleOutputLabel.setText(consoleOutput);
     }
 
+    /**
+     * Resets the level score to zero.
+     */
     private void resetLevelScore() {
         score = 0;
         scoreLabel.setText(0 + "");
     }
 
+    /**
+     * Updates the game over screen with the final calculated score.
+     */
     private void updateGameOverScore() {
         int finalScore = (int) (score + time);
         gameOverScore.setText("Final score: " + finalScore);
@@ -524,6 +577,9 @@ public class GameScreen implements Screen {
         playerStats.save();
     }
 
+    /**
+     * Updates the victory screen with the final calculated score.
+     */
     private void updateVictoryScore() {
         int finalScore = (int) (score + time);
         victoryScore.setText("Final score: " + finalScore);
@@ -532,6 +588,10 @@ public class GameScreen implements Screen {
         playerStats.save();
     }
 
+    /**
+     * Processes console commands entered by the user.
+     * @param command The console command string to process.
+     */
     private void processConsoleCommand(String command) {
         if(command.trim().isEmpty()) return;
 
@@ -540,7 +600,7 @@ public class GameScreen implements Screen {
 
         try {
             switch(cmd) {
-                case "help":
+                case "help","man","?":
                     showHelp();
                     break;
                 case "set":
@@ -580,6 +640,9 @@ public class GameScreen implements Screen {
         }
     }
 
+    /**
+     * Displays help text with available console commands.
+     */
     private void showHelp() {
         String helpText = """
                 
@@ -601,6 +664,10 @@ public class GameScreen implements Screen {
         appendConsoleOutput(helpText);
     }
 
+    /**
+     * Handles the 'set' console command for modifying game variables.
+     * @param parts The command parts split by whitespace.
+     */
     private void handleSetCommand(String[] parts) {
         if(parts.length < 3) {
             appendConsoleOutput("\nUsage: set [variable] [value]");
@@ -639,6 +706,10 @@ public class GameScreen implements Screen {
         }
     }
 
+    /**
+     * Handles the 'get' console command for retrieving variable values.
+     * @param parts The command parts split by whitespace.
+     */
     private void handleGetCommand(String[] parts) {
         if(parts.length < 2) {
             appendConsoleOutput("\nUsage: get [variable]");
@@ -655,6 +726,10 @@ public class GameScreen implements Screen {
         }
     }
 
+    /**
+     * Handles the 'give' console command for granting items to the player.
+     * @param parts The command parts split by whitespace.
+     */
     private void handleGiveCommand(String[] parts) {
         if(parts.length < 2) {
             appendConsoleOutput("\nUsage: give [item] [amount]");
@@ -695,6 +770,10 @@ public class GameScreen implements Screen {
         }
     }
 
+    /**
+     * Handles the 'kill' console command for eliminating enemies.
+     * @param parts The command parts split by whitespace.
+     */
     private void handleKillCommand(String[] parts) {
         if(parts.length > 1 && parts[1].equalsIgnoreCase("all")) {
             int count = 0;
@@ -716,6 +795,10 @@ public class GameScreen implements Screen {
         }
     }
 
+    /**
+     * Handles the 'heal' console command for restoring player health.
+     * @param parts The command parts split by whitespace.
+     */
     private void handleHealCommand(String[] parts) {
         int amount = parts.length > 1 ? Integer.parseInt(parts[1]) : 5;
         player.setHp(Math.min(5, player.getHp() + amount));
@@ -723,6 +806,10 @@ public class GameScreen implements Screen {
         appendConsoleOutput("\nHealed player to " + player.getHp() + " HP");
     }
 
+    /**
+     * Handles the 'teleport' console command for moving the player to specified coordinates.
+     * @param parts The command parts split by whitespace.
+     */
     private void handleTeleportCommand(String[] parts) {
         if(parts.length < 3) {
             appendConsoleOutput("\nUsage: teleport [x] [y]");
@@ -746,6 +833,9 @@ public class GameScreen implements Screen {
         }
     }
 
+    /**
+     * Handles the 'list' console command for displaying all console variables.
+     */
     private void handleListCommand() {
         StringBuilder listOutput = new StringBuilder("\nGame Variables:");
         for(Map.Entry<String, Object> entry : consoleVariables.entrySet()) {
@@ -754,6 +844,11 @@ public class GameScreen implements Screen {
         appendConsoleOutput(listOutput.toString());
     }
 
+    /**
+     * Applies changes from console variable modifications to the actual game state.
+     * @param varName The name of the variable being changed.
+     * @param value The new value to apply.
+     */
     private void applyVariableChange(String varName, Object value) {
         switch(varName) {
             case "health":
@@ -778,6 +873,9 @@ public class GameScreen implements Screen {
         }
     }
 
+    /**
+     * Awards experience points to the player based on their score and saves the updated stats.
+     */
     private void awardExp() {
         int plusExp = (int) (score / 500);
         if(plusExp > 0) {
@@ -786,6 +884,9 @@ public class GameScreen implements Screen {
         }
     }
 
+    /**
+     * Handles global input events like opening/closing the console, pausing, and camera zoom.
+     */
     private void globalInput() {
         if(!gameOver && !victory && Gdx.input.isKeyJustPressed(Input.Keys.F1)) {
             consoleOpen = !consoleOpen;
@@ -824,11 +925,18 @@ public class GameScreen implements Screen {
         }
     }
 
+    /**
+     * Centers the camera on the player's current position.
+     */
     private void centerCameraOnPlayer() {
         camera.position.set(player.getX() + GameObj.TILE / 2f, player.getY() + GameObj.TILE / 2f, 0);
         camera.update();
     }
 
+    /**
+     * Processes player input for movement and attacks based on key bindings.
+     * @param delta The time in seconds since the last frame.
+     */
     private void playerInput(float delta) {
         float baseSpeed = Gdx.input.isKeyPressed(binds.SPRINT) ? 168f : 100f;
         float speed = baseSpeed * player.getCurrentSpeed();
@@ -838,7 +946,6 @@ public class GameScreen implements Screen {
         if(Gdx.input.isKeyPressed(binds.UP)) dy += speed * delta;
         if(Gdx.input.isKeyPressed(binds.DOWN)) dy -= speed * delta;
 
-        // attack
         if(Gdx.input.isKeyJustPressed(binds.ATTACK)) {
             player.attack(map.getEnemies());
             for(Enemy e : map.getEnemies().stream().filter(e -> !e.isAlive()).toList()) {
@@ -852,13 +959,16 @@ public class GameScreen implements Screen {
 
         if(dx == 0 && dy == 0) return;
 
-        // collision
         Rectangle next = new Rectangle(player.getX() + dx, player.getY() + dy, GameObj.TILE, GameObj.TILE);
         if(!enemyOverlap(next)) {
             player.move(dx, dy, map);
         }
     }
 
+    /**
+     * Checks if a rectangle overlaps with any living enemies.
+     * @param rect The rectangle to check for overlap.
+     */
     private boolean enemyOverlap(Rectangle rect) {
         for(Enemy e : map.getEnemies()) {
             if(!e.isAlive()) continue;
@@ -867,6 +977,13 @@ public class GameScreen implements Screen {
         return false;
     }
 
+    /**
+     * Computes the rotation angle for the exit arrow indicator.
+     * @param px The player's X position.
+     * @param py The player's Y position.
+     * @param ex The exit's X position.
+     * @param ey The exit's Y position.
+     */
     private float computeArrow(float px, float py, float ex, float ey) {
         float dx = ex - px;
         float dy = ey - py;
@@ -881,6 +998,11 @@ public class GameScreen implements Screen {
     public void show() {
     }
 
+    /**
+     * Handles screen resizing by updating all viewports.
+     * @param width The new screen width.
+     * @param height The new screen height.
+     */
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height);
@@ -904,6 +1026,9 @@ public class GameScreen implements Screen {
     public void hide() {
     }
 
+    /**
+     * Disposes of all resources used by the game screen.
+     */
     @Override
     public void dispose() {
         sr.dispose();
