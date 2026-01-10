@@ -4,10 +4,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.Array;
 
 /**
  * The PlayerStats class manages the saving and loading of player files.
- * It also handles incrementing and purchasing stats and setting their price.
+ * It also handles incrementing and purchasing stats and setting their price,
+ * as well as managing achievements.
  */
 public class PlayerStats {
     private String name;
@@ -15,7 +17,19 @@ public class PlayerStats {
     private int exp = 0, score = 0;
     private int hpLvl = 1, speedLvl = 1, atkLvl = 1, level = 1;
 
+    private ObjectMap<String, Achievement> achievements;
+
     private static final Json json = new Json();
+
+    private static final Array<Achievement> DEFAULT_ACHIEVEMENTS = new Array<>() {{
+        add(new Achievement("first_blood", "First Blood", "Kill your first enemy", 1, "kill"));
+        add(new Achievement("enemy_slayer", "Enemy Slayer", "Kill 50 enemies", 50, "kill"));
+        add(new Achievement("key_collector", "Key Collector", "Collect 20 keys", 20, "collect"));
+        add(new Achievement("score_master", "Score Master", "Reach 5000 total score", 5000, "score"));
+        add(new Achievement("survivor", "Survivor", "Complete 10 levels", 10, "level"));
+        add(new Achievement("speedrunner", "Speedrunner", "Complete a level in under 60 seconds", 1, "time"));
+        add(new Achievement("upgrade_master", "Upgrade Master", "Reach level 10 in all upgrades", 30, "upgrade"));
+    }};
 
     /**
      * Constructor for PlayerStats.
@@ -25,7 +39,9 @@ public class PlayerStats {
     public PlayerStats(String name) {
         this.name = name;
         SAVE_FILE = "save_" + name + ".json";
+        achievements = new ObjectMap<>();
         load();
+        initAchievements();
     }
 
     /**
@@ -35,7 +51,7 @@ public class PlayerStats {
     private void load() {
         try {
             FileHandle file = Gdx.files.local(SAVE_FILE);
-            if (file.exists()) {
+            if(file.exists()) {
                 String jsonData = file.readString();
                 ObjectMap<String, Object> data = json.fromJson(ObjectMap.class, jsonData);
 
@@ -47,13 +63,18 @@ public class PlayerStats {
                 Object speedObj = data.get("speedLvl");
                 Object atkObj = data.get("atkLvl");
 
-                name = nameObj instanceof String ? (String)nameObj : "Player";
-                score = scoreObj instanceof Number ? ((Number)scoreObj).intValue() : 0;
-                level = scoreObj instanceof Number ? ((Number) levelObj).intValue() : 1;
-                exp = expObj instanceof Number ? ((Number)expObj).intValue() : 0;
-                hpLvl = hpObj instanceof Number ? ((Number)hpObj).intValue() : 1;
-                speedLvl = speedObj instanceof Number ? ((Number)speedObj).intValue() : 1;
-                atkLvl = atkObj instanceof Number ? ((Number)atkObj).intValue() : 1;
+                name = nameObj instanceof String ? (String) nameObj : "Player";
+                score = scoreObj instanceof Number ? ((Number) scoreObj).intValue() : 0;
+                level = levelObj instanceof Number ? ((Number) levelObj).intValue() : 1;
+                exp = expObj instanceof Number ? ((Number) expObj).intValue() : 0;
+                hpLvl = hpObj instanceof Number ? ((Number) hpObj).intValue() : 1;
+                speedLvl = speedObj instanceof Number ? ((Number) speedObj).intValue() : 1;
+                atkLvl = atkObj instanceof Number ? ((Number) atkObj).intValue() : 1;
+
+                Object achievementsObj = data.get("achievements");
+                if(achievementsObj instanceof ObjectMap) {
+                    achievements = (ObjectMap<String, Achievement>) achievementsObj;
+                }
             }
         } catch(Exception e) {
             System.err.println("Error loading stats for " + name + ": " + e.getMessage());
@@ -61,8 +82,20 @@ public class PlayerStats {
     }
 
     /**
+     * Initializes achievements if none are loaded from the save file.
+     * Adds default achievements to the achievements map.
+     */
+    private void initAchievements() {
+        if(achievements.size == 0) {
+            for(Achievement ach : DEFAULT_ACHIEVEMENTS) {
+                achievements.put(ach.getId(), ach);
+            }
+        }
+    }
+
+    /**
      * Handles file saving.
-     * */
+     */
     public void save() {
         try {
             ObjectMap<String, Object> data = new ObjectMap<>();
@@ -73,12 +106,90 @@ public class PlayerStats {
             data.put("hpLvl", hpLvl);
             data.put("speedLvl", speedLvl);
             data.put("atkLvl", atkLvl);
+            data.put("achievements", achievements);
 
             FileHandle file = Gdx.files.local(SAVE_FILE);
             file.writeString(json.prettyPrint(json.toJson(data)), false);
         } catch(Exception e) {
             System.err.println("Error saving stats for " + name + ": " + e.getMessage());
         }
+    }
+
+    /**
+     * Updates achievements of a specific type by adding progress.
+     * Also handles special achievement logic for the "upgrade_master" achievement.
+     * @param type The type of achievement to update
+     * @param amount The amount of progress to add
+     */
+    public Array<String> updateAchievement(String type, int amount) {
+        Array<String> newlyUnlocked = new Array<>();
+
+        for(Achievement ach : achievements.values()) {
+            if(ach.getType().equals(type) && !ach.isUnlocked()) {
+                boolean wasUnlocked = ach.isUnlocked();
+                ach.addProgress(amount);
+
+                if(ach.isUnlocked() && !wasUnlocked) {
+                    newlyUnlocked.add(ach.getName());
+                }
+            }
+        }
+
+        Achievement upgradeMaster = achievements.get("upgrade_master");
+        if(upgradeMaster != null && !upgradeMaster.isUnlocked()) {
+            int totalUpgrades = hpLvl + speedLvl + atkLvl;
+            upgradeMaster.setProgress(totalUpgrades - 3);
+            if(totalUpgrades >= 33) {
+                if(!upgradeMaster.isUnlocked()) {
+                    upgradeMaster.setUnlocked(true);
+                    newlyUnlocked.add(upgradeMaster.getName());
+                }
+            }
+        }
+
+        if(newlyUnlocked.size > 0) {
+            save();
+        }
+
+        return newlyUnlocked;
+    }
+
+    /**
+     * Checks and updates score-related achievements based on current score.
+     */
+    public Array<String> checkScoreAchievements() {
+        return updateAchievement("score", score);
+    }
+
+    /**
+     * Checks and updates level-related achievements based on current level.
+     */
+    public Array<String> checkLevelAchievements() {
+        return updateAchievement("level", level);
+    }
+
+    /**
+     * Returns all achievements as an array.
+     */
+    public Array<Achievement> getAchievements() {
+        Array<Achievement> result = new Array<>();
+        for(Achievement ach : achievements.values()) {
+            result.add(ach);
+        }
+        return result;
+    }
+
+    /**
+     * Returns the count of unlocked achievements.
+     */
+    public int getUnlockedAchievementsCount() {
+        int count = 0;
+        for(Achievement ach : achievements.values()) {
+            if(ach.isUnlocked()) {
+                count++;
+            }
+        }
+        return count;
     }
 
     /**
@@ -162,9 +273,19 @@ public class PlayerStats {
         return Math.max(0.01f, 0.5f - (atkLvl - 1) * 0.005f);
     }
 
+    /**
+     * Increments the player's level by one.
+     */
     public void incrementLvl() {
         level++;
         save();
+    }
+
+    /**
+     * Returns the player's maximum HP.
+     */
+    public int getMaxHp() {
+        return 4 + hpLvl;
     }
 
     public String getName() {
@@ -193,9 +314,5 @@ public class PlayerStats {
 
     public int getAtkLvl() {
         return atkLvl;
-    }
-
-    public int getMaxHp() {
-        return 4 + hpLvl;
     }
 }

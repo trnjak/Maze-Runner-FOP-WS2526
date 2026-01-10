@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.*;
 import de.tum.cit.fop.maze.*;
 import de.tum.cit.fop.maze.objects.*;
@@ -65,12 +66,9 @@ public class GameScreen implements Screen {
             lost = Gdx.audio.newSound(Gdx.files.internal("sounds/lose.ogg"));
     private boolean wonPlayed = false, lostPlayed = false;
 
-    /**
-     * Constructor for GameScreen that loads a specific map from a file path.
-     *
-     * @param game The main game instance.
-     * @param path The file path to load the map from.
-     */
+    private Label achievementLabel;
+    private float achievementTimer = 0;
+
     public GameScreen(MazeRunnerGame game, String path) throws IOException {
         this.game = game;
 
@@ -177,6 +175,12 @@ public class GameScreen implements Screen {
                     }
                     score += 100;
                     scored.play(0.1f);
+
+                    Array<String> unlocked = playerStats.updateAchievement("collect", 1);
+                    if(unlocked.size > 0) {
+                        showAchievement(unlocked.first());
+                    }
+
                     it.remove();
                 }
             }
@@ -257,6 +261,14 @@ public class GameScreen implements Screen {
                 game.getSpriteBatch().draw(TEXTURE_REGION[6][3], arrowX, arrowY, originX, originY, GameObj.TILE, GameObj.TILE, 1, 1, arrowRotation);
             }
         }
+
+        if(achievementTimer > 0) {
+            achievementTimer -= delta;
+            float alpha = Math.min(achievementTimer, 1.0f);
+            achievementLabel.setColor(1, 1, 1, alpha);
+            achievementLabel.draw(game.getSpriteBatch(), 1);
+        }
+
         game.getSpriteBatch().end();
 
         scoreLabel.setText((int) score + "");
@@ -308,9 +320,13 @@ public class GameScreen implements Screen {
         }
     }
 
-    /**
-     * Initializes the HUD.
-     */
+    private void showAchievement(String name) {
+        achievementLabel = new Label("Achievement Unlocked: " + name, game.getSkin(), "title");
+        achievementLabel.setFontScale(0.5f);
+        achievementLabel.setPosition(hudVp.getWorldWidth() / 2 - achievementLabel.getPrefWidth() / 2, 100);
+        achievementTimer = 3.0f;
+    }
+
     private void initHud() {
         hudStage = new Stage(hudVp, game.getSpriteBatch());
 
@@ -574,6 +590,12 @@ public class GameScreen implements Screen {
         gameOverScore.setText("Final score: " + finalScore);
         awardExp();
         playerStats.addScore(finalScore);
+
+        Array<String> unlocked = playerStats.checkScoreAchievements();
+        if(unlocked.size > 0) {
+            showAchievement(unlocked.first());
+        }
+
         playerStats.save();
     }
 
@@ -585,6 +607,17 @@ public class GameScreen implements Screen {
         victoryScore.setText("Final score: " + finalScore);
         awardExp();
         playerStats.addScore(finalScore);
+
+        Array<String> unlocked = playerStats.checkScoreAchievements();
+        if(unlocked.size > 0) {
+            showAchievement(unlocked.first());
+        }
+
+        Array<String> levelUnlocked = playerStats.checkLevelAchievements();
+        if(levelUnlocked.size > 0) {
+            showAchievement(levelUnlocked.first());
+        }
+
         playerStats.save();
     }
 
@@ -948,11 +981,20 @@ public class GameScreen implements Screen {
 
         if(Gdx.input.isKeyJustPressed(binds.ATTACK)) {
             player.attack(map.getEnemies());
+            int killed = 0;
             for(Enemy e : map.getEnemies().stream().filter(e -> !e.isAlive()).toList()) {
                 if(!e.isAlive()) {
                     score += 100;
+                    killed++;
                     scored.play(0.1f);
                     map.getEnemies().remove(e);
+                }
+            }
+
+            if(killed > 0) {
+                Array<String> unlocked = playerStats.updateAchievement("kill", killed);
+                if(unlocked.size > 0) {
+                    showAchievement(unlocked.first());
                 }
             }
         }

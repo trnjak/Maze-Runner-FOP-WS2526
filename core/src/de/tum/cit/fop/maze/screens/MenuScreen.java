@@ -27,33 +27,70 @@ public class MenuScreen implements Screen {
         var camera = new OrthographicCamera();
         stage = new Stage(new FitViewport(game.WIDTH, game.HEIGHT, camera), game.getSpriteBatch());
 
-        Table table = new Table();
-        table.setFillParent(true);
-        stage.addActor(table);
+        Table mainTable = new Table();
+        mainTable.setFillParent(true);
+        stage.addActor(mainTable);
 
         Label title = new Label("AWESOME GAME", game.getSkin(), "title");
-        table.add(title).padBottom(80).row();
+        mainTable.add(title).padBottom(80).row();
+        Table gridTable = new Table();
+        gridTable.defaults().pad(10);
 
-        String[] menuItems = {"Load Map", "New Endless", "Stats & Upgrades", "Leaderboard", "Settings", "Exit"};
+        String[][] menuItems = {
+                {"Load Map", "New Endless"},
+                {"Stats/Upgrades", "Leaderboard"},
+                {"Achievements", "Settings"},
+                {"Exit", null}
+        };
 
-        for(String item : menuItems) {
-            TextButton button = new TextButton(item, game.getSkin());
-            table.add(button).width(320).padBottom(20).row();
+        float buttonWidth = 300f;
+        float buttonHeight = 60f;
+        float exitButtonWidth = buttonWidth * 2 + 10;
 
-            button.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    switch(item) {
-                        case "Load Map" -> game.goToGame();
-                        case "New Endless" -> game.goToEndlessGame();
-                        case "Stats & Upgrades" -> game.goToStats();
-                        case "Leaderboard" -> game.goToLeaderboard();
-                        case "Settings" -> game.goToSettings();
-                        case "Exit" -> Gdx.app.exit();
+        for(int row = 0; row < menuItems.length; row++) {
+            for(int col = 0; col < 2; col++) {
+                String item = menuItems[row][col];
+                if(item != null) {
+                    TextButton button = new TextButton(item, game.getSkin());
+                    if(row == menuItems.length - 1 && "Exit".equals(item)) {
+                        gridTable.add(button)
+                                .colspan(2)
+                                .width(exitButtonWidth)
+                                .height(buttonHeight)
+                                .padBottom(20)
+                                .center();
+                    } else {
+                        gridTable.add(button)
+                                .width(buttonWidth)
+                                .height(buttonHeight)
+                                .padBottom(20);
+                        if(col == 0) {
+                            gridTable.getCell(button).padRight(10);
+                        }
                     }
+
+                    button.addListener(new ChangeListener() {
+                        @Override
+                        public void changed(ChangeEvent event, Actor actor) {
+                            switch(item) {
+                                case "Load Map" -> game.goToGame();
+                                case "New Endless" -> game.goToEndlessGame();
+                                case "Stats/Upgrades" -> game.goToStats();
+                                case "Leaderboard" -> game.goToLeaderboard();
+                                case "Achievements" -> game.goToAchievement();
+                                case "Settings" -> game.goToSettings();
+                                case "Exit" -> Gdx.app.exit();
+                            }
+                        }
+                    });
+                } else if(col == 0) {
+                    gridTable.add().width(buttonWidth).height(0);
                 }
-            });
+            }
+            gridTable.row();
         }
+
+        mainTable.add(gridTable).center();
     }
 
     /**

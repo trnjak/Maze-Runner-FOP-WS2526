@@ -79,63 +79,71 @@ public class LeaderboardScreen implements Screen {
         table.pad(30);
 
         Label title = new Label("LEADERBOARDS", game.getSkin(), "title");
-        table.add(title).padBottom(60).colspan(7).row();
+        table.add(title).padBottom(40).colspan(1).center().row();
 
         stats.sort((p1, p2) -> Integer.compare(p2.getScore(), p1.getScore()));
 
+        Table contentTable = new Table();
+
         Table headerTable = new Table();
+        headerTable.defaults().pad(10, 15, 10, 15);
 
-        headerTable.add(new Label("Rank", game.getSkin())).width(100).pad(10, 15, 10, 15);
+        headerTable.add(new Label("Rank", game.getSkin())).width(100);
         headerTable.add().width(5);
-        headerTable.add(new Label("Player", game.getSkin())).width(150).pad(10, 15, 10, 15);
+        headerTable.add(new Label("Player", game.getSkin())).width(150);
         headerTable.add().width(5);
-        headerTable.add(new Label("Score", game.getSkin())).width(100).pad(10, 15, 10, 15);
+        headerTable.add(new Label("Score", game.getSkin())).width(100);
         headerTable.add().width(5);
-        headerTable.add(new Label("Level", game.getSkin())).width(100).pad(10, 15, 10, 15);
+        headerTable.add(new Label("Level", game.getSkin())).width(100);
 
-        table.add(headerTable).padBottom(30).colspan(15).row();
+        contentTable.add(headerTable).padBottom(20).row();
 
         Table playerTable = new Table();
         ScrollPane scrollPane = new ScrollPane(playerTable, game.getSkin());
         scrollPane.setFadeScrollBars(false);
         scrollPane.setScrollingDisabled(true, false);
 
+        float scrollPaneWidth = game.WIDTH-200;
+        float scrollPaneHeight = 300;
+
         for(int i = 0; i < stats.size; i++) {
             PlayerStats player = stats.get(i);
 
-            Table rowContainer = new Table();
-
             Table rowTable = new Table();
-            rowContainer.add(rowTable).pad(5, 0, 5, 0);
+            rowTable.defaults().pad(8, 15, 8, 15);
 
             Label rankLabel;
             if(i == 0) {
-                rankLabel = new Label((i + 1) + "", game.getSkin(), "bold");
+                rankLabel = new Label((i + 1) + "", game.getSkin());
                 rankLabel.setColor(1, 0.84f, 0, 1);
             } else if(i == 1) {
-                rankLabel = new Label((i + 1) + "", game.getSkin(), "bold");
+                rankLabel = new Label((i + 1) + "", game.getSkin());
                 rankLabel.setColor(0.75f, 0.75f, 0.75f, 1);
             } else if(i == 2) {
-                rankLabel = new Label((i + 1) + "", game.getSkin(), "bold");
+                rankLabel = new Label((i + 1) + "", game.getSkin());
                 rankLabel.setColor(0.8f, 0.5f, 0.2f, 1);
             } else {
                 rankLabel = new Label(String.valueOf(i + 1), game.getSkin());
             }
 
-            rowTable.add(rankLabel).width(100).pad(8, 15, 8, 15);
+            rowTable.add(rankLabel).width(100);
             rowTable.add().width(5);
-            rowTable.add(new Label(player.getName(), game.getSkin())).width(150).pad(8, 15, 8, 15);
+            rowTable.add(new Label(player.getName(), game.getSkin())).width(150);
             rowTable.add().width(5);
-            rowTable.add(new Label(String.valueOf(player.getScore()), game.getSkin())).width(100).pad(8, 15, 8, 15);
+            rowTable.add(new Label(String.valueOf(player.getScore()), game.getSkin())).width(100);
             rowTable.add().width(5);
-            rowTable.add(new Label(String.valueOf(player.getLevel()), game.getSkin())).width(100).pad(8, 15, 8, 15);
+            rowTable.add(new Label(String.valueOf(player.getLevel()), game.getSkin())).width(100);
 
-            playerTable.add(rowContainer).colspan(15).padBottom(4).fillX().row();
+            playerTable.add(rowTable).padBottom(4).fillX().row();
         }
 
-        table.add(scrollPane).colspan(15).expand().fill().pad(20, 0, 30, 0).row();
+        contentTable.add(scrollPane)
+                .width(scrollPaneWidth)
+                .height(scrollPaneHeight)
+                .pad(10, 0, 30, 0)
+                .row();
 
-        table.add().pad(20).colspan(7).row();
+        table.add(contentTable).center().expandY().row();
 
         TextButton back = new TextButton("Back to Menu", game.getSkin());
         back.addListener(new ClickListener() {
@@ -144,7 +152,7 @@ public class LeaderboardScreen implements Screen {
                 game.goToMenu();
             }
         });
-        table.add(back).padTop(20).width(250).height(60).colspan(7).row();
+        table.add(back).padTop(20).width(250).height(60).center().row();
     }
 
     /**

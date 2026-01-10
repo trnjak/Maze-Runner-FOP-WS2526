@@ -85,6 +85,20 @@ public class MazeRunnerGame extends Game {
     }
 
     /**
+     * Switches to the achievements screen
+     */
+    public void goToAchievement() {
+        setScreen(new AchievementScreen(this));
+        if(gameScreen != null) {
+            gameScreen.pause();
+        }
+        if(menuScreen != null) {
+            menuScreen.dispose();
+            menuScreen = null;
+        }
+    }
+
+    /**
      * Switches to the stats screen.
      */
     public void goToStats() {
