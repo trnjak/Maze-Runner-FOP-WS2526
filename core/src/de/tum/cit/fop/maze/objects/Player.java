@@ -42,7 +42,7 @@ public class Player extends GameObj {
      * @param y The initial Y coordinate of the player.
      */
     public Player(float x, float y) {
-        super(x, y, 7, 0);
+        super(x, y, 8, 3);
         this.w = TILE;
         this.h = TILE;
 
