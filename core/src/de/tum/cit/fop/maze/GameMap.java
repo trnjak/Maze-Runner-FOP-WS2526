@@ -23,7 +23,7 @@ import java.util.*;
  */
 public class GameMap {
     private static final Texture TILE_SHEET = new Texture("main_tilemap.png");
-    public static final TextureRegion[][] TEXTURE_REGION = TextureRegion.split(TILE_SHEET, TILE_SHEET.getWidth()/12, TILE_SHEET.getHeight()/11);
+    public static final TextureRegion[][] TEXTURE_REGION = TextureRegion.split(TILE_SHEET, TILE_SHEET.getWidth() / 12, TILE_SHEET.getHeight() / 11);
 
     private int w, h;
     private final Map<String, Integer> tiles = new HashMap<>();
@@ -189,64 +189,284 @@ public class GameMap {
      * Saves the generated map to a local file and loads it.
      */
     public void generateMap() throws IOException {
-        int level = playerStats.getLevel();
-        int n = Math.min((25 * level / 2), 20), key = 0, trap = 0, enemy = 0, power = 0;
+        int lvl = playerStats.getLevel();
+        int n = Math.min(15 + lvl, 30);
+
+        if(n % 2 == 0) n++;
+
         isEndless = true;
+
+        long seed = lvl * 1000L + playerStats.getScore();
+        Random r = new Random(seed);
 
         FileHandle file = Gdx.files.local("maps/endless.properties");
         if(file.exists()) {
             file.delete();
         }
 
-        StringBuilder sb = new StringBuilder(10000);
-        BufferedWriter bw = new BufferedWriter(file.writer(false));
-
+        int[][] grid = new int[n][n];
         for(int i = 0; i < n; i++) {
-            sb.append(i).append(",0=0\n");
-            sb.append("0,").append(i).append("=0\n");
-            sb.append((n - 1)).append(",").append(i).append("=0\n");
-            sb.append(i).append(",").append(n - 1).append("=0\n");
+            for(int j = 0; j < n; j++) {
+                grid[i][j] = 0;
+            }
         }
 
-        sb.append("1,1=1\n");
-        sb.append((n - 2)).append(",").append(n - 2).append("=2\n");
+        int startX = 1;
+        int startY = 1;
 
-        for(int i = 2; i < n - 2; i++) {
-            for(int j = 2; j < n - 2; j++) {
-                int what = (int) (Math.random() * 7);
-                switch(what) {
+        Stack<int[]> stack = new Stack<>();
+        stack.push(new int[]{startX, startY});
+        grid[startX][startY] = 7;
+        int[][] dirs = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+
+        while(!stack.isEmpty()) {
+            int[] current = stack.peek();
+            int x = current[0];
+            int y = current[1];
+
+            List<int[]> neighbours = new ArrayList<>();
+            for(int[] dir : dirs) {
+                int nx = x + dir[0] * 2;
+                int ny = y + dir[1] * 2;
+
+                if(nx > 0 && nx < n - 1 && ny > 0 && ny < n - 1 && grid[nx][ny] == 0) {
+                    neighbours.add(new int[]{nx, ny, dir[0], dir[1]});
+                }
+            }
+
+            if(!neighbours.isEmpty()) {
+                int[] next = neighbours.get(r.nextInt(neighbours.size()));
+                int nx = next[0];
+                int ny = next[1];
+                int dx = next[2];
+                int dy = next[3];
+
+                grid[x + dx][y + dy] = 7;
+                grid[nx][ny] = 7;
+
+                stack.push(new int[]{nx, ny});
+            } else {
+                stack.pop();
+            }
+        }
+
+        int roomCount = Math.min(2 + lvl / 5, 5);
+        for(int room = 0; room < roomCount; room++) {
+
+            int roomSize = 3 + r.nextInt(3);
+            int roomX = 2 + r.nextInt(n - roomSize - 4);
+            int roomY = 2 + r.nextInt(n - roomSize - 4);
+
+            for(int i = 0; i < roomSize; i++) {
+                for(int j = 0; j < roomSize; j++) {
+                    int x = roomX + i;
+                    int y = roomY + j;
+                    if(x < n && y < n) {
+                        grid[x][y] = 7;
+                    }
+                }
+            }
+
+            int entrances = 1 + r.nextInt(2);
+            for(int e = 0; e < entrances; e++) {
+                int side = r.nextInt(4);
+                int connX, connY;
+
+                switch(side) {
+                    case 0:
+                        connX = roomX + r.nextInt(roomSize);
+                        connY = roomY + roomSize;
+                        if(connY < n - 1) {
+                            grid[connX][connY] = 7;
+                            if(connY + 1 < n) grid[connX][connY + 1] = 7;
+                        }
+                        break;
+                    case 1:
+                        connX = roomX + r.nextInt(roomSize);
+                        connY = roomY - 1;
+                        if(connY > 0) {
+                            grid[connX][connY] = 7;
+                            grid[connX][connY - 1] = 7;
+                        }
+                        break;
+                    case 2:
+                        connX = roomX + roomSize;
+                        connY = roomY + r.nextInt(roomSize);
+                        if(connX < n - 1) {
+                            grid[connX][connY] = 7;
+                            if(connX + 1 < n) grid[connX + 1][connY] = 7;
+                        }
+                        break;
                     case 3:
-                        if(trap < 5) {
-                            sb.append(i).append(",").append(j).append("=").append(what).append("\n");
-                            trap++;
-                        }
-                        break;
-                    case 4:
-                        if(enemy < 5 && (i > 3 && j > 3)) {
-                            sb.append(i).append(",").append(j).append("=").append(what).append("\n");
-                            enemy++;
-                        }
-                        break;
-                    case 5:
-                        if(key < 3) {
-                            sb.append(i).append(",").append(j).append("=").append(what).append("\n");
-                            key++;
-                        }
-                        break;
-                    case 6:
-                        if(power < 5) {
-                            sb.append(i).append(",").append(j).append("=").append(what).append("\n");
-                            power++;
-                        }
-                        break;
-                    default:
-                        if(Math.round(Math.random()) > 0 && !(what == 1 || what == 2)) {
-                            sb.append(i).append(",").append(j).append("=").append(what).append("\n");
+                        connX = roomX - 1;
+                        connY = roomY + r.nextInt(roomSize);
+                        if(connX > 0) {
+                            grid[connX][connY] = 7;
+                            grid[connX - 1][connY] = 7;
                         }
                         break;
                 }
             }
         }
+
+        List<int[]> walkableCells = new ArrayList<>();
+        for(int i = 0; i < n; i++) {
+            for(int j = 0; j < n; j++) {
+                if(grid[i][j] == 7) {
+                    walkableCells.add(new int[]{i, j});
+                }
+            }
+        }
+
+        int exitX, exitY;
+        int attempts = 0;
+        do {
+            int[] exitCell = walkableCells.get(r.nextInt(walkableCells.size()));
+            exitX = exitCell[0];
+            exitY = exitCell[1];
+            attempts++;
+
+            int distance = Math.abs(exitX - startX) + Math.abs(exitY - startY);
+            int minDistance = n / 3;
+
+            if(distance >= minDistance || attempts > 50) {
+                break;
+            }
+        } while(true);
+
+        grid[startX][startY] = 1;
+        grid[exitX][exitY] = 2;
+
+        List<int[]> roomCells = new ArrayList<>();
+        List<int[]> corridorCells = new ArrayList<>();
+
+        for(int i = 0; i < n; i++) {
+            for(int j = 0; j < n; j++) {
+                if(grid[i][j] == 7 && !(i == startX && j == startY) && !(i == exitX && j == exitY)) {
+                    int neighborCount = 0;
+                    for(int[] dir : dirs) {
+                        int nx = i + dir[0];
+                        int ny = j + dir[1];
+                        if(nx >= 0 && nx < n && ny >= 0 && ny < n && grid[nx][ny] == 7) {
+                            neighborCount++;
+                        }
+                    }
+
+                    if(neighborCount >= 3) {
+                        roomCells.add(new int[]{i, j});
+                    } else {
+                        corridorCells.add(new int[]{i, j});
+                    }
+                }
+            }
+        }
+
+        int maxWalkable = walkableCells.size();
+        int trapCount = Math.min(3 + (int) (lvl * 0.5), maxWalkable / 10);
+        int enemyCount = Math.min(2 + (int) (lvl * 0.7), maxWalkable / 8);
+        int powerCount = Math.min(2 + (int) (lvl * 0.4), maxWalkable / 12);
+
+        Collections.shuffle(corridorCells, r);
+        int placedTraps = 0;
+        for(int i = 0; i < corridorCells.size() && placedTraps < trapCount; i++) {
+            int[] cell = corridorCells.get(i);
+            if(grid[cell[0]][cell[1]] == 7) {
+                grid[cell[0]][cell[1]] = 3;
+                placedTraps++;
+                corridorCells.remove(i);
+                i--;
+            }
+        }
+
+        int enemiesInRooms = Math.min(enemyCount * 2 / 3, roomCells.size());
+        Collections.shuffle(roomCells, r);
+        int enemiesPlaced = 0;
+        for(int i = 0; i < roomCells.size() && enemiesPlaced < enemiesInRooms; i++) {
+            int[] cell = roomCells.get(i);
+            if(grid[cell[0]][cell[1]] == 7) {
+                grid[cell[0]][cell[1]] = 4;
+                enemiesPlaced++;
+                roomCells.remove(i);
+                i--;
+            }
+        }
+
+        Collections.shuffle(corridorCells, r);
+        for(int i = 0; i < corridorCells.size() && enemiesPlaced < enemyCount; i++) {
+            int[] cell = corridorCells.get(i);
+            if(grid[cell[0]][cell[1]] == 7) {
+                grid[cell[0]][cell[1]] = 4;
+                enemiesPlaced++;
+                corridorCells.remove(i);
+                i--;
+            }
+        }
+
+        List<int[]> allAvailable = new ArrayList<>();
+        allAvailable.addAll(roomCells);
+        allAvailable.addAll(corridorCells);
+
+        Collections.shuffle(allAvailable, r);
+        if(!allAvailable.isEmpty()) {
+            int bestIndex = -1;
+            int bestDistance = Integer.MAX_VALUE;
+
+            for(int i = 0; i < Math.min(allAvailable.size(), 20); i++) {
+                int[] cell = allAvailable.get(i);
+                int distToStart = Math.abs(cell[0] - startX) + Math.abs(cell[1] - startY);
+                int distToExit = Math.abs(cell[0] - exitX) + Math.abs(cell[1] - exitY);
+                int diff = Math.abs(distToStart - distToExit);
+
+                if(diff < bestDistance) {
+                    bestDistance = diff;
+                    bestIndex = i;
+                }
+            }
+
+            if(bestIndex != -1) {
+                int[] cell = allAvailable.get(bestIndex);
+                grid[cell[0]][cell[1]] = 5;
+                allAvailable.remove(bestIndex);
+            }
+        }
+
+        int powerupsInRooms = Math.min(powerCount * 3 / 4, roomCells.size());
+        Collections.shuffle(roomCells, r);
+        int placedPowers = 0;
+        for(int i = 0; i < roomCells.size() && placedPowers < powerupsInRooms; i++) {
+            int[] cell = roomCells.get(i);
+            if(grid[cell[0]][cell[1]] == 7) {
+                grid[cell[0]][cell[1]] = 6;
+                placedPowers++;
+                roomCells.remove(i);
+                i--;
+            }
+        }
+
+        Collections.shuffle(corridorCells, r);
+        for(int i = 0; i < corridorCells.size() && placedPowers < powerCount; i++) {
+            int[] cell = corridorCells.get(i);
+            if(grid[cell[0]][cell[1]] == 7) {
+                grid[cell[0]][cell[1]] = 6;
+                placedPowers++;
+                corridorCells.remove(i);
+                i--;
+            }
+        }
+
+        StringBuilder sb = new StringBuilder();
+        BufferedWriter bw = new BufferedWriter(file.writer(false));
+
+        for(int i = 0; i < n; i++) {
+            for(int j = 0; j < n; j++) {
+                int val = grid[i][j];
+                if(val == 7) {
+                    continue;
+                }
+                sb.append(i).append(",").append(j).append("=").append(val).append("\n");
+            }
+        }
+
         bw.write(sb.toString());
         bw.close();
 
