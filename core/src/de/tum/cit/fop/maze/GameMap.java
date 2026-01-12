@@ -190,7 +190,7 @@ public class GameMap {
      */
     public void generateMap() throws IOException {
         int lvl = playerStats.getLevel();
-        int n = Math.min(15 + lvl, 30);
+        int n = Math.min(20 + lvl, 40);
 
         if(n % 2 == 0) n++;
 
