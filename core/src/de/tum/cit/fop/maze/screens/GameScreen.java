@@ -67,7 +67,7 @@ public class GameScreen implements Screen {
     private boolean wonPlayed = false, lostPlayed = false;
 
     private Label achievementLabel;
-    private float achievementTimer = 0;
+    private float achievementTimer = 0, endlessTimer = 0;
 
     public GameScreen(MazeRunnerGame game, String path) throws IOException {
         this.game = game;
@@ -204,6 +204,23 @@ public class GameScreen implements Screen {
                 }
                 if(player.getKeys() > 0) {
                     e.open();
+                }
+            }
+
+            if(map.isEndless()) {
+                endlessTimer += delta;
+                if(endlessTimer >= 30) {
+                    Random r = new Random();
+                    int newX, newY;
+                    do {
+                        newX = r.nextInt(map.getW()-1);
+                        newY = r.nextInt(map.getH()-1);
+                    } while(map.isWall(newX, newY));
+                    map.getExit().setX(newX);
+                    map.getExit().setY(newY);
+                    Sound witch = Gdx.audio.newSound(Gdx.files.internal("sounds/witch_cackle.ogg"));
+                    witch.play(0.4f);
+                    endlessTimer = 0;
                 }
             }
 
@@ -472,6 +489,7 @@ public class GameScreen implements Screen {
                     victory = false;
                     paused = false;
                     time = 300;
+                    endlessTimer = 0;
 
                     game.menuMusic.stop();
                     gameMusic.play();

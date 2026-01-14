@@ -6,8 +6,7 @@ import de.tum.cit.fop.maze.objects.*;
 
 /**
  * The Trap abstract class serves as the base class for all trap objects in the game.
- * It provides common functionality for rendering and collision detection while requiring
- * specific update behavior to be implemented by each trap type.
+ * It provides common functionality for rendering and collision detection.
  */
 public abstract class Trap extends GameObj {
     /**

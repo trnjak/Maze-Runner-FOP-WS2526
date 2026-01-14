@@ -473,6 +473,14 @@ public class GameMap {
         load("maps/endless.properties");
     }
 
+    public int getW() {
+        return w;
+    }
+
+    public int getH() {
+        return h;
+    }
+
     public boolean isEndless() {
         return isEndless;
     }
