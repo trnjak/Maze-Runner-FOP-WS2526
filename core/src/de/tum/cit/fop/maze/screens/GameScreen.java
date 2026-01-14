@@ -29,7 +29,8 @@ import java.util.*;
  *
  * Hud textures from: <a href="https://kenney.nl/assets/micro-roguelike">LINK</a>
  * Music from: <a href="https://opengameart.org/content/random-battle">LINK</a>
- * SFX from: <a href="https://kenney.nl/assets/category:Audio">LINK</a>
+ * SFX from: <a href="https://kenney.nl/assets/category:Audio">LINK</a> and
+ * <a href="https://opengameart.org/content/witch-cackle">LINK 2</a>
  */
 public class GameScreen implements Screen {
     private final MazeRunnerGame game;
@@ -371,7 +372,7 @@ public class GameScreen implements Screen {
         Label title = new Label("PAUSED", game.getSkin(), "title");
         pauseTable.add(title).padBottom(80).row();
 
-        String[] menuItems = {"Continue", "New Map", "New Endless", "Main Menu"};
+        String[] menuItems = {"Continue", "New Game", "Load Map", "Main Menu"};
         for(String item : menuItems) {
             TextButton button = new TextButton(item, game.getSkin());
             pauseTable.add(button).width(320).padBottom(20).row();
@@ -399,15 +400,15 @@ public class GameScreen implements Screen {
                 game.menuMusic.stop();
                 gameMusic.play();
                 break;
-            case "New Map":
-                resetLevelScore();
-                game.menuMusic.stop();
-                game.goToGame();
-                break;
-            case "New Endless":
+            case "New Game":
                 resetLevelScore();
                 game.menuMusic.stop();
                 game.goToEndlessGame();
+                break;
+            case "Load Map":
+                resetLevelScore();
+                game.menuMusic.stop();
+                game.goToGame();
                 break;
             case "Main Menu":
                 gameMusic.stop();
@@ -470,7 +471,7 @@ public class GameScreen implements Screen {
         victoryScore = new Label("", game.getSkin());
         initMenuStep2("YOU WON!", victoryStage, victoryTable, victoryScore);
 
-        TextButton newMapButton = new TextButton("Next Endless", game.getSkin());
+        TextButton newMapButton = new TextButton("Next Level", game.getSkin());
         victoryTable.add(newMapButton).width(320).padBottom(20).row();
 
         newMapButton.addListener(new ChangeListener() {

@@ -3,6 +3,7 @@ package de.tum.cit.fop.maze;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -103,6 +104,20 @@ public class MazeRunnerGame extends Game {
      */
     public void goToStats() {
         setScreen(new StatsScreen(this));
+        if(gameScreen != null) {
+            gameScreen.pause();
+        }
+        if(menuScreen != null) {
+            menuScreen.dispose();
+            menuScreen = null;
+        }
+    }
+
+    /**
+     * Switches to the story screen.
+     */
+    public void goToStory() {
+        setScreen(new StoryScreen(this));
         if(gameScreen != null) {
             gameScreen.pause();
         }

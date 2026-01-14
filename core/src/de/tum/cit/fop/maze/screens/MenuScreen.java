@@ -37,48 +37,39 @@ public class MenuScreen implements Screen {
         gridTable.defaults().pad(10);
 
         String[][] menuItems = {
-                {"Load Map", "New Endless"},
+                {"Start Game", "Load Map"},
                 {"Stats/Upgrades", "Leaderboard"},
                 {"Achievements", "Settings"},
-                {"Exit", null}
+                {"Story", "Exit"}
         };
 
-        float buttonWidth = 300f;
+        float buttonWidth = 320f;
         float buttonHeight = 60f;
-        float exitButtonWidth = buttonWidth * 2 + 10;
 
         for(int row = 0; row < menuItems.length; row++) {
             for(int col = 0; col < 2; col++) {
                 String item = menuItems[row][col];
                 if(item != null) {
                     TextButton button = new TextButton(item, game.getSkin());
-                    if(row == menuItems.length - 1 && "Exit".equals(item)) {
-                        gridTable.add(button)
-                                .colspan(2)
-                                .width(exitButtonWidth)
-                                .height(buttonHeight)
-                                .padBottom(20)
-                                .center();
-                    } else {
-                        gridTable.add(button)
-                                .width(buttonWidth)
-                                .height(buttonHeight)
-                                .padBottom(20);
-                        if(col == 0) {
-                            gridTable.getCell(button).padRight(10);
-                        }
+                    gridTable.add(button)
+                            .width(buttonWidth)
+                            .height(buttonHeight)
+                            .padBottom(20);
+                    if(col == 0) {
+                        gridTable.getCell(button).padRight(10);
                     }
 
                     button.addListener(new ChangeListener() {
                         @Override
                         public void changed(ChangeEvent event, Actor actor) {
                             switch(item) {
+                                case "Start Game" -> decide(game);
                                 case "Load Map" -> game.goToGame();
-                                case "New Endless" -> game.goToEndlessGame();
                                 case "Stats/Upgrades" -> game.goToStats();
                                 case "Leaderboard" -> game.goToLeaderboard();
                                 case "Achievements" -> game.goToAchievement();
                                 case "Settings" -> game.goToSettings();
+                                case "Story" -> game.goToStory();
                                 case "Exit" -> Gdx.app.exit();
                             }
                         }
@@ -91,6 +82,20 @@ public class MenuScreen implements Screen {
         }
 
         mainTable.add(gridTable).center();
+    }
+
+    /**
+     * Helper method to decide whether the "Start Game" button will show the story or not
+     * based on the number of points in the save file.
+     * @param game The main game class.
+     * */
+    private void decide(MazeRunnerGame game) {
+        if(BeginScreen.STATS.getScore() == 0) {
+            game.goToStory();
+        }
+        else {
+            game.goToEndlessGame();
+        }
     }
 
     /**
