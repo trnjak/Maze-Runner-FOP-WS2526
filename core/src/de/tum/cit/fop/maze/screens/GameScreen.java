@@ -929,7 +929,7 @@ public class GameScreen implements Screen {
      * Awards experience points to the player based on their score and saves the updated stats.
      */
     private void awardExp() {
-        int plusExp = (int) (score / 500);
+        int plusExp = (int) Math.ceil(score/500);
         if(plusExp > 0) {
             playerStats.addExp(plusExp);
             playerStats.save();
