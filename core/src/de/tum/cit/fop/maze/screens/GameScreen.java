@@ -852,8 +852,8 @@ public class GameScreen implements Screen {
      * @param parts The command parts split by whitespace.
      */
     private void handleHealCommand(String[] parts) {
-        int amount = parts.length > 1 ? Integer.parseInt(parts[1]) : 5;
-        player.setHp(Math.min(5, player.getHp() + amount));
+        int amount = parts.length > 1 ? Integer.parseInt(parts[1]) : playerStats.getMaxHp();
+        player.setHp(Math.min(playerStats.getMaxHp(), player.getHp() + amount));
         consoleVariables.put("health", player.getHp());
         appendConsoleOutput("\nHealed player to " + player.getHp() + " HP");
     }
