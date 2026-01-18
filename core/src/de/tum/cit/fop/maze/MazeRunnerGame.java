@@ -46,6 +46,7 @@ public class MazeRunnerGame extends Game {
      * Called when the game is created. Initializes the SpriteBatch, Skin and menu music.
      *
      * Music from: <a href="https://opengameart.org/content/fantasy-good-night">LINK</a>
+     * Background image courtesy of Benedikt Jaletzke on Unsplash: <a href="https://unsplash.com/photos/brown-concrete-castle-UboDuBeLKIw">LINK</a>
      */
     @Override
     public void create() {
@@ -57,7 +58,7 @@ public class MazeRunnerGame extends Game {
         menuMusic.setVolume(0.2f);
         menuMusic.play();
 
-        menuImage = new Image(new Texture("background.png"));
+        menuImage = new Image(new Texture("background.jpg"));
         menuImage.setSize(WIDTH, HEIGHT);
         menuImage.setPosition(0, 0);
 
