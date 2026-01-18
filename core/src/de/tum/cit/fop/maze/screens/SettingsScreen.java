@@ -48,6 +48,7 @@ public class SettingsScreen implements Screen {
         this.game = game;
         var camera = new OrthographicCamera();
         stage = new Stage(new FitViewport(game.WIDTH, game.HEIGHT, camera), game.getSpriteBatch());
+        stage.addActor(game.menuImage);
 
         Table table = new Table();
         table.setFillParent(true);
@@ -173,7 +174,7 @@ public class SettingsScreen implements Screen {
      */
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0.46f, 0.23f, 0.21f, 1);
+        Gdx.gl.glClearColor(0.255f, 0.286f, 0.349f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         handleInput();
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));

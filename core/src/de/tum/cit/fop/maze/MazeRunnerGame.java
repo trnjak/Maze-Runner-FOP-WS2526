@@ -3,8 +3,8 @@ package de.tum.cit.fop.maze;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import de.tum.cit.fop.maze.screens.*;
@@ -30,6 +30,7 @@ public class MazeRunnerGame extends Game {
     private final NativeFileChooser fileChooser;
 
     public Music menuMusic;
+    public Image menuImage;
 
     /**
      * Constructor for MazeRunnerGame.
@@ -55,6 +56,10 @@ public class MazeRunnerGame extends Game {
         menuMusic.setLooping(true);
         menuMusic.setVolume(0.2f);
         menuMusic.play();
+
+        menuImage = new Image(new Texture("background.png"));
+        menuImage.setSize(WIDTH, HEIGHT);
+        menuImage.setPosition(0, 0);
 
         setScreen(new BeginScreen(this));
     }

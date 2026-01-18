@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -26,12 +27,13 @@ public class MenuScreen implements Screen {
     public MenuScreen(MazeRunnerGame game) {
         var camera = new OrthographicCamera();
         stage = new Stage(new FitViewport(game.WIDTH, game.HEIGHT, camera), game.getSpriteBatch());
+        stage.addActor(game.menuImage);
 
         Table mainTable = new Table();
         mainTable.setFillParent(true);
         stage.addActor(mainTable);
 
-        Label title = new Label("AWESOME GAME", game.getSkin(), "title");
+        Label title = new Label("Game Title", game.getSkin(), "title");
         mainTable.add(title).padBottom(80).row();
         Table gridTable = new Table();
         gridTable.defaults().pad(10);
@@ -104,7 +106,7 @@ public class MenuScreen implements Screen {
      */
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0.46f, 0.23f, 0.21f, 1);
+        Gdx.gl.glClearColor(0.255f, 0.286f, 0.349f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
