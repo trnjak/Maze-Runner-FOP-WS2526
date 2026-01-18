@@ -34,7 +34,7 @@ public class StoryScreen implements Screen {
         Label title = new Label("STORY", game.getSkin(), "title");
         mainTable.add(title).padBottom(40).row();
 
-        String storyText =
+        String story =
                """
                In the shadow-haunted Castle of Zoloft, Princess Hayley finds herself trapped by an evil witch.
                \s
@@ -54,7 +54,7 @@ public class StoryScreen implements Screen {
                Can you help Princess Hayley escape the witch's wrath?
                """;
 
-        Label storyLabel = new Label(storyText, game.getSkin());
+        Label storyLabel = new Label(story, game.getSkin());
         storyLabel.setWrap(true);
         storyLabel.setAlignment(Align.top | Align.left);
 
