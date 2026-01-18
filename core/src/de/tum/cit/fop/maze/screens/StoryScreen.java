@@ -38,7 +38,7 @@ public class StoryScreen implements Screen {
                """
                In the shadow-haunted Castle of Zoloft, Princess Hayley finds herself trapped by an evil witch.
                \s
-               The witch, jealous of the princess's courage, has woven a powerful curse:
+               The witch, jealous of the princess's courage, has woven a powerful curse upon Hayley's castle:
                \s
                > GHOSTS chasing anyone that dares to cross their path
                > GIANT SPIDERS patrolling the premises
