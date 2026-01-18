@@ -37,6 +37,7 @@ public class GameMap {
     private final List<Powerup> powerups = new ArrayList<>();
     private Exit exit;
 
+
     private boolean isEndless = false;
 
     private final PlayerStats playerStats = BeginScreen.STATS;
@@ -504,4 +505,39 @@ public class GameMap {
     public List<Powerup> getPowerups() {
         return powerups;
     }
+
+
+
+
+    public int getWidth() {
+        return w;  // number of tiles horizontally
+    }
+
+    public int getHeight() {
+        return h;  // number of tiles vertically
+    }
+    public List<int[]> findFreeSpots() {
+        List<int[]> freeSpots = new ArrayList<>();
+
+        for (int i = 0; i < w; i++) {
+            for (int j = 0; j < h; j++) {
+                if (isWall(i, j)) continue;
+
+                boolean occupied = false;
+                for (Trap t : traps) if (t.getX() == i && t.getY() == j) { occupied = true; break; }
+                for (Enemy e : enemies) if (e.getX() == i && e.getY() == j) { occupied = true; break; }
+                for (Powerup p : powerups) if (p.getX() == i && p.getY() == j) { occupied = true; break; }
+                for (Key k : keys) if (k.getX() == i && k.getY() == j) { occupied = true; break; }
+
+                if (!occupied) freeSpots.add(new int[]{i, j});
+            }
+        }
+
+        return freeSpots;
+    }
+
+
+
+
+
 }

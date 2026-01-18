@@ -111,6 +111,7 @@ public class GameScreen implements Screen {
         hudVp = new FitViewport(game.WIDTH, game.HEIGHT, hudCam);
 
         map = new GameMap();
+     
         try {
             map.generateMap();
         } catch(IOException e) {
@@ -1082,4 +1083,7 @@ public class GameScreen implements Screen {
             hudStage.dispose();
         }
     }
+
+
+
 }
