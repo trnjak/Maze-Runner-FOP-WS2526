@@ -30,7 +30,7 @@ public class Player extends GameObj {
     takeDmg = Gdx.audio.newSound(Gdx.files.internal("sounds/take_dmg.ogg"));
 
     public Player(float x, float y) {
-        super(x, y, 7, 0);
+        super(x, y, 8, 3);
         this.w = TILE;
         this.h = TILE;
 
