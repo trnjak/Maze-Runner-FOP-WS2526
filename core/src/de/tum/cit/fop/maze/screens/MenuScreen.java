@@ -49,23 +49,23 @@ public class MenuScreen implements Screen {
         float buttonWidth = 320f;
         float buttonHeight = 60f;
 
-        for (int row = 0; row < menuItems.length; row++) {
-            for (int col = 0; col < 2; col++) {
-                String item = menuItems[row][col];
-                if (item != null) {
+        for(String[] menuItem : menuItems) {
+            for(int col = 0; col < 2; col++) {
+                String item = menuItem[col];
+                if(item != null) {
                     TextButton button = new TextButton(item, game.getSkin());
                     gridTable.add(button)
                             .width(buttonWidth)
                             .height(buttonHeight)
                             .padBottom(20);
-                    if (col == 0) {
+                    if(col == 0) {
                         gridTable.getCell(button).padRight(10);
                     }
 
                     button.addListener(new ChangeListener() {
                         @Override
                         public void changed(ChangeEvent event, Actor actor) {
-                            switch (item) {
+                            switch(item) {
                                 case "Start Game" -> decide(game);
                                 case "Load Map" -> game.goToGame();
                                 case "Stats/Upgrades" -> game.goToStats();
@@ -77,7 +77,7 @@ public class MenuScreen implements Screen {
                             }
                         }
                     });
-                } else if (col == 0) {
+                } else if(col == 0) {
                     gridTable.add().width(buttonWidth).height(0);
                 }
             }
@@ -95,7 +95,7 @@ public class MenuScreen implements Screen {
      *
      */
     private void decide(MazeRunnerGame game) {
-        if (BeginScreen.STATS.getScore() == 0) {
+        if(BeginScreen.STATS.getScore() == 0) {
             game.goToStory();
         } else {
             game.goToEndlessGame();
