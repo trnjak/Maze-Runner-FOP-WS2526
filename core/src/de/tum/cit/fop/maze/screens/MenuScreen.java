@@ -153,5 +153,6 @@ public class MenuScreen implements Screen {
 
     @Override
     public void hide() {
+        Gdx.input.setInputProcessor(null);
     }
 }
