@@ -205,6 +205,7 @@ public class MazeRunnerGame extends Game {
      */
     @Override
     public void dispose() {
+        getScreen().hide();
         getScreen().dispose();
         spriteBatch.dispose();
         skin.dispose();

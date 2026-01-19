@@ -99,6 +99,7 @@ public class MenuScreen implements Screen {
             game.goToStory();
         } else {
             game.goToEndlessGame();
+            Gdx.input.setInputProcessor(null);
         }
     }
 
@@ -152,7 +153,5 @@ public class MenuScreen implements Screen {
     }
 
     @Override
-    public void hide() {
-        Gdx.input.setInputProcessor(null);
-    }
+    public void hide() {}
 }

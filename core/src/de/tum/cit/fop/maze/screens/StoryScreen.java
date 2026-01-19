@@ -87,6 +87,7 @@ public class StoryScreen implements Screen {
         startButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                Gdx.input.setInputProcessor(null);
                 game.goToEndlessGame();
             }
         });
