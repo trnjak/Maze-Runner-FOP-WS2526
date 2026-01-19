@@ -20,12 +20,13 @@ public class Speedup extends Powerup {
 
     /**
      * Applies the temporary speed effect on the player if he collects it.
+     *
      * @param player The player object to apply the effect to.
-     * @param delta The time in seconds since the last update.
+     * @param delta  The time in seconds since the last update.
      */
     @Override
     public void update(Player player, float delta) {
-        if(player.getBounds().overlaps(getBounds())) {
+        if (player.getBounds().overlaps(getBounds())) {
             player.speedEffect(1.25f, 2f, Color.GREEN);
         }
     }

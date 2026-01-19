@@ -28,9 +28,10 @@ public class ChaserEnemy extends Enemy {
      * using obstacle avoidance to navigate around walls. When not chasing,
      * the enemy moves randomly. If the enemy reaches the player, it pushes
      * the player away and stops moving.
-     * @param delta The time elapsed since the last frame update
+     *
+     * @param delta  The time elapsed since the last frame update
      * @param player The player character being chased
-     * @param map The game map containing wall collision data
+     * @param map    The game map containing wall collision data
      */
     @Override
     protected void move(float delta, Player player, GameMap map) {
@@ -151,9 +152,9 @@ public class ChaserEnemy extends Enemy {
     /**
      * Checks whether the enemy has a line of sight to the player or not,
      * used to ensure that the enemy won't try to chase a player from behind a wall.
+     *
      * @param player The player chased by the enemy.
-     * @param map The game map.
-     * @return True if the enemy can see the player, false otherwise.
+     * @param map    The game map.
      */
     private boolean hasLineOfSight(Player player, GameMap map) {
         Vector2 enemyPos = new Vector2(x + w / 2, y + h / 2);
@@ -167,10 +168,10 @@ public class ChaserEnemy extends Enemy {
 
         Vector2 cur = new Vector2(enemyPos);
 
-        for(int i = 0; i < steps; i++) {
+        for (int i = 0; i < steps; i++) {
             cur.add(dir.x * stepSize, dir.y * stepSize);
             Rectangle checkRect = new Rectangle(cur.x - 2, cur.y - 2, 4, 4);
-            if(map.collidesWithWall(checkRect)) {
+            if (map.collidesWithWall(checkRect)) {
                 return false;
             }
         }
@@ -181,6 +182,7 @@ public class ChaserEnemy extends Enemy {
      * Pushes the player away from the enemy when they collide.
      * The push direction is calculated as the vector from the enemy to the player,
      * normalised and scaled by a fixed strength.
+     *
      * @param player The player to push.
      */
     protected void pushPlayer(Player player) {

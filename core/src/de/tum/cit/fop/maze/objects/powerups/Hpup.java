@@ -18,13 +18,14 @@ public class Hpup extends Powerup {
 
     /**
      * Updates the powerup's effect on the player when collected, restores one health point if below maximum health.
+     *
      * @param player The player object to apply the effect to.
-     * @param delta The time in seconds since the last update.
+     * @param delta  The time in seconds since the last update.
      */
     @Override
     public void update(Player player, float delta) {
-        if(player.getBounds().overlaps(getBounds()) && player.getHp()+1<=player.getMaxHealth()) {
-            player.setHp(player.getHp()+1);
+        if (player.getBounds().overlaps(getBounds()) && player.getHp() + 1 <= player.getMaxHealth()) {
+            player.setHp(player.getHp() + 1);
         }
     }
 }

@@ -1,9 +1,13 @@
 package de.tum.cit.fop.maze.screens;
 
-import com.badlogic.gdx.*;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
@@ -13,58 +17,62 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.viewport.*;
-import de.tum.cit.fop.maze.*;
-import de.tum.cit.fop.maze.objects.*;
-import de.tum.cit.fop.maze.objects.enemies.*;
-import de.tum.cit.fop.maze.objects.powerups.*;
-import de.tum.cit.fop.maze.objects.traps.*;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
+import de.tum.cit.fop.maze.GameMap;
+import de.tum.cit.fop.maze.KeyBindings;
+import de.tum.cit.fop.maze.MazeRunnerGame;
+import de.tum.cit.fop.maze.PlayerStats;
+import de.tum.cit.fop.maze.objects.Exit;
+import de.tum.cit.fop.maze.objects.GameObj;
+import de.tum.cit.fop.maze.objects.Key;
+import de.tum.cit.fop.maze.objects.Player;
+import de.tum.cit.fop.maze.objects.enemies.Enemy;
+import de.tum.cit.fop.maze.objects.powerups.Powerup;
+import de.tum.cit.fop.maze.objects.traps.Trap;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Random;
 
 /**
  * The GameScreen class is the main gameplay screen that handles map loading, player interaction,
  * enemy AI, collision detection, scoring, and developer console functionality.
- *
+ * <p>
  * Hud textures from: <a href="https://kenney.nl/assets/micro-roguelike">LINK</a>
  * Music from: <a href="https://opengameart.org/content/random-battle">LINK</a>
  * SFX from: <a href="https://kenney.nl/assets/category:Audio">LINK</a> and
  * <a href="https://opengameart.org/content/witch-cackle">LINK 2</a>
  */
 public class GameScreen implements Screen {
+    private static final Texture TILE_SHEET = new Texture("hud_tilemap.png");
+    public static final TextureRegion[][] TEXTURE_REGION = TextureRegion.split(TILE_SHEET, TILE_SHEET.getWidth() / 16, TILE_SHEET.getHeight() / 10);
     private final MazeRunnerGame game;
     private final OrthographicCamera camera, hudCam;
     private final Viewport viewport, hudVp;
     private final GameMap map;
     private final Player player;
     private final PlayerStats playerStats;
+    private final KeyBindings binds = KeyBindings.load();
+    private final ShapeRenderer sr = new ShapeRenderer();
+    private final Map<String, Object> consoleVariables = new HashMap<>();
+    private final Music gameMusic = Gdx.audio.newMusic(Gdx.files.internal("game_bg.mp3"));
+    private final Sound scored = Gdx.audio.newSound(Gdx.files.internal("sounds/scored.ogg")),
+            won = Gdx.audio.newSound(Gdx.files.internal("sounds/win.ogg")),
+            lost = Gdx.audio.newSound(Gdx.files.internal("sounds/lose.ogg"));
     private boolean paused = false, gameOver = false, victory = false;
-
     private float score = 0, time = 300;
     private int maxHearts;
-
-    private final KeyBindings binds = KeyBindings.load();
-
-    private final ShapeRenderer sr = new ShapeRenderer();
-
     private Stage pauseStage, gameOverStage, victoryStage, consoleStage, hudStage;
     private Table pauseTable, gameOverTable, victoryTable, consoleTable;
     private Label gameOverScore, victoryScore, consoleOutputLabel, scoreLabel, timeLabel;
     private TextField consoleTextField;
     private ScrollPane consoleScrollPane;
-
-    private static final Texture TILE_SHEET = new Texture("hud_tilemap.png");
-    public static final TextureRegion[][] TEXTURE_REGION = TextureRegion.split(TILE_SHEET, TILE_SHEET.getWidth() / 16, TILE_SHEET.getHeight() / 10);
-
     private boolean consoleOpen = false;
     private String consoleOutput = "";
-    private final Map<String, Object> consoleVariables = new HashMap<>();
-
-    private final Music gameMusic = Gdx.audio.newMusic(Gdx.files.internal("game_bg.mp3"));
-    private final Sound scored = Gdx.audio.newSound(Gdx.files.internal("sounds/scored.ogg")),
-            won = Gdx.audio.newSound(Gdx.files.internal("sounds/win.ogg")),
-            lost = Gdx.audio.newSound(Gdx.files.internal("sounds/lose.ogg"));
     private boolean wonPlayed = false, lostPlayed = false;
 
     private Label achievementLabel;
@@ -112,10 +120,10 @@ public class GameScreen implements Screen {
         hudVp = new FitViewport(game.WIDTH, game.HEIGHT, hudCam);
 
         map = new GameMap();
-     
+
         try {
             map.generateMap();
-        } catch(IOException e) {
+        } catch (IOException e) {
             System.out.println(e.getMessage());
         }
 
@@ -136,6 +144,7 @@ public class GameScreen implements Screen {
 
     /**
      * Main game loop that updates game logic, handles input, renders graphics and UI.
+     *
      * @param delta The time in seconds since the last render.
      */
     @Override
@@ -145,33 +154,33 @@ public class GameScreen implements Screen {
 
         globalInput();
 
-        if(!paused && !gameOver && !victory && !consoleOpen) {
+        if (!paused && !gameOver && !victory && !consoleOpen) {
             time -= delta;
 
             player.update(delta);
             playerInput(delta);
 
-            for(Enemy e : map.getEnemies()) {
+            for (Enemy e : map.getEnemies()) {
                 e.update(delta, player, map);
-                if(!player.isAlive()) {
+                if (!player.isAlive()) {
                     gameOver = true;
                     updateGameOverScore();
                 }
             }
 
-            for(Trap t : map.getTraps()) {
+            for (Trap t : map.getTraps()) {
                 t.update(player, delta);
-                if(!player.isAlive()) {
+                if (!player.isAlive()) {
                     gameOver = true;
                     updateGameOverScore();
                 }
             }
 
-            for(Iterator<Key> it = map.getKeys().iterator(); it.hasNext(); ) {
+            for (Iterator<Key> it = map.getKeys().iterator(); it.hasNext(); ) {
                 Key key = it.next();
-                if(player.getBounds().overlaps(key.getBounds())) {
+                if (player.getBounds().overlaps(key.getBounds())) {
                     player.collectKey();
-                    if(player.getKeys() == 1) {
+                    if (player.getKeys() == 1) {
                         Sound open = Gdx.audio.newSound(Gdx.files.internal("sounds/door_open.ogg"));
                         open.play(0.2f);
                     }
@@ -179,7 +188,7 @@ public class GameScreen implements Screen {
                     scored.play(0.1f);
 
                     Array<String> unlocked = playerStats.updateAchievement("collect", 1);
-                    if(unlocked.size > 0) {
+                    if (unlocked.size > 0) {
                         showAchievement(unlocked.first());
                     }
 
@@ -187,9 +196,9 @@ public class GameScreen implements Screen {
                 }
             }
 
-            for(Iterator<Powerup> it = map.getPowerups().iterator(); it.hasNext(); ) {
+            for (Iterator<Powerup> it = map.getPowerups().iterator(); it.hasNext(); ) {
                 Powerup p = it.next();
-                if(player.getBounds().overlaps(p.getBounds())) {
+                if (player.getBounds().overlaps(p.getBounds())) {
                     p.update(player, delta);
                     score += 50;
                     scored.play(0.1f);
@@ -198,26 +207,26 @@ public class GameScreen implements Screen {
             }
 
             Exit e = map.getExit();
-            if(e != null) {
+            if (e != null) {
                 e.update(delta);
-                if(player.getBounds().overlaps(e.getBounds()) && player.getKeys() > 0) {
+                if (player.getBounds().overlaps(e.getBounds()) && player.getKeys() > 0) {
                     victory = true;
                     updateVictoryScore();
                 }
-                if(player.getKeys() > 0) {
+                if (player.getKeys() > 0) {
                     e.open();
                 }
             }
 
-            if(map.isEndless()) {
+            if (map.isEndless()) {
                 endlessTimer += delta;
-                if(endlessTimer >= 30) {
+                if (endlessTimer >= 30) {
                     Random r = new Random();
                     int newX, newY;
                     do {
-                        newX = r.nextInt(map.getW()-1);
-                        newY = r.nextInt(map.getH()-1);
-                    } while(map.isWall(newX, newY));
+                        newX = r.nextInt(map.getW() - 1);
+                        newY = r.nextInt(map.getH() - 1);
+                    } while (map.isWall(newX, newY));
                     map.getExit().setX(newX);
                     map.getExit().setY(newY);
                     Sound witch = Gdx.audio.newSound(Gdx.files.internal("sounds/witch_cackle.ogg"));
@@ -229,7 +238,7 @@ public class GameScreen implements Screen {
             centerCameraOnPlayer();
         }
 
-        if(time <= 0) {
+        if (time <= 0) {
             gameOver = true;
             updateGameOverScore();
         }
@@ -241,7 +250,7 @@ public class GameScreen implements Screen {
         game.getSpriteBatch().begin();
         map.render(game.getSpriteBatch());
         player.render(game.getSpriteBatch());
-        for(Enemy enemy : map.getEnemies()) {
+        for (Enemy enemy : map.getEnemies()) {
             enemy.render(game.getSpriteBatch());
         }
         game.getSpriteBatch().end();
@@ -253,35 +262,35 @@ public class GameScreen implements Screen {
         game.getSpriteBatch().begin();
         int currentLives = player.getHp();
         float heartX = 20, heartY = hudVp.getWorldHeight() - 40;
-        for(int i = 0; i < maxHearts; i++) {
-            if(i < currentLives) {
+        for (int i = 0; i < maxHearts; i++) {
+            if (i < currentLives) {
                 game.getSpriteBatch().draw(TEXTURE_REGION[6][6], heartX + i * GameObj.TILE, heartY, GameObj.TILE, GameObj.TILE);
             } else {
                 game.getSpriteBatch().draw(TEXTURE_REGION[6][4], heartX + i * GameObj.TILE, heartY, GameObj.TILE, GameObj.TILE);
             }
         }
-        if(currentLives > maxHearts) {
-            for(int i = maxHearts; i < currentLives; i++) {
+        if (currentLives > maxHearts) {
+            for (int i = maxHearts; i < currentLives; i++) {
                 game.getSpriteBatch().draw(TEXTURE_REGION[6][6], heartX + i * GameObj.TILE, heartY, GameObj.TILE, GameObj.TILE);
             }
             maxHearts = currentLives;
         }
-        if(player.getKeys() < 1) {
+        if (player.getKeys() < 1) {
             game.getSpriteBatch().draw(TEXTURE_REGION[7][4], hudVp.getWorldWidth() - GameObj.TILE - 20, hudVp.getWorldHeight() - 40, GameObj.TILE, GameObj.TILE);
         } else {
             game.getSpriteBatch().draw(TEXTURE_REGION[5][10], hudVp.getWorldWidth() - GameObj.TILE - 20, hudVp.getWorldHeight() - 40, GameObj.TILE, GameObj.TILE);
         }
         Exit exit = map.getExit();
-        if(exit != null) {
+        if (exit != null) {
             float arrowRotation = computeArrow(player.getX(), player.getY(), exit.getX() * GameObj.TILE, exit.getY() * GameObj.TILE);
-            if(arrowRotation >= 0) {
+            if (arrowRotation >= 0) {
                 float arrowX = 20, arrowY = game.HEIGHT - 80;
                 float originX = (float) GameObj.TILE / 2, originY = (float) GameObj.TILE / 2;
                 game.getSpriteBatch().draw(TEXTURE_REGION[6][3], arrowX, arrowY, originX, originY, GameObj.TILE, GameObj.TILE, 1, 1, arrowRotation);
             }
         }
 
-        if(achievementTimer > 0) {
+        if (achievementTimer > 0) {
             achievementTimer -= delta;
             float alpha = Math.min(achievementTimer, 1.0f);
             achievementLabel.setColor(1, 1, 1, alpha);
@@ -299,18 +308,18 @@ public class GameScreen implements Screen {
         hudStage.act(delta);
         hudStage.draw();
 
-        if(consoleOpen) {
+        if (consoleOpen) {
             consoleStage.getViewport().apply();
             consoleTable.setVisible(true);
             consoleStage.act(delta);
             consoleStage.draw();
-        } else if(paused && !gameOver && !victory) {
+        } else if (paused && !gameOver && !victory) {
             pauseStage.getViewport().apply();
             pauseTable.setVisible(true);
             pauseStage.act(delta);
             pauseStage.draw();
-        } else if(gameOver) {
-            if(!lostPlayed) {
+        } else if (gameOver) {
+            if (!lostPlayed) {
                 lost.play(0.2f);
                 gameMusic.stop();
                 game.menuMusic.play();
@@ -320,8 +329,8 @@ public class GameScreen implements Screen {
             gameOverTable.setVisible(true);
             gameOverStage.act(delta);
             gameOverStage.draw();
-        } else if(victory) {
-            if(!wonPlayed) {
+        } else if (victory) {
+            if (!wonPlayed) {
                 won.play(0.2f);
                 gameMusic.stop();
                 game.menuMusic.play();
@@ -374,7 +383,7 @@ public class GameScreen implements Screen {
         pauseTable.add(title).padBottom(80).row();
 
         String[] menuItems = {"Continue", "New Game", "Load Map", "Main Menu"};
-        for(String item : menuItems) {
+        for (String item : menuItems) {
             TextButton button = new TextButton(item, game.getSkin());
             pauseTable.add(button).width(320).padBottom(20).row();
 
@@ -391,10 +400,11 @@ public class GameScreen implements Screen {
 
     /**
      * Handles the selection of options from the pause menu.
+     *
      * @param item The selected menu item.
      */
     private void handlePauseMenuSelection(String item) {
-        switch(item) {
+        switch (item) {
             case "Continue":
                 paused = false;
                 Gdx.input.setInputProcessor(null);
@@ -421,10 +431,11 @@ public class GameScreen implements Screen {
 
     /**
      * Initializes the game over and victory screens with common UI elements.
+     *
      * @param title The title to display on the screen.
-     * @param s The stage to add the table to.
-     * @param t The table containing the UI elements.
-     * @param sc The label to display the score.
+     * @param s     The stage to add the table to.
+     * @param t     The table containing the UI elements.
+     * @param sc    The label to display the score.
      */
     private void initMenuStep2(String title, Stage s, Table t, Label sc) {
         Label la = new Label(title, game.getSkin(), "title");
@@ -503,7 +514,7 @@ public class GameScreen implements Screen {
 
                     centerCameraOnPlayer();
                     Gdx.input.setInputProcessor(null);
-                } catch(IOException e) {
+                } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -545,7 +556,7 @@ public class GameScreen implements Screen {
         consoleTextField = new TextField("", game.getSkin());
         consoleTextField.setMessageText("Enter command...");
         consoleTextField.setTextFieldListener((textField, c) -> {
-            if(c == '\r' || c == '\n') {
+            if (c == '\r' || c == '\n') {
                 processConsoleCommand(textField.getText());
                 textField.setText("");
             }
@@ -560,15 +571,16 @@ public class GameScreen implements Screen {
 
     /**
      * Appends text to the console output display.
+     *
      * @param text The text to append to the console output.
      */
     private void appendConsoleOutput(String text) {
         consoleOutput += text;
 
-        if(consoleOutput.length() > 5000) {
+        if (consoleOutput.length() > 5000) {
             consoleOutput = consoleOutput.substring(consoleOutput.length() - 5000);
             int firstNewline = consoleOutput.indexOf('\n');
-            if(firstNewline != -1) {
+            if (firstNewline != -1) {
                 consoleOutput = consoleOutput.substring(firstNewline);
             }
         }
@@ -612,7 +624,7 @@ public class GameScreen implements Screen {
         playerStats.addScore(finalScore);
 
         Array<String> unlocked = playerStats.checkScoreAchievements();
-        if(unlocked.size > 0) {
+        if (unlocked.size > 0) {
             showAchievement(unlocked.first());
         }
 
@@ -629,12 +641,12 @@ public class GameScreen implements Screen {
         playerStats.addScore(finalScore);
 
         Array<String> unlocked = playerStats.checkScoreAchievements();
-        if(unlocked.size > 0) {
+        if (unlocked.size > 0) {
             showAchievement(unlocked.first());
         }
 
         Array<String> levelUnlocked = playerStats.checkLevelAchievements();
-        if(levelUnlocked.size > 0) {
+        if (levelUnlocked.size > 0) {
             showAchievement(levelUnlocked.first());
         }
 
@@ -643,17 +655,18 @@ public class GameScreen implements Screen {
 
     /**
      * Processes console commands entered by the user.
+     *
      * @param command The console command string to process.
      */
     private void processConsoleCommand(String command) {
-        if(command.trim().isEmpty()) return;
+        if (command.trim().isEmpty()) return;
 
         String[] parts = command.trim().split("\\s+");
         String cmd = parts[0].toLowerCase();
 
         try {
-            switch(cmd) {
-                case "help","man","?":
+            switch (cmd) {
+                case "help", "man", "?":
                     showHelp();
                     break;
                 case "set":
@@ -688,7 +701,7 @@ public class GameScreen implements Screen {
                 default:
                     appendConsoleOutput("\nUnknown command: " + cmd + ". Type 'help' for available commands.");
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             appendConsoleOutput("\nError executing command: " + e.getMessage());
         }
     }
@@ -719,10 +732,11 @@ public class GameScreen implements Screen {
 
     /**
      * Handles the 'set' console command for modifying game variables.
+     *
      * @param parts The command parts split by whitespace.
      */
     private void handleSetCommand(String[] parts) {
-        if(parts.length < 3) {
+        if (parts.length < 3) {
             appendConsoleOutput("\nUsage: set [variable] [value]");
             return;
         }
@@ -736,14 +750,14 @@ public class GameScreen implements Screen {
                 consoleVariables.put(varName, intValue);
                 applyVariableChange(varName, intValue);
                 appendConsoleOutput("\nSet " + varName + " = " + intValue);
-            } catch(NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 try {
                     float floatValue = Float.parseFloat(valueStr);
                     consoleVariables.put(varName, floatValue);
                     applyVariableChange(varName, floatValue);
                     appendConsoleOutput("\nSet " + varName + " = " + floatValue);
-                } catch(NumberFormatException e2) {
-                    if(valueStr.equalsIgnoreCase("true") || valueStr.equalsIgnoreCase("false")) {
+                } catch (NumberFormatException e2) {
+                    if (valueStr.equalsIgnoreCase("true") || valueStr.equalsIgnoreCase("false")) {
                         boolean boolValue = Boolean.parseBoolean(valueStr);
                         consoleVariables.put(varName, boolValue);
                         applyVariableChange(varName, boolValue);
@@ -754,17 +768,18 @@ public class GameScreen implements Screen {
                     }
                 }
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             appendConsoleOutput("\nError setting variable: " + e.getMessage());
         }
     }
 
     /**
      * Handles the 'get' console command for retrieving variable values.
+     *
      * @param parts The command parts split by whitespace.
      */
     private void handleGetCommand(String[] parts) {
-        if(parts.length < 2) {
+        if (parts.length < 2) {
             appendConsoleOutput("\nUsage: get [variable]");
             return;
         }
@@ -772,7 +787,7 @@ public class GameScreen implements Screen {
         String varName = parts[1];
         Object value = consoleVariables.get(varName);
 
-        if(value != null) {
+        if (value != null) {
             appendConsoleOutput("\n" + varName + " = " + value);
         } else {
             appendConsoleOutput("\nVariable not found: " + varName);
@@ -781,10 +796,11 @@ public class GameScreen implements Screen {
 
     /**
      * Handles the 'give' console command for granting items to the player.
+     *
      * @param parts The command parts split by whitespace.
      */
     private void handleGiveCommand(String[] parts) {
-        if(parts.length < 2) {
+        if (parts.length < 2) {
             appendConsoleOutput("\nUsage: give [item] [amount]");
             return;
         }
@@ -792,16 +808,16 @@ public class GameScreen implements Screen {
         String item = parts[1].toLowerCase();
         int amount = parts.length > 2 ? Integer.parseInt(parts[2]) : 1;
 
-        switch(item) {
+        switch (item) {
             case "key", "keys":
-                for(int i = 0; i < amount; i++) {
+                for (int i = 0; i < amount; i++) {
                     player.collectKey();
                 }
                 consoleVariables.put("keys", player.getKeys());
                 appendConsoleOutput("\nGiven " + amount + " key(s) to player");
                 break;
             case "health", "hp":
-                if(amount > maxHearts) {
+                if (amount > maxHearts) {
                     maxHearts = amount;
                 }
                 player.setHp(player.getHp() + amount);
@@ -825,19 +841,20 @@ public class GameScreen implements Screen {
 
     /**
      * Handles the 'kill' console command for eliminating enemies.
+     *
      * @param parts The command parts split by whitespace.
      */
     private void handleKillCommand(String[] parts) {
-        if(parts.length > 1 && parts[1].equalsIgnoreCase("all")) {
+        if (parts.length > 1 && parts[1].equalsIgnoreCase("all")) {
             int count = 0;
-            for(Enemy enemy : map.getEnemies()) {
-                if(enemy.isAlive()) {
+            for (Enemy enemy : map.getEnemies()) {
+                if (enemy.isAlive()) {
                     enemy.takeDamage(1234567890);
                     count++;
                 }
             }
-            for(Enemy e : map.getEnemies().stream().filter(e -> !e.isAlive()).toList()) {
-                if(!e.isAlive()) {
+            for (Enemy e : map.getEnemies().stream().filter(e -> !e.isAlive()).toList()) {
+                if (!e.isAlive()) {
                     map.getEnemies().remove(e);
                 }
             }
@@ -850,6 +867,7 @@ public class GameScreen implements Screen {
 
     /**
      * Handles the 'heal' console command for restoring player health.
+     *
      * @param parts The command parts split by whitespace.
      */
     private void handleHealCommand(String[] parts) {
@@ -861,10 +879,11 @@ public class GameScreen implements Screen {
 
     /**
      * Handles the 'teleport' console command for moving the player to specified coordinates.
+     *
      * @param parts The command parts split by whitespace.
      */
     private void handleTeleportCommand(String[] parts) {
-        if(parts.length < 3) {
+        if (parts.length < 3) {
             appendConsoleOutput("\nUsage: teleport [x] [y]");
             return;
         }
@@ -874,14 +893,14 @@ public class GameScreen implements Screen {
             float y = Float.parseFloat(parts[2]) * GameObj.TILE;
 
             Rectangle testRect = new Rectangle(x, y, GameObj.TILE, GameObj.TILE);
-            if(!map.collidesWithWall(testRect)) {
+            if (!map.collidesWithWall(testRect)) {
                 player.move(x - player.getX(), y - player.getY(), map);
                 centerCameraOnPlayer();
                 appendConsoleOutput("\nTeleported player to (" + parts[1] + ", " + parts[2] + ")");
             } else {
                 appendConsoleOutput("\nCannot teleport to wall at (" + parts[1] + ", " + parts[2] + ")");
             }
-        } catch(NumberFormatException e) {
+        } catch (NumberFormatException e) {
             appendConsoleOutput("\nInvalid coordinates");
         }
     }
@@ -891,7 +910,7 @@ public class GameScreen implements Screen {
      */
     private void handleListCommand() {
         StringBuilder listOutput = new StringBuilder("\nGame Variables:");
-        for(Map.Entry<String, Object> entry : consoleVariables.entrySet()) {
+        for (Map.Entry<String, Object> entry : consoleVariables.entrySet()) {
             listOutput.append("\n").append(entry.getKey()).append(" = ").append(entry.getValue());
         }
         appendConsoleOutput(listOutput.toString());
@@ -899,11 +918,12 @@ public class GameScreen implements Screen {
 
     /**
      * Applies changes from console variable modifications to the actual game state.
+     *
      * @param varName The name of the variable being changed.
-     * @param value The new value to apply.
+     * @param value   The new value to apply.
      */
     private void applyVariableChange(String varName, Object value) {
-        switch(varName) {
+        switch (varName) {
             case "health":
                 player.setHp((Integer) value);
                 break;
@@ -917,7 +937,7 @@ public class GameScreen implements Screen {
                 break;
             case "paused":
                 paused = (Boolean) value;
-                if(paused) {
+                if (paused) {
                     Gdx.input.setInputProcessor(pauseStage);
                 } else {
                     Gdx.input.setInputProcessor(null);
@@ -930,8 +950,8 @@ public class GameScreen implements Screen {
      * Awards experience points to the player based on their score and saves the updated stats.
      */
     private void awardExp() {
-        int plusExp = (int) Math.ceil(score/500);
-        if(plusExp > 0) {
+        int plusExp = (int) Math.ceil(score / 500);
+        if (plusExp > 0) {
             playerStats.addExp(plusExp);
             playerStats.save();
         }
@@ -941,9 +961,9 @@ public class GameScreen implements Screen {
      * Handles global input events like opening/closing the console, pausing, and camera zoom.
      */
     private void globalInput() {
-        if(!gameOver && !victory && Gdx.input.isKeyJustPressed(Input.Keys.F1)) {
+        if (!gameOver && !victory && Gdx.input.isKeyJustPressed(Input.Keys.F1)) {
             consoleOpen = !consoleOpen;
-            if(consoleOpen) {
+            if (consoleOpen) {
                 Gdx.input.setInputProcessor(consoleStage);
                 consoleTextField.setFocusTraversal(true);
                 consoleStage.setKeyboardFocus(consoleTextField);
@@ -952,9 +972,9 @@ public class GameScreen implements Screen {
             }
         }
 
-        if(!consoleOpen && !gameOver && !victory && Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+        if (!consoleOpen && !gameOver && !victory && Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             paused = !paused;
-            if(paused) {
+            if (paused) {
                 Gdx.input.setInputProcessor(pauseStage);
                 gameMusic.stop();
                 game.menuMusic.play();
@@ -965,16 +985,16 @@ public class GameScreen implements Screen {
             }
         }
 
-        if(!consoleOpen && gameOver && Gdx.input.getInputProcessor() != gameOverStage) {
+        if (!consoleOpen && gameOver && Gdx.input.getInputProcessor() != gameOverStage) {
             Gdx.input.setInputProcessor(gameOverStage);
-        } else if(!consoleOpen && victory && Gdx.input.getInputProcessor() != victoryStage) {
+        } else if (!consoleOpen && victory && Gdx.input.getInputProcessor() != victoryStage) {
             Gdx.input.setInputProcessor(victoryStage);
         }
 
-        if(!consoleOpen && !paused && !gameOver && !victory) {
-            if(Gdx.input.isKeyPressed(Input.Keys.PLUS) || Gdx.input.isKeyPressed(Input.Keys.EQUALS))
+        if (!consoleOpen && !paused && !gameOver && !victory) {
+            if (Gdx.input.isKeyPressed(Input.Keys.PLUS) || Gdx.input.isKeyPressed(Input.Keys.EQUALS))
                 camera.zoom = Math.max(0.5f, camera.zoom - 0.02f);
-            if(Gdx.input.isKeyPressed(Input.Keys.MINUS)) camera.zoom = Math.min(2.0f, camera.zoom + 0.02f);
+            if (Gdx.input.isKeyPressed(Input.Keys.MINUS)) camera.zoom = Math.min(2.0f, camera.zoom + 0.02f);
         }
     }
 
@@ -988,22 +1008,23 @@ public class GameScreen implements Screen {
 
     /**
      * Processes player input for movement and attacks based on key bindings.
+     *
      * @param delta The time in seconds since the last frame.
      */
     private void playerInput(float delta) {
         float baseSpeed = Gdx.input.isKeyPressed(binds.SPRINT) ? 168f : 100f;
         float speed = baseSpeed * player.getCurrentSpeed();
         float dx = 0, dy = 0;
-        if(Gdx.input.isKeyPressed(binds.LEFT)) dx -= speed * delta;
-        if(Gdx.input.isKeyPressed(binds.RIGHT)) dx += speed * delta;
-        if(Gdx.input.isKeyPressed(binds.UP)) dy += speed * delta;
-        if(Gdx.input.isKeyPressed(binds.DOWN)) dy -= speed * delta;
+        if (Gdx.input.isKeyPressed(binds.LEFT)) dx -= speed * delta;
+        if (Gdx.input.isKeyPressed(binds.RIGHT)) dx += speed * delta;
+        if (Gdx.input.isKeyPressed(binds.UP)) dy += speed * delta;
+        if (Gdx.input.isKeyPressed(binds.DOWN)) dy -= speed * delta;
 
-        if(Gdx.input.isKeyJustPressed(binds.ATTACK)) {
+        if (Gdx.input.isKeyJustPressed(binds.ATTACK)) {
             player.attack(map.getEnemies());
             int killed = 0;
-            for(Enemy e : map.getEnemies().stream().filter(e -> !e.isAlive()).toList()) {
-                if(!e.isAlive()) {
+            for (Enemy e : map.getEnemies().stream().filter(e -> !e.isAlive()).toList()) {
+                if (!e.isAlive()) {
                     score += 100;
                     killed++;
                     scored.play(0.1f);
@@ -1011,36 +1032,38 @@ public class GameScreen implements Screen {
                 }
             }
 
-            if(killed > 0) {
+            if (killed > 0) {
                 Array<String> unlocked = playerStats.updateAchievement("kill", killed);
-                if(unlocked.size > 0) {
+                if (unlocked.size > 0) {
                     showAchievement(unlocked.first());
                 }
             }
         }
 
-        if(dx == 0 && dy == 0) return;
+        if (dx == 0 && dy == 0) return;
 
         Rectangle next = new Rectangle(player.getX() + dx, player.getY() + dy, GameObj.TILE, GameObj.TILE);
-        if(!enemyOverlap(next)) {
+        if (!enemyOverlap(next)) {
             player.move(dx, dy, map);
         }
     }
 
     /**
      * Checks if a rectangle overlaps with any living enemies.
+     *
      * @param rect The rectangle to check for overlap.
      */
     private boolean enemyOverlap(Rectangle rect) {
-        for(Enemy e : map.getEnemies()) {
-            if(!e.isAlive()) continue;
-            if(rect.overlaps(e.getBounds())) return true;
+        for (Enemy e : map.getEnemies()) {
+            if (!e.isAlive()) continue;
+            if (rect.overlaps(e.getBounds())) return true;
         }
         return false;
     }
 
     /**
      * Computes the rotation angle for the exit arrow indicator.
+     *
      * @param px The player's X position.
      * @param py The player's Y position.
      * @param ex The exit's X position.
@@ -1050,9 +1073,9 @@ public class GameScreen implements Screen {
         float dx = ex - px;
         float dy = ey - py;
         float d = (float) Math.sqrt(dx * dx + dy * dy);
-        if(d <= 8) return -1;
+        if (d <= 8) return -1;
         float angle = (float) Math.toDegrees(Math.atan2(dy, dx));
-        if(angle < 0) angle += 360;
+        if (angle < 0) angle += 360;
         return angle;
     }
 
@@ -1062,14 +1085,15 @@ public class GameScreen implements Screen {
 
     /**
      * Handles screen resizing by updating all viewports.
-     * @param width The new screen width.
+     *
+     * @param width  The new screen width.
      * @param height The new screen height.
      */
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height);
         hudVp.update(width, height, true);
-        if(hudStage != null) {
+        if (hudStage != null) {
             hudStage.getViewport().update(width, height, true);
         }
     }
@@ -1098,11 +1122,10 @@ public class GameScreen implements Screen {
         gameOverStage.dispose();
         victoryStage.dispose();
         consoleStage.dispose();
-        if(hudStage != null) {
+        if (hudStage != null) {
             hudStage.dispose();
         }
     }
-
 
 
 }

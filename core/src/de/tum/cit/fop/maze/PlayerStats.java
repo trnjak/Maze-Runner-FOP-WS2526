@@ -2,9 +2,9 @@ package de.tum.cit.fop.maze;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.Array;
 
 /**
  * The PlayerStats class manages the saving and loading of player files.
@@ -12,15 +12,7 @@ import com.badlogic.gdx.utils.Array;
  * as well as managing achievements.
  */
 public class PlayerStats {
-    private String name;
-    private final String SAVE_FILE;
-    private int exp = 0, score = 0;
-    private int hpLvl = 1, speedLvl = 1, atkLvl = 1, level = 1;
-
-    private ObjectMap<String, Achievement> achievements;
-
     private static final Json json = new Json();
-
     private static final Array<Achievement> DEFAULT_ACHIEVEMENTS = new Array<>() {{
         add(new Achievement("first_blood", "First Blood", "Kill your first enemy", 1, "kill"));
         add(new Achievement("enemy_slayer", "Enemy Slayer", "Kill 50 enemies", 50, "kill"));
@@ -30,6 +22,11 @@ public class PlayerStats {
         add(new Achievement("speedrunner", "Speedrunner", "Complete a level in under 60 seconds", 1, "time"));
         add(new Achievement("upgrade_master", "Upgrade Master", "Reach level 10 in all upgrades", 30, "upgrade"));
     }};
+    private final String SAVE_FILE;
+    private String name;
+    private int exp = 0, score = 0;
+    private int hpLvl = 1, speedLvl = 1, atkLvl = 1, level = 1;
+    private ObjectMap<String, Achievement> achievements;
 
     /**
      * Constructor for PlayerStats.
@@ -51,7 +48,7 @@ public class PlayerStats {
     private void load() {
         try {
             FileHandle file = Gdx.files.local(SAVE_FILE);
-            if(file.exists()) {
+            if (file.exists()) {
                 String jsonData = file.readString();
                 ObjectMap<String, Object> data = json.fromJson(ObjectMap.class, jsonData);
 
@@ -72,11 +69,11 @@ public class PlayerStats {
                 atkLvl = atkObj instanceof Number ? ((Number) atkObj).intValue() : 1;
 
                 Object achievementsObj = data.get("achievements");
-                if(achievementsObj instanceof ObjectMap) {
+                if (achievementsObj instanceof ObjectMap) {
                     achievements = (ObjectMap<String, Achievement>) achievementsObj;
                 }
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             System.err.println("Error loading stats for " + name + ": " + e.getMessage());
         }
     }
@@ -86,8 +83,8 @@ public class PlayerStats {
      * Adds default achievements to the achievements map.
      */
     private void initAchievements() {
-        if(achievements.size == 0) {
-            for(Achievement ach : DEFAULT_ACHIEVEMENTS) {
+        if (achievements.size == 0) {
+            for (Achievement ach : DEFAULT_ACHIEVEMENTS) {
                 achievements.put(ach.getId(), ach);
             }
         }
@@ -110,7 +107,7 @@ public class PlayerStats {
 
             FileHandle file = Gdx.files.local(SAVE_FILE);
             file.writeString(json.prettyPrint(json.toJson(data)), false);
-        } catch(Exception e) {
+        } catch (Exception e) {
             System.err.println("Error saving stats for " + name + ": " + e.getMessage());
         }
     }
@@ -118,36 +115,37 @@ public class PlayerStats {
     /**
      * Updates achievements of a specific type by adding progress.
      * Also handles special achievement logic for the "upgrade_master" achievement.
-     * @param type The type of achievement to update
+     *
+     * @param type   The type of achievement to update
      * @param amount The amount of progress to add
      */
     public Array<String> updateAchievement(String type, int amount) {
         Array<String> newlyUnlocked = new Array<>();
 
-        for(Achievement ach : achievements.values()) {
-            if(ach.getType().equals(type) && !ach.isUnlocked()) {
+        for (Achievement ach : achievements.values()) {
+            if (ach.getType().equals(type) && !ach.isUnlocked()) {
                 boolean wasUnlocked = ach.isUnlocked();
                 ach.addProgress(amount);
 
-                if(ach.isUnlocked() && !wasUnlocked) {
+                if (ach.isUnlocked() && !wasUnlocked) {
                     newlyUnlocked.add(ach.getName());
                 }
             }
         }
 
         Achievement upgradeMaster = achievements.get("upgrade_master");
-        if(upgradeMaster != null && !upgradeMaster.isUnlocked()) {
+        if (upgradeMaster != null && !upgradeMaster.isUnlocked()) {
             int totalUpgrades = hpLvl + speedLvl + atkLvl;
             upgradeMaster.setProgress(totalUpgrades - 3);
-            if(totalUpgrades >= 33) {
-                if(!upgradeMaster.isUnlocked()) {
+            if (totalUpgrades >= 33) {
+                if (!upgradeMaster.isUnlocked()) {
                     upgradeMaster.setUnlocked(true);
                     newlyUnlocked.add(upgradeMaster.getName());
                 }
             }
         }
 
-        if(newlyUnlocked.size > 0) {
+        if (newlyUnlocked.size > 0) {
             save();
         }
 
@@ -173,7 +171,7 @@ public class PlayerStats {
      */
     public Array<Achievement> getAchievements() {
         Array<Achievement> result = new Array<>();
-        for(Achievement ach : achievements.values()) {
+        for (Achievement ach : achievements.values()) {
             result.add(ach);
         }
         return result;
@@ -184,8 +182,8 @@ public class PlayerStats {
      */
     public int getUnlockedAchievementsCount() {
         int count = 0;
-        for(Achievement ach : achievements.values()) {
-            if(ach.isUnlocked()) {
+        for (Achievement ach : achievements.values()) {
+            if (ach.isUnlocked()) {
                 count++;
             }
         }
@@ -194,8 +192,10 @@ public class PlayerStats {
 
     /**
      * Increases EXP.
+     *
      * @param n the amount of EXP to be added
-     * */
+     *
+     */
     public void addExp(int n) {
         exp += n;
         save();
@@ -203,8 +203,10 @@ public class PlayerStats {
 
     /**
      * Increases the score.
+     *
      * @param n the amount to add to the score
-     * */
+     *
+     */
     public void addScore(int n) {
         score += n;
         save();
@@ -212,10 +214,12 @@ public class PlayerStats {
 
     /**
      * Spends EXP. (Used for purchasing upgrades).
+     *
      * @param cost the cost of the upgrade.
-     * */
+     *
+     */
     public boolean spendExp(int cost) {
-        if(exp >= cost) {
+        if (exp >= cost) {
             exp -= cost;
             save();
             return true;
@@ -225,10 +229,11 @@ public class PlayerStats {
 
     /**
      * Upgrades the player's HP
-     * */
+     *
+     */
     public boolean upgradeHp() {
         int cost = hpLvl * 2;
-        if(spendExp(cost)) {
+        if (spendExp(cost)) {
             hpLvl++;
             return true;
         }
@@ -237,10 +242,11 @@ public class PlayerStats {
 
     /**
      * Upgrades the player's speed
-     * */
+     *
+     */
     public boolean upgradeSpeed() {
         int cost = speedLvl * 2;
-        if(spendExp(cost)) {
+        if (spendExp(cost)) {
             speedLvl++;
             return true;
         }
@@ -249,10 +255,11 @@ public class PlayerStats {
 
     /**
      * Upgrades the player's attack
-     * */
+     *
+     */
     public boolean upgradeAtk() {
         int cost = atkLvl * 2;
-        if(spendExp(cost)) {
+        if (spendExp(cost)) {
             atkLvl++;
             return true;
         }
@@ -261,14 +268,16 @@ public class PlayerStats {
 
     /**
      * Returns player's speed (1 + 2% of speedLvl)
-     * */
+     *
+     */
     public float getSpeed() {
         return 1f + (speedLvl - 1) * 0.02f;
     }
 
     /**
      * Returns player's attack cooldown (0.01 is the smallest possible)
-     * */
+     *
+     */
     public float getAttackCooldown() {
         return Math.max(0.01f, 0.5f - (atkLvl - 1) * 0.005f);
     }

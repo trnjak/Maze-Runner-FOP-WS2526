@@ -19,6 +19,7 @@ public class Key extends GameObj {
 
     /**
      * Renders the key using the static object rendering method from GameObj.
+     *
      * @param batch The SpriteBatch used for rendering.
      */
     @Override

@@ -6,46 +6,53 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
-import de.tum.cit.fop.maze.objects.*;
-import de.tum.cit.fop.maze.objects.enemies.*;
-import de.tum.cit.fop.maze.objects.powerups.*;
-import de.tum.cit.fop.maze.objects.traps.*;
+import de.tum.cit.fop.maze.objects.Exit;
+import de.tum.cit.fop.maze.objects.GameObj;
+import de.tum.cit.fop.maze.objects.Key;
+import de.tum.cit.fop.maze.objects.enemies.ChaserEnemy;
+import de.tum.cit.fop.maze.objects.enemies.Enemy;
+import de.tum.cit.fop.maze.objects.enemies.PatrolEnemy;
+import de.tum.cit.fop.maze.objects.powerups.Hpup;
+import de.tum.cit.fop.maze.objects.powerups.Powerup;
+import de.tum.cit.fop.maze.objects.powerups.Speedup;
+import de.tum.cit.fop.maze.objects.traps.DamageTrap;
+import de.tum.cit.fop.maze.objects.traps.SludgeTrap;
+import de.tum.cit.fop.maze.objects.traps.Trap;
 import de.tum.cit.fop.maze.screens.BeginScreen;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.*;
 
 /**
  * The GameMap class represents the game world containing tiles, traps, enemies, powerups, keys, and the exit.
  * It handles map loading, rendering, collision detection, and procedural generation for endless mode.
- *
+ * <p>
  * Map textures from: <a href="https://kenney.nl/assets/tiny-dungeon">LINK</a>
  */
 public class GameMap {
     private static final Texture TILE_SHEET = new Texture("main_tilemap.png");
     public static final TextureRegion[][] TEXTURE_REGION = TextureRegion.split(TILE_SHEET, TILE_SHEET.getWidth() / 12, TILE_SHEET.getHeight() / 11);
-
-    private int w, h;
     private final Map<String, Integer> tiles = new HashMap<>();
-    private int ex, ey;
-    private final TextureRegion wall = TEXTURE_REGION[3][4],
-            floor[] = {TEXTURE_REGION[4][0], TEXTURE_REGION[4][1]},
-            entry = TEXTURE_REGION[4][0];
+    private final TextureRegion wall = TEXTURE_REGION[3][4];
+    private final TextureRegion[] floor = {TEXTURE_REGION[4][0], TEXTURE_REGION[4][1]};
+    private final TextureRegion entry = TEXTURE_REGION[4][0];
     private final List<Trap> traps = new ArrayList<>();
     private final List<Key> keys = new ArrayList<>();
     private final List<Enemy> enemies = new ArrayList<>();
     private final List<Powerup> powerups = new ArrayList<>();
-    private Exit exit;
-
-
-    private boolean isEndless = false;
-
     private final PlayerStats playerStats = BeginScreen.STATS;
+    private int w, h;
+    private int ex, ey;
+    private Exit exit;
+    private boolean isEndless = false;
 
     /**
      * Loads a map from a properties file at the specified path.
      * Clears existing map data and parses tile values to populate the map with walls, entry point, exit,
      * traps, enemies, keys, and powerups.
+     *
      * @param path The path to the map properties file.
      */
     public void load(String path) {
@@ -57,14 +64,14 @@ public class GameMap {
         exit = null;
 
         Properties p = new Properties();
-        try(BufferedReader r = new BufferedReader(Gdx.files.internal(path).reader())) {
+        try (BufferedReader r = new BufferedReader(Gdx.files.internal(path).reader())) {
             p.load(r);
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException("Failed to load map.", e);
         }
 
         int maxX = 0, maxY = 0;
-        for(String key : p.stringPropertyNames()) {
+        for (String key : p.stringPropertyNames()) {
             int val = Integer.parseInt(p.getProperty(key).trim());
             tiles.put(key, val);
 
@@ -72,14 +79,14 @@ public class GameMap {
             int x = Integer.parseInt(split[0]);
             int y = Integer.parseInt(split[1]);
 
-            if(x > maxX) {
+            if (x > maxX) {
                 maxX = x;
             }
-            if(y > maxY) {
+            if (y > maxY) {
                 maxY = y;
             }
 
-            switch(val) {
+            switch (val) {
                 case 1 -> {
                     ex = x;
                     ey = y;
@@ -100,17 +107,18 @@ public class GameMap {
 
     /**
      * Renders the entire map including tiles, traps, keys, enemies, powerups, and the exit.
+     *
      * @param batch The SpriteBatch used for drawing.
      */
     public void render(SpriteBatch batch) {
-        for(int y = 0; y < h; y++) {
-            for(int x = 0; x < w; x++) {
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
                 Integer v = tiles.get(x + "," + y);
                 TextureRegion t;
-                if(v == null) {
+                if (v == null) {
                     t = floor[1];
                 } else {
-                    t = switch(v) {
+                    t = switch (v) {
                         case 0 -> wall;
                         case 1 -> entry;
                         default -> floor[1];
@@ -129,11 +137,12 @@ public class GameMap {
     /**
      * Retrieves the tile value at the specified coordinates.
      * Coordinates outside the map boundaries are treated as walls.
+     *
      * @param x The x-coordinate of the tile.
      * @param y The y-coordinate of the tile.
      */
     public Integer getTile(int x, int y) {
-        if(x < 0 || x >= w || y < 0 || y >= h) {
+        if (x < 0 || x >= w || y < 0 || y >= h) {
             return 0;
         }
         return tiles.get(x + "," + y);
@@ -141,6 +150,7 @@ public class GameMap {
 
     /**
      * Checks if the tile at the given coordinates is a wall.
+     *
      * @param x The x-coordinate of the tile.
      * @param y The y-coordinate of the tile.
      */
@@ -151,6 +161,7 @@ public class GameMap {
 
     /**
      * Determines if a given rectangle collides with any wall in the map.
+     *
      * @param r The rectangle to check for collision.
      */
     public boolean collidesWithWall(Rectangle r) {
@@ -169,15 +180,15 @@ public class GameMap {
         int minTY = (int) Math.floor(hitbox.y / t);
         int maxTY = (int) Math.ceil((hitbox.y + hitbox.height) / t);
 
-        if(minTX < 0 || maxTX >= w || minTY < 0 || maxTY >= h) {
+        if (minTX < 0 || maxTX >= w || minTY < 0 || maxTY >= h) {
             return true;
         }
 
-        for(int x = minTX; x <= Math.min(w - 1, maxTX); x++) {
-            for(int y = minTY; y <= Math.min(h - 1, maxTY); y++) {
-                if(this.isWall(x, y)) {
+        for (int x = minTX; x <= Math.min(w - 1, maxTX); x++) {
+            for (int y = minTY; y <= Math.min(h - 1, maxTY); y++) {
+                if (this.isWall(x, y)) {
                     Rectangle wallRect = new Rectangle(x * t, y * t, t, t);
-                    if(hitbox.overlaps(wallRect)) return true;
+                    if (hitbox.overlaps(wallRect)) return true;
                 }
             }
         }
@@ -193,7 +204,7 @@ public class GameMap {
         int lvl = playerStats.getLevel();
         int n = Math.min(20 + lvl, 40);
 
-        if(n % 2 == 0) n++;
+        if (n % 2 == 0) n++;
 
         isEndless = true;
 
@@ -201,13 +212,13 @@ public class GameMap {
         Random r = new Random(seed);
 
         FileHandle file = Gdx.files.local("maps/endless.properties");
-        if(file.exists()) {
+        if (file.exists()) {
             file.delete();
         }
 
         int[][] grid = new int[n][n];
-        for(int i = 0; i < n; i++) {
-            for(int j = 0; j < n; j++) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
                 grid[i][j] = 0;
             }
         }
@@ -220,22 +231,22 @@ public class GameMap {
         grid[startX][startY] = 7;
         int[][] dirs = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
 
-        while(!stack.isEmpty()) {
+        while (!stack.isEmpty()) {
             int[] current = stack.peek();
             int x = current[0];
             int y = current[1];
 
             List<int[]> neighbours = new ArrayList<>();
-            for(int[] dir : dirs) {
+            for (int[] dir : dirs) {
                 int nx = x + dir[0] * 2;
                 int ny = y + dir[1] * 2;
 
-                if(nx > 0 && nx < n - 1 && ny > 0 && ny < n - 1 && grid[nx][ny] == 0) {
+                if (nx > 0 && nx < n - 1 && ny > 0 && ny < n - 1 && grid[nx][ny] == 0) {
                     neighbours.add(new int[]{nx, ny, dir[0], dir[1]});
                 }
             }
 
-            if(!neighbours.isEmpty()) {
+            if (!neighbours.isEmpty()) {
                 int[] next = neighbours.get(r.nextInt(neighbours.size()));
                 int nx = next[0];
                 int ny = next[1];
@@ -252,40 +263,40 @@ public class GameMap {
         }
 
         int roomCount = Math.min(2 + lvl / 5, 5);
-        for(int room = 0; room < roomCount; room++) {
+        for (int room = 0; room < roomCount; room++) {
 
             int roomSize = 3 + r.nextInt(3);
             int roomX = 2 + r.nextInt(n - roomSize - 4);
             int roomY = 2 + r.nextInt(n - roomSize - 4);
 
-            for(int i = 0; i < roomSize; i++) {
-                for(int j = 0; j < roomSize; j++) {
+            for (int i = 0; i < roomSize; i++) {
+                for (int j = 0; j < roomSize; j++) {
                     int x = roomX + i;
                     int y = roomY + j;
-                    if(x < n && y < n) {
+                    if (x < n && y < n) {
                         grid[x][y] = 7;
                     }
                 }
             }
 
             int entrances = 1 + r.nextInt(2);
-            for(int e = 0; e < entrances; e++) {
+            for (int e = 0; e < entrances; e++) {
                 int side = r.nextInt(4);
                 int connX, connY;
 
-                switch(side) {
+                switch (side) {
                     case 0:
                         connX = roomX + r.nextInt(roomSize);
                         connY = roomY + roomSize;
-                        if(connY < n - 1) {
+                        if (connY < n - 1) {
                             grid[connX][connY] = 7;
-                            if(connY + 1 < n) grid[connX][connY + 1] = 7;
+                            if (connY + 1 < n) grid[connX][connY + 1] = 7;
                         }
                         break;
                     case 1:
                         connX = roomX + r.nextInt(roomSize);
                         connY = roomY - 1;
-                        if(connY > 0) {
+                        if (connY > 0) {
                             grid[connX][connY] = 7;
                             grid[connX][connY - 1] = 7;
                         }
@@ -293,15 +304,15 @@ public class GameMap {
                     case 2:
                         connX = roomX + roomSize;
                         connY = roomY + r.nextInt(roomSize);
-                        if(connX < n - 1) {
+                        if (connX < n - 1) {
                             grid[connX][connY] = 7;
-                            if(connX + 1 < n) grid[connX + 1][connY] = 7;
+                            if (connX + 1 < n) grid[connX + 1][connY] = 7;
                         }
                         break;
                     case 3:
                         connX = roomX - 1;
                         connY = roomY + r.nextInt(roomSize);
-                        if(connX > 0) {
+                        if (connX > 0) {
                             grid[connX][connY] = 7;
                             grid[connX - 1][connY] = 7;
                         }
@@ -311,9 +322,9 @@ public class GameMap {
         }
 
         List<int[]> walkableCells = new ArrayList<>();
-        for(int i = 0; i < n; i++) {
-            for(int j = 0; j < n; j++) {
-                if(grid[i][j] == 7) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j] == 7) {
                     walkableCells.add(new int[]{i, j});
                 }
             }
@@ -330,10 +341,10 @@ public class GameMap {
             int distance = Math.abs(exitX - startX) + Math.abs(exitY - startY);
             int minDistance = n / 3;
 
-            if(distance >= minDistance || attempts > 50) {
+            if (distance >= minDistance || attempts > 50) {
                 break;
             }
-        } while(true);
+        } while (true);
 
         grid[startX][startY] = 1;
         grid[exitX][exitY] = 2;
@@ -341,19 +352,19 @@ public class GameMap {
         List<int[]> roomCells = new ArrayList<>();
         List<int[]> corridorCells = new ArrayList<>();
 
-        for(int i = 0; i < n; i++) {
-            for(int j = 0; j < n; j++) {
-                if(grid[i][j] == 7 && !(i == startX && j == startY) && !(i == exitX && j == exitY)) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j] == 7 && !(i == startX && j == startY) && !(i == exitX && j == exitY)) {
                     int neighborCount = 0;
-                    for(int[] dir : dirs) {
+                    for (int[] dir : dirs) {
                         int nx = i + dir[0];
                         int ny = j + dir[1];
-                        if(nx >= 0 && nx < n && ny >= 0 && ny < n && grid[nx][ny] == 7) {
+                        if (nx >= 0 && nx < n && ny >= 0 && ny < n && grid[nx][ny] == 7) {
                             neighborCount++;
                         }
                     }
 
-                    if(neighborCount >= 3) {
+                    if (neighborCount >= 3) {
                         roomCells.add(new int[]{i, j});
                     } else {
                         corridorCells.add(new int[]{i, j});
@@ -369,9 +380,9 @@ public class GameMap {
 
         Collections.shuffle(corridorCells, r);
         int placedTraps = 0;
-        for(int i = 0; i < corridorCells.size() && placedTraps < trapCount; i++) {
+        for (int i = 0; i < corridorCells.size() && placedTraps < trapCount; i++) {
             int[] cell = corridorCells.get(i);
-            if(grid[cell[0]][cell[1]] == 7) {
+            if (grid[cell[0]][cell[1]] == 7) {
                 grid[cell[0]][cell[1]] = 3;
                 placedTraps++;
                 corridorCells.remove(i);
@@ -382,9 +393,9 @@ public class GameMap {
         int enemiesInRooms = Math.min(enemyCount * 2 / 3, roomCells.size());
         Collections.shuffle(roomCells, r);
         int enemiesPlaced = 0;
-        for(int i = 0; i < roomCells.size() && enemiesPlaced < enemiesInRooms; i++) {
+        for (int i = 0; i < roomCells.size() && enemiesPlaced < enemiesInRooms; i++) {
             int[] cell = roomCells.get(i);
-            if(grid[cell[0]][cell[1]] == 7) {
+            if (grid[cell[0]][cell[1]] == 7) {
                 grid[cell[0]][cell[1]] = 4;
                 enemiesPlaced++;
                 roomCells.remove(i);
@@ -393,9 +404,9 @@ public class GameMap {
         }
 
         Collections.shuffle(corridorCells, r);
-        for(int i = 0; i < corridorCells.size() && enemiesPlaced < enemyCount; i++) {
+        for (int i = 0; i < corridorCells.size() && enemiesPlaced < enemyCount; i++) {
             int[] cell = corridorCells.get(i);
-            if(grid[cell[0]][cell[1]] == 7) {
+            if (grid[cell[0]][cell[1]] == 7) {
                 grid[cell[0]][cell[1]] = 4;
                 enemiesPlaced++;
                 corridorCells.remove(i);
@@ -408,23 +419,23 @@ public class GameMap {
         allAvailable.addAll(corridorCells);
 
         Collections.shuffle(allAvailable, r);
-        if(!allAvailable.isEmpty()) {
+        if (!allAvailable.isEmpty()) {
             int bestIndex = -1;
             int bestDistance = Integer.MAX_VALUE;
 
-            for(int i = 0; i < Math.min(allAvailable.size(), 20); i++) {
+            for (int i = 0; i < Math.min(allAvailable.size(), 20); i++) {
                 int[] cell = allAvailable.get(i);
                 int distToStart = Math.abs(cell[0] - startX) + Math.abs(cell[1] - startY);
                 int distToExit = Math.abs(cell[0] - exitX) + Math.abs(cell[1] - exitY);
                 int diff = Math.abs(distToStart - distToExit);
 
-                if(diff < bestDistance) {
+                if (diff < bestDistance) {
                     bestDistance = diff;
                     bestIndex = i;
                 }
             }
 
-            if(bestIndex != -1) {
+            if (bestIndex != -1) {
                 int[] cell = allAvailable.get(bestIndex);
                 grid[cell[0]][cell[1]] = 5;
                 allAvailable.remove(bestIndex);
@@ -434,9 +445,9 @@ public class GameMap {
         int powerupsInRooms = Math.min(powerCount * 3 / 4, roomCells.size());
         Collections.shuffle(roomCells, r);
         int placedPowers = 0;
-        for(int i = 0; i < roomCells.size() && placedPowers < powerupsInRooms; i++) {
+        for (int i = 0; i < roomCells.size() && placedPowers < powerupsInRooms; i++) {
             int[] cell = roomCells.get(i);
-            if(grid[cell[0]][cell[1]] == 7) {
+            if (grid[cell[0]][cell[1]] == 7) {
                 grid[cell[0]][cell[1]] = 6;
                 placedPowers++;
                 roomCells.remove(i);
@@ -445,9 +456,9 @@ public class GameMap {
         }
 
         Collections.shuffle(corridorCells, r);
-        for(int i = 0; i < corridorCells.size() && placedPowers < powerCount; i++) {
+        for (int i = 0; i < corridorCells.size() && placedPowers < powerCount; i++) {
             int[] cell = corridorCells.get(i);
-            if(grid[cell[0]][cell[1]] == 7) {
+            if (grid[cell[0]][cell[1]] == 7) {
                 grid[cell[0]][cell[1]] = 6;
                 placedPowers++;
                 corridorCells.remove(i);
@@ -458,10 +469,10 @@ public class GameMap {
         StringBuilder sb = new StringBuilder();
         BufferedWriter bw = new BufferedWriter(file.writer(false));
 
-        for(int i = 0; i < n; i++) {
-            for(int j = 0; j < n; j++) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
                 int val = grid[i][j];
-                if(val == 7) {
+                if (val == 7) {
                     continue;
                 }
                 sb.append(i).append(",").append(j).append("=").append(val).append("\n");
@@ -515,8 +526,6 @@ public class GameMap {
     }
 
 
-
-
     public int getWidth() {
         return w;  // number of tiles horizontally
     }
@@ -524,6 +533,7 @@ public class GameMap {
     public int getHeight() {
         return h;  // number of tiles vertically
     }
+
     public List<int[]> findFreeSpots() {
         List<int[]> freeSpots = new ArrayList<>();
 
@@ -532,10 +542,26 @@ public class GameMap {
                 if (isWall(i, j)) continue;
 
                 boolean occupied = false;
-                for (Trap t : traps) if (t.getX() == i && t.getY() == j) { occupied = true; break; }
-                for (Enemy e : enemies) if (e.getX() == i && e.getY() == j) { occupied = true; break; }
-                for (Powerup p : powerups) if (p.getX() == i && p.getY() == j) { occupied = true; break; }
-                for (Key k : keys) if (k.getX() == i && k.getY() == j) { occupied = true; break; }
+                for (Trap t : traps)
+                    if (t.getX() == i && t.getY() == j) {
+                        occupied = true;
+                        break;
+                    }
+                for (Enemy e : enemies)
+                    if (e.getX() == i && e.getY() == j) {
+                        occupied = true;
+                        break;
+                    }
+                for (Powerup p : powerups)
+                    if (p.getX() == i && p.getY() == j) {
+                        occupied = true;
+                        break;
+                    }
+                for (Key k : keys)
+                    if (k.getX() == i && k.getY() == j) {
+                        occupied = true;
+                        break;
+                    }
 
                 if (!occupied) freeSpots.add(new int[]{i, j});
             }
@@ -543,9 +569,6 @@ public class GameMap {
 
         return freeSpots;
     }
-
-
-
 
 
 }

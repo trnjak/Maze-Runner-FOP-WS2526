@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Json;
  * The KeyBindings class handles key binds, as well as saving/loading them from a file.
  */
 public class KeyBindings {
+    private static final String PATH = "keybinds.json";
     public int UP = Input.Keys.UP;
     public int DOWN = Input.Keys.DOWN;
     public int LEFT = Input.Keys.LEFT;
@@ -16,7 +17,19 @@ public class KeyBindings {
     public int ATTACK = Input.Keys.SPACE;
     public int SPRINT = Input.Keys.SHIFT_LEFT;
 
-    private static final String PATH = "keybinds.json";
+    /**
+     * Loads the binds from a json file.
+     */
+    public static KeyBindings load() {
+        FileHandle file = Gdx.files.local(PATH);
+        if (!file.exists()) {
+            KeyBindings kb = new KeyBindings();
+            kb.save();
+            return kb;
+        }
+        Json json = new Json();
+        return json.fromJson(KeyBindings.class, file);
+    }
 
     /**
      * Saves the binds to a json file.
@@ -25,19 +38,5 @@ public class KeyBindings {
         Json json = new Json();
         FileHandle file = Gdx.files.local(PATH);
         file.writeString(json.prettyPrint(this), false);
-    }
-
-    /**
-     * Loads the binds from a json file.
-     */
-    public static KeyBindings load() {
-        FileHandle file = Gdx.files.local(PATH);
-        if(!file.exists()) {
-            KeyBindings kb = new KeyBindings();
-            kb.save();
-            return kb;
-        }
-        Json json = new Json();
-        return json.fromJson(KeyBindings.class, file);
     }
 }

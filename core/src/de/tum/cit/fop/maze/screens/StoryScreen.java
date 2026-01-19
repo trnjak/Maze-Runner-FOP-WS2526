@@ -6,7 +6,10 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -36,24 +39,24 @@ public class StoryScreen implements Screen {
         mainTable.add(title).padBottom(40).row();
 
         String story =
-               """
-               In the shadow-haunted Castle of Zoloft, Princess Hayley finds herself trapped by an evil witch.
-               \s
-               The witch, jealous of the princess's courage, has woven a powerful curse upon Hayley's castle:
-               \s
-               > GHOSTS chasing anyone that dares to cross their path
-               > GIANT SPIDERS patrolling the premises
-               > SPIKE TRAPS making the escape painful
-               \s
-               But, the cruelest trick of all: THE EXIT DOOR changes location every 30 seconds!
-               \s
-               Princess Hayley, armed with only her wits and unwavering determination, must navigate this ever-changing labyrinth, \
-               avoid the witch's minions, and find the exit before it moves again. \
-               \s
-               Time is against her. The castle itself conspires to keep her prisoner.
-               \s
-               Can you help Princess Hayley escape the witch's wrath?
-               """;
+                """
+                        In the shadow-haunted Castle of Zoloft, Princess Hayley finds herself trapped by an evil witch.
+                        \s
+                        The witch, jealous of the princess's courage, has woven a powerful curse upon Hayley's castle:
+                        \s
+                        > GHOSTS chasing anyone that dares to cross their path
+                        > GIANT SPIDERS patrolling the premises
+                        > SPIKE TRAPS making the escape painful
+                        \s
+                        But, the cruelest trick of all: THE EXIT DOOR changes location every 30 seconds!
+                        \s
+                        Princess Hayley, armed with only her wits and unwavering determination, must navigate this ever-changing labyrinth, \
+                        avoid the witch's minions, and find the exit before it moves again. \
+                        \s
+                        Time is against her. The castle itself conspires to keep her prisoner.
+                        \s
+                        Can you help Princess Hayley escape the witch's wrath?
+                        """;
 
         Label storyLabel = new Label(story, game.getSkin());
         storyLabel.setWrap(true);
@@ -96,6 +99,7 @@ public class StoryScreen implements Screen {
 
     /**
      * Renders the story screen.
+     *
      * @param delta The time in seconds since the last render.
      */
     @Override
@@ -109,7 +113,8 @@ public class StoryScreen implements Screen {
 
     /**
      * Handles screen resizing by updating the stage's viewport.
-     * @param width The new screen width.
+     *
+     * @param width  The new screen width.
      * @param height The new screen height.
      */
     @Override

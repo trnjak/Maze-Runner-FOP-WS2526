@@ -72,11 +72,10 @@ public class BeginScreen implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 String name = nameField.getText().trim();
-                if(!name.isEmpty()) {
+                if (!name.isEmpty()) {
                     STATS = new PlayerStats(name);
                     STATS.save();
-                }
-                else {
+                } else {
                     STATS = new PlayerStats("Player");
                     STATS.save();
                 }
@@ -102,6 +101,7 @@ public class BeginScreen implements Screen {
 
     /**
      * Renders the begin screen by clearing the display and drawing the stage.
+     *
      * @param delta The time in seconds since the last render.
      */
     @Override
@@ -115,7 +115,8 @@ public class BeginScreen implements Screen {
 
     /**
      * Handles screen resizing by updating the stage's viewport.
-     * @param width The new screen width.
+     *
+     * @param width  The new screen width.
      * @param height The new screen height.
      */
     @Override

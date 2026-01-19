@@ -1,9 +1,9 @@
 package de.tum.cit.fop.maze.objects.enemies;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import de.tum.cit.fop.maze.GameMap;
 import de.tum.cit.fop.maze.objects.GameObj;
 import de.tum.cit.fop.maze.objects.Player;
@@ -13,20 +13,19 @@ import de.tum.cit.fop.maze.objects.Player;
  * It provides common functionality for movement, attack patterns, health management, and rendering.
  */
 public abstract class Enemy extends GameObj {
-    protected float speed = 75, timer = 0, range = TILE * 1.1f;
     protected final float interval = 1;
+    protected final TextureRegion right, left;
+    protected float speed = 75, timer = 0, range = TILE * 1.1f;
     protected int hp = 3;
     protected boolean alive = true;
     protected float lookX, lookY;
-
-    protected final TextureRegion right, left;
     protected TextureRegion current;
 
     /**
      * Constructor for Enemy.
      *
-     * @param x The X coordinate.
-     * @param y The Y coordinate.
+     * @param x     The X coordinate.
+     * @param y     The Y coordinate.
      * @param tileY The row index in the texture tile sheet.
      * @param tileX The column index in the texture tile sheet.
      */
@@ -44,20 +43,22 @@ public abstract class Enemy extends GameObj {
 
     /**
      * Abstract method that defines the enemy's movement behavior.
-     * @param delta The time in seconds since the last update.
+     *
+     * @param delta  The time in seconds since the last update.
      * @param player The player object used for tracking or avoidance.
-     * @param map The game map used for collision detection and navigation.
+     * @param map    The game map used for collision detection and navigation.
      */
     protected abstract void move(float delta, Player player, GameMap map);
 
     /**
      * Updates the enemy's state, including movement, attack timing, and orientation.
-     * @param delta The time in seconds since the last update.
+     *
+     * @param delta  The time in seconds since the last update.
      * @param player The player object for range checking and attacks.
-     * @param map The game map for collision and movement calculations.
+     * @param map    The game map for collision and movement calculations.
      */
     public void update(float delta, Player player, GameMap map) {
-        if(!alive) {
+        if (!alive) {
             return;
         }
 
@@ -65,8 +66,8 @@ public abstract class Enemy extends GameObj {
 
         move(delta, player, map);
 
-        if(inRange(player)) {
-            if(timer <= 0) {
+        if (inRange(player)) {
+            if (timer <= 0) {
                 player.loseLife();
                 player.setTint(Color.RED);
                 timer = interval;
@@ -80,6 +81,7 @@ public abstract class Enemy extends GameObj {
 
     /**
      * Checks if the player is within the enemy's attack range.
+     *
      * @param player The player object to check distance against.
      */
     public boolean inRange(Player player) {
@@ -88,6 +90,7 @@ public abstract class Enemy extends GameObj {
 
     /**
      * Calculates the distance between the enemy and the player in pixels.
+     *
      * @param player The player object to calculate distance to.
      */
     protected float distance(Player player) {
@@ -96,14 +99,15 @@ public abstract class Enemy extends GameObj {
 
     /**
      * Applies damage to the enemy.
+     *
      * @param dmg The amount of damage to apply.
      */
     public void takeDamage(int dmg) {
-        if(!alive) {
+        if (!alive) {
             return;
         }
         hp -= dmg;
-        if(hp <= 0) {
+        if (hp <= 0) {
             alive = false;
         }
     }
@@ -130,6 +134,7 @@ public abstract class Enemy extends GameObj {
 
     /**
      * Renders the enemy sprite with the current orientation.
+     *
      * @param batch The SpriteBatch used for rendering.
      */
     @Override

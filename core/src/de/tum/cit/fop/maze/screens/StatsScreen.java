@@ -70,7 +70,7 @@ public class StatsScreen implements Screen {
         healthButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if(playerStats.upgradeHp()) {
+                if (playerStats.upgradeHp()) {
                     updateLabels();
                     playerStats.save();
                 }
@@ -85,7 +85,7 @@ public class StatsScreen implements Screen {
         speedButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if(playerStats.upgradeSpeed()) {
+                if (playerStats.upgradeSpeed()) {
                     updateLabels();
                     playerStats.save();
                 }
@@ -100,7 +100,7 @@ public class StatsScreen implements Screen {
         attackButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if(playerStats.upgradeAtk()) {
+                if (playerStats.upgradeAtk()) {
                     updateLabels();
                     playerStats.save();
                 }
@@ -135,6 +135,7 @@ public class StatsScreen implements Screen {
 
     /**
      * Renders the stats screen by clearing the display and drawing the stage.
+     *
      * @param delta The time in seconds since the last render.
      */
     @Override
@@ -148,7 +149,8 @@ public class StatsScreen implements Screen {
 
     /**
      * Handles screen resizing by updating the stage's viewport.
-     * @param width The new screen width.
+     *
+     * @param width  The new screen width.
      * @param height The new screen height.
      */
     @Override

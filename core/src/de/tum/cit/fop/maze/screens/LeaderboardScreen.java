@@ -2,13 +2,16 @@ package de.tum.cit.fop.maze.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -49,18 +52,18 @@ public class LeaderboardScreen implements Screen {
         stats.clear();
         FileHandle saveDir = Gdx.files.local("");
 
-        if(saveDir.exists()) {
+        if (saveDir.exists()) {
             FileHandle[] files = saveDir.list();
 
-            for(FileHandle file : files) {
-                if(file.name().startsWith("save_") && file.name().endsWith(".json")) {
+            for (FileHandle file : files) {
+                if (file.name().startsWith("save_") && file.name().endsWith(".json")) {
                     try {
                         String filename = file.name();
                         String name = filename.substring(5, filename.length() - 5);
 
                         PlayerStats ps = new PlayerStats(name);
                         stats.add(ps);
-                    } catch(Exception e) {
+                    } catch (Exception e) {
                         System.err.println("Error loading player stats from " + file.name() + ": " + e.getMessage());
                     }
                 }
@@ -104,23 +107,23 @@ public class LeaderboardScreen implements Screen {
         scrollPane.setFadeScrollBars(false);
         scrollPane.setScrollingDisabled(true, false);
 
-        float scrollPaneWidth = game.WIDTH-200;
+        float scrollPaneWidth = game.WIDTH - 200;
         float scrollPaneHeight = 300;
 
-        for(int i = 0; i < stats.size; i++) {
+        for (int i = 0; i < stats.size; i++) {
             PlayerStats player = stats.get(i);
 
             Table rowTable = new Table();
             rowTable.defaults().pad(8, 15, 8, 15);
 
             Label rankLabel;
-            if(i == 0) {
+            if (i == 0) {
                 rankLabel = new Label((i + 1) + "", game.getSkin());
                 rankLabel.setColor(1, 0.84f, 0, 1);
-            } else if(i == 1) {
+            } else if (i == 1) {
                 rankLabel = new Label((i + 1) + "", game.getSkin());
                 rankLabel.setColor(0.75f, 0.75f, 0.75f, 1);
-            } else if(i == 2) {
+            } else if (i == 2) {
                 rankLabel = new Label((i + 1) + "", game.getSkin());
                 rankLabel.setColor(0.8f, 0.5f, 0.2f, 1);
             } else {
@@ -168,6 +171,7 @@ public class LeaderboardScreen implements Screen {
 
     /**
      * Renders the leaderboard screen by clearing the display and drawing the stage.
+     *
      * @param delta The time in seconds since the last render.
      */
     @Override
@@ -181,7 +185,8 @@ public class LeaderboardScreen implements Screen {
 
     /**
      * Handles screen resizing by updating the stage's viewport.
-     * @param width The new screen width.
+     *
+     * @param width  The new screen width.
      * @param height The new screen height.
      */
     @Override

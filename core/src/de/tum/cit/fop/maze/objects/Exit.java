@@ -36,10 +36,11 @@ public class Exit extends GameObj {
 
     /**
      * Updates the exit's animation state when it is open.
+     *
      * @param delta The time in seconds since the last update.
      */
     public void update(float delta) {
-        if(isOpen) {
+        if (isOpen) {
             time += delta;
         }
     }
@@ -59,17 +60,19 @@ public class Exit extends GameObj {
 
     /**
      * Renders the exit, displaying either the static closed texture or the current frame of the opening animation.
+     *
      * @param batch The SpriteBatch used for rendering.
      */
     @Override
     public void render(SpriteBatch batch) {
-        if(isOpen) {
+        if (isOpen) {
             TextureRegion currentFrame = openAnimation.getKeyFrame(time, false);
             batch.draw(currentFrame, x * TILE, y * TILE, TILE, TILE);
         } else {
             renderStaticObj(batch);
         }
     }
+
     @Override
     public Rectangle getBounds() {
         return getBoundsStaticObj();

@@ -4,10 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import de.tum.cit.fop.maze.MazeRunnerGame;
@@ -48,23 +49,23 @@ public class MenuScreen implements Screen {
         float buttonWidth = 320f;
         float buttonHeight = 60f;
 
-        for(int row = 0; row < menuItems.length; row++) {
-            for(int col = 0; col < 2; col++) {
+        for (int row = 0; row < menuItems.length; row++) {
+            for (int col = 0; col < 2; col++) {
                 String item = menuItems[row][col];
-                if(item != null) {
+                if (item != null) {
                     TextButton button = new TextButton(item, game.getSkin());
                     gridTable.add(button)
                             .width(buttonWidth)
                             .height(buttonHeight)
                             .padBottom(20);
-                    if(col == 0) {
+                    if (col == 0) {
                         gridTable.getCell(button).padRight(10);
                     }
 
                     button.addListener(new ChangeListener() {
                         @Override
                         public void changed(ChangeEvent event, Actor actor) {
-                            switch(item) {
+                            switch (item) {
                                 case "Start Game" -> decide(game);
                                 case "Load Map" -> game.goToGame();
                                 case "Stats/Upgrades" -> game.goToStats();
@@ -76,7 +77,7 @@ public class MenuScreen implements Screen {
                             }
                         }
                     });
-                } else if(col == 0) {
+                } else if (col == 0) {
                     gridTable.add().width(buttonWidth).height(0);
                 }
             }
@@ -89,19 +90,21 @@ public class MenuScreen implements Screen {
     /**
      * Helper method to decide whether the "Start Game" button will show the story or not
      * based on the number of points in the save file.
+     *
      * @param game The main game class.
-     * */
+     *
+     */
     private void decide(MazeRunnerGame game) {
-        if(BeginScreen.STATS.getScore() == 0) {
+        if (BeginScreen.STATS.getScore() == 0) {
             game.goToStory();
-        }
-        else {
+        } else {
             game.goToEndlessGame();
         }
     }
 
     /**
      * Renders the menu screen by clearing the display and drawing the stage.
+     *
      * @param delta The time in seconds since the last render.
      */
     @Override
@@ -115,7 +118,8 @@ public class MenuScreen implements Screen {
 
     /**
      * Handles screen resizing by updating the stage's viewport.
-     * @param width The new screen width.
+     *
+     * @param width  The new screen width.
      * @param height The new screen height.
      */
     @Override

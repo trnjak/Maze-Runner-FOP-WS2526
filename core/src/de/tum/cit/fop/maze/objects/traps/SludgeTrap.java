@@ -12,8 +12,8 @@ public class SludgeTrap extends Trap {
     /**
      * Constructor for SludgeTrap.
      *
-     * @param x The X coordinate.
-     * @param y The Y coordinate.
+     * @param x    The X coordinate.
+     * @param y    The Y coordinate.
      * @param mult The speed multiplier to apply.
      */
     public SludgeTrap(int x, int y, float mult) {
@@ -23,12 +23,13 @@ public class SludgeTrap extends Trap {
 
     /**
      * Applies the speed reduction while in range.
+     *
      * @param player The player object to apply the effect to.
-     * @param delta The time in seconds since the last update.
+     * @param delta  The time in seconds since the last update.
      */
     @Override
     public void update(Player player, float delta) {
-        if(player.getBounds().overlaps(getBounds())) {
+        if (player.getBounds().overlaps(getBounds())) {
             player.speedEffect(mult, 0.1f, Color.SKY);
         }
     }

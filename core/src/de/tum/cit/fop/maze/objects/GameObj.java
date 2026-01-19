@@ -14,20 +14,19 @@ public abstract class GameObj {
      * The standard tile size in pixels used for game object dimensions.
      */
     public static final int TILE = 32;
-    protected float x, y;
-    protected float w, h;
-    protected final TextureRegion texture;
-
     /**
      * Collision padding value to make collision detection more generous around object edges.
      */
     protected static final float P = -5;
+    protected final TextureRegion texture;
+    protected float x, y;
+    protected float w, h;
 
     /**
      * Constructor for GameObj.
      *
-     * @param x The X coordinate of the object.
-     * @param y The Y coordinate of the object.
+     * @param x     The X coordinate of the object.
+     * @param y     The Y coordinate of the object.
      * @param tileY The row index in the texture tile sheet.
      * @param tileX The column index in the texture tile sheet.
      */
@@ -39,6 +38,7 @@ public abstract class GameObj {
 
     /**
      * Renders a static object (positioned in tile coordinates) using the object's texture.
+     *
      * @param batch The SpriteBatch used for rendering.
      */
     protected void renderStaticObj(SpriteBatch batch) {
@@ -47,7 +47,8 @@ public abstract class GameObj {
 
     /**
      * Renders a moving object (positioned in pixel coordinates) using the specified texture region.
-     * @param batch The SpriteBatch used for rendering.
+     *
+     * @param batch   The SpriteBatch used for rendering.
      * @param current The TextureRegion to render.
      */
     protected void renderMovingObj(SpriteBatch batch, TextureRegion current) {
@@ -56,6 +57,7 @@ public abstract class GameObj {
 
     /**
      * Abstract render method that must be implemented by all game objects to define their visual representation.
+     *
      * @param batch The SpriteBatch used for rendering.
      */
     public abstract void render(SpriteBatch batch);
@@ -65,7 +67,7 @@ public abstract class GameObj {
      */
     protected Rectangle getBoundsStaticObj() {
         return new Rectangle(
-                x * TILE - P, y * TILE - P,TILE + 2 * P, TILE + 2 * P
+                x * TILE - P, y * TILE - P, TILE + 2 * P, TILE + 2 * P
         );
     }
 
@@ -86,12 +88,15 @@ public abstract class GameObj {
     public float getX() {
         return x;
     }
+
     public void setX(float x) {
         this.x = x;
     }
+
     public float getY() {
         return y;
     }
+
     public void setY(float y) {
         this.y = y;
     }

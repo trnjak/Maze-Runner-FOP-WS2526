@@ -5,14 +5,15 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import de.tum.cit.fop.maze.*;
+import de.tum.cit.fop.maze.KeyBindings;
+import de.tum.cit.fop.maze.MazeRunnerGame;
 
 /**
  * The SettingsScreen class allows players to configure key bindings for game controls.
@@ -55,7 +56,7 @@ public class SettingsScreen implements Screen {
         stage.addActor(table);
 
         buttons = new TextButton[items.length];
-        for(int idx = 0; idx < items.length; idx++) {
+        for (int idx = 0; idx < items.length; idx++) {
             String text = getButtonText(idx);
             TextButton button = new TextButton(text, game.getSkin());
             buttons[idx] = button;
@@ -64,7 +65,7 @@ public class SettingsScreen implements Screen {
             button.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    if(index == items.length - 1) {
+                    if (index == items.length - 1) {
                         game.setScreen(new MenuScreen(game));
                     } else {
                         waiting = true;
@@ -82,10 +83,11 @@ public class SettingsScreen implements Screen {
 
     /**
      * Generates the text displayed on each key binding button.
+     *
      * @param idx The index of the control in the items array.
      */
     private String getButtonText(int idx) {
-        if(idx == items.length - 1) return items[idx];
+        if (idx == items.length - 1) return items[idx];
         return items[idx] + ": " + Input.Keys.toString(getCurrentBind(idx));
     }
 
@@ -93,7 +95,7 @@ public class SettingsScreen implements Screen {
      * Updates all button texts.
      */
     private void updateButtons() {
-        for(int idx = 0; idx < items.length; idx++) {
+        for (int idx = 0; idx < items.length; idx++) {
             buttons[idx].setText(getButtonText(idx));
         }
     }
@@ -102,7 +104,7 @@ public class SettingsScreen implements Screen {
      * Updates the status label based on current interaction state.
      */
     private void updateStatus() {
-        if(waiting) {
+        if (waiting) {
             statusLabel.setText("Press a key (ESC to cancel)");
         } else {
             statusLabel.setText("Click to change, ESC to return");
@@ -113,18 +115,18 @@ public class SettingsScreen implements Screen {
      * Handles keyboard input for navigation and key binding changes.
      */
     private void handleInput() {
-        if(!waiting) {
-            if(Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+        if (!waiting) {
+            if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
                 game.setScreen(new MenuScreen(game));
             }
         } else {
-            if(Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
                 waiting = false;
                 updateStatus();
                 return;
             }
-            for(int k = 0; k <= Input.Keys.MAX_KEYCODE; k++) {
-                if(Gdx.input.isKeyJustPressed(k)) {
+            for (int k = 0; k <= Input.Keys.MAX_KEYCODE; k++) {
+                if (Gdx.input.isKeyJustPressed(k)) {
                     applyBind(i, k);
                     binds.save();
                     waiting = false;
@@ -138,11 +140,12 @@ public class SettingsScreen implements Screen {
 
     /**
      * Applies a new key binding to the specified control.
-     * @param i The index of the control being modified.
+     *
+     * @param i   The index of the control being modified.
      * @param key The new key code to assign.
      */
     private void applyBind(int i, int key) {
-        switch(i) {
+        switch (i) {
             case 0 -> binds.UP = key;
             case 1 -> binds.DOWN = key;
             case 2 -> binds.LEFT = key;
@@ -154,10 +157,11 @@ public class SettingsScreen implements Screen {
 
     /**
      * Retrieves the current key binding for a specified control.
+     *
      * @param i The index of the control.
      */
     private int getCurrentBind(int i) {
-        return switch(i) {
+        return switch (i) {
             case 0 -> binds.UP;
             case 1 -> binds.DOWN;
             case 2 -> binds.LEFT;
@@ -170,6 +174,7 @@ public class SettingsScreen implements Screen {
 
     /**
      * Renders the settings screen by processing input and drawing the stage.
+     *
      * @param delta The time in seconds since the last render.
      */
     @Override
@@ -183,7 +188,8 @@ public class SettingsScreen implements Screen {
 
     /**
      * Handles screen resizing by updating the stage's viewport.
-     * @param width The new screen width.
+     *
+     * @param width  The new screen width.
      * @param height The new screen height.
      */
     @Override

@@ -8,7 +8,10 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import de.tum.cit.fop.maze.Achievement;
@@ -93,12 +96,12 @@ public class AchievementScreen implements Screen {
 
         var achievements = playerStats.getAchievements();
         achievements.sort((a1, a2) -> {
-            if(a1.isUnlocked() && !a2.isUnlocked()) return -1;
-            if(!a1.isUnlocked() && a2.isUnlocked()) return 1;
+            if (a1.isUnlocked() && !a2.isUnlocked()) return -1;
+            if (!a1.isUnlocked() && a2.isUnlocked()) return 1;
 
             float progress1 = (float) a1.getProgress() / a1.getTarget();
             float progress2 = (float) a2.getProgress() / a2.getTarget();
-            if(Math.abs(progress2 - progress1) > 0.001f) {
+            if (Math.abs(progress2 - progress1) > 0.001f) {
                 return Float.compare(progress2, progress1);
             }
 
@@ -113,7 +116,7 @@ public class AchievementScreen implements Screen {
 
         achievementsTable.add(new Label("", game.getSkin())).height(1).colspan(4).fillX().row();
 
-        for(Achievement a : achievements) {
+        for (Achievement a : achievements) {
             String unlockedText = a.isUnlocked() ? "UNLOCKED" : "LOCKED";
 
             Label nameLabel = new Label(a.getName(), game.getSkin());
@@ -156,6 +159,7 @@ public class AchievementScreen implements Screen {
 
     /**
      * Renders the achievements screen.
+     *
      * @param delta The time in seconds since the last render.
      */
     @Override
@@ -169,7 +173,8 @@ public class AchievementScreen implements Screen {
 
     /**
      * Handles screen resizing.
-     * @param width The new screen width.
+     *
+     * @param width  The new screen width.
      * @param height The new screen height.
      */
     @Override

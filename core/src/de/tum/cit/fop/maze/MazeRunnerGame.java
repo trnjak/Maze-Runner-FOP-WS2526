@@ -6,7 +6,8 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import de.tum.cit.fop.maze.screens.*;
 import games.spooky.gdx.nativefilechooser.NativeFileChooser;
 import games.spooky.gdx.nativefilechooser.NativeFileChooserCallback;
@@ -19,18 +20,14 @@ import java.io.IOException;
  * It manages the screens and global resources like SpriteBatch and Skin.
  */
 public class MazeRunnerGame extends Game {
-    public float WIDTH = 1024, HEIGHT = 768;
-
-    private MenuScreen menuScreen;
-    private GameScreen gameScreen;
-
-    private SpriteBatch spriteBatch;
-    private Skin skin;
-
     private final NativeFileChooser fileChooser;
-
+    public float WIDTH = 1024, HEIGHT = 768;
     public Music menuMusic;
     public Image menuImage;
+    private MenuScreen menuScreen;
+    private GameScreen gameScreen;
+    private SpriteBatch spriteBatch;
+    private Skin skin;
 
     /**
      * Constructor for MazeRunnerGame.
@@ -44,7 +41,7 @@ public class MazeRunnerGame extends Game {
 
     /**
      * Called when the game is created. Initializes the SpriteBatch, Skin and menu music.
-     *
+     * <p>
      * Music from: <a href="https://opengameart.org/content/fantasy-good-night">LINK</a>
      * Background image courtesy of Benedikt Jaletzke on Unsplash: <a href="https://unsplash.com/photos/brown-concrete-castle-UboDuBeLKIw">LINK</a>
      */
@@ -81,11 +78,11 @@ public class MazeRunnerGame extends Game {
      */
     public void goToLeaderboard() {
         setScreen(new LeaderboardScreen(this));
-        if(gameScreen != null) {
+        if (gameScreen != null) {
             gameScreen.dispose();
             gameScreen = null;
         }
-        if(menuScreen != null) {
+        if (menuScreen != null) {
             menuScreen.dispose();
             menuScreen = null;
         }
@@ -96,10 +93,10 @@ public class MazeRunnerGame extends Game {
      */
     public void goToAchievement() {
         setScreen(new AchievementScreen(this));
-        if(gameScreen != null) {
+        if (gameScreen != null) {
             gameScreen.pause();
         }
-        if(menuScreen != null) {
+        if (menuScreen != null) {
             menuScreen.dispose();
             menuScreen = null;
         }
@@ -110,10 +107,10 @@ public class MazeRunnerGame extends Game {
      */
     public void goToStats() {
         setScreen(new StatsScreen(this));
-        if(gameScreen != null) {
+        if (gameScreen != null) {
             gameScreen.pause();
         }
-        if(menuScreen != null) {
+        if (menuScreen != null) {
             menuScreen.dispose();
             menuScreen = null;
         }
@@ -124,10 +121,10 @@ public class MazeRunnerGame extends Game {
      */
     public void goToStory() {
         setScreen(new StoryScreen(this));
-        if(gameScreen != null) {
+        if (gameScreen != null) {
             gameScreen.pause();
         }
-        if(menuScreen != null) {
+        if (menuScreen != null) {
             menuScreen.dispose();
             menuScreen = null;
         }
@@ -138,10 +135,9 @@ public class MazeRunnerGame extends Game {
      * from the game or from the menu.
      */
     public void backToGameOrMenuDependingOnWhetherOrNotThePlayerEnteredTheScreenFromTheGameOrFromTheMenu() {
-        if(gameScreen != null) {
+        if (gameScreen != null) {
             setScreen(gameScreen);
-        }
-        else {
+        } else {
             goToMenu();
         }
     }
@@ -178,9 +174,11 @@ public class MazeRunnerGame extends Game {
                     menuScreen = null;
                 }
             }
+
             @Override
             public void onCancellation() {
             }
+
             @Override
             public void onError(Exception e) {
                 System.err.println(e.getMessage());
@@ -207,7 +205,6 @@ public class MazeRunnerGame extends Game {
      */
     @Override
     public void dispose() {
-        getScreen().hide();
         getScreen().dispose();
         spriteBatch.dispose();
         skin.dispose();
