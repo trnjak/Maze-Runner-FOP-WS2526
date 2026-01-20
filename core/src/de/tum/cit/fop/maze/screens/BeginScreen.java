@@ -14,8 +14,8 @@ import de.tum.cit.fop.maze.MazeRunnerGame;
 import de.tum.cit.fop.maze.PlayerStats;
 
 /**
- * The BeginScreen class is the initial screen shown when the game starts,
- * prompting the player to enter their name and initializing their player statistics.
+ * The BeginScreen class is the initial screen shown when the game starts.
+ * Prompts the player to enter their name and initialises their player statistics.
  */
 public class BeginScreen implements Screen {
     public static PlayerStats STATS;
@@ -24,9 +24,9 @@ public class BeginScreen implements Screen {
     private final MazeRunnerGame game;
 
     /**
-     * Constructor for BeginScreen.
+     * Constructs a new BeginScreen to initialise player profile and statistics.
      *
-     * @param game The main game class, used to access global resources and methods.
+     * @param game The main MazeRunnerGame instance for screen management
      */
     public BeginScreen(MazeRunnerGame game) {
         this.game = game;
@@ -41,7 +41,8 @@ public class BeginScreen implements Screen {
     }
 
     /**
-     * Displays a dialog box prompting the player to enter their name, with options to proceed or cancel.
+     * Displays a dialogue box prompting the player to enter their name.
+     * Includes options to proceed with the entered name or cancel/exit the application.
      */
     private void showPlayerNameDialog() {
         Dialog dialog = new Dialog("", game.getSkin());
@@ -100,9 +101,9 @@ public class BeginScreen implements Screen {
     }
 
     /**
-     * Renders the begin screen by clearing the display and drawing the stage.
+     * Renders the beginning screen by clearing the display and drawing the stage.
      *
-     * @param delta The time in seconds since the last render.
+     * @param delta The time in seconds since the last render
      */
     @Override
     public void render(float delta) {
@@ -116,8 +117,8 @@ public class BeginScreen implements Screen {
     /**
      * Handles screen resizing by updating the stage's viewport.
      *
-     * @param width  The new screen width.
-     * @param height The new screen height.
+     * @param width  The new screen width in pixels
+     * @param height The new screen height in pixels
      */
     @Override
     public void resize(int width, int height) {
@@ -133,21 +134,30 @@ public class BeginScreen implements Screen {
     }
 
     /**
-     * Shows the screen and sets the input processor.
+     * Shows the screen and sets the input processor to handle UI interactions.
      */
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
     }
 
+    /**
+     * Called when the screen loses focus.
+     */
     @Override
     public void pause() {
     }
 
+    /**
+     * Called when the screen regains focus.
+     */
     @Override
     public void resume() {
     }
 
+    /**
+     * Called when the screen is no longer visible.
+     */
     @Override
     public void hide() {
     }

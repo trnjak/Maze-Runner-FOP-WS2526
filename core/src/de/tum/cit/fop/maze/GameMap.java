@@ -26,10 +26,9 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * The GameMap class represents the game world containing tiles, traps, enemies, powerups, keys, and the exit.
- * It handles map loading, rendering, collision detection, and procedural generation for endless mode.
- * <p>
- * Map textures from: <a href="https://kenney.nl/assets/tiny-dungeon">LINK</a>
+ * The GameMap class manages the game world including terrain, objects, and procedural generation.
+ * Handles map loading, rendering, collision detection, and endless mode generation.
+ * <p>Map textures from: <a href="https://kenney.nl/assets/tiny-dungeon">Tiny Dungeon by Kenney</a>
  */
 public class GameMap {
     private static final Texture TILE_SHEET = new Texture("main_tilemap.png");
@@ -49,11 +48,11 @@ public class GameMap {
     private boolean isEndless = false;
 
     /**
-     * Loads a map from a properties file at the specified path.
-     * Clears existing map data and parses tile values to populate the map with walls, entry point, exit,
-     * traps, enemies, keys, and powerups.
+     * Loads a map from a properties file and initializes all game objects.
+     * Clears existing map data and parses tile values to populate the map.
      *
-     * @param path The path to the map properties file.
+     * @param path The path to the map properties file
+     * @throws RuntimeException If the map file cannot be loaded
      */
     public void load(String path) {
         tiles.clear();
@@ -106,9 +105,9 @@ public class GameMap {
     }
 
     /**
-     * Renders the entire map including tiles, traps, keys, enemies, powerups, and the exit.
+     * Renders the entire game map including terrain, objects, and entities.
      *
-     * @param batch The SpriteBatch used for drawing.
+     * @param batch The SpriteBatch used for drawing
      */
     public void render(SpriteBatch batch) {
         for (int y = 0; y < h; y++) {
@@ -135,11 +134,12 @@ public class GameMap {
     }
 
     /**
-     * Retrieves the tile value at the specified coordinates.
-     * Coordinates outside the map boundaries are treated as walls.
+     * Gets the tile value at specified coordinates.
+     * Coordinates outside map boundaries are treated as walls.
      *
-     * @param x The x-coordinate of the tile.
-     * @param y The y-coordinate of the tile.
+     * @param x The x-coordinate of the tile
+     * @param y The y-coordinate of the tile
+     * @return The tile value or 0 for out-of-bounds coordinates
      */
     public Integer getTile(int x, int y) {
         if (x < 0 || x >= w || y < 0 || y >= h) {
@@ -149,10 +149,11 @@ public class GameMap {
     }
 
     /**
-     * Checks if the tile at the given coordinates is a wall.
+     * Checks if the tile at given coordinates is a wall.
      *
-     * @param x The x-coordinate of the tile.
-     * @param y The y-coordinate of the tile.
+     * @param x The x-coordinate of the tile
+     * @param y The y-coordinate of the tile
+     * @return true if the tile is a wall, false otherwise
      */
     public boolean isWall(int x, int y) {
         Integer v = getTile(x, y);
@@ -160,9 +161,11 @@ public class GameMap {
     }
 
     /**
-     * Determines if a given rectangle collides with any wall in the map.
+     * Determines if a rectangle collides with any wall in the map.
+     * Uses a slightly smaller hitbox for more forgiving collision detection.
      *
-     * @param r The rectangle to check for collision.
+     * @param r The rectangle to check for collision
+     * @return true if the rectangle overlaps any wall, false otherwise
      */
     public boolean collidesWithWall(Rectangle r) {
         int t = GameObj.TILE;
@@ -196,9 +199,10 @@ public class GameMap {
     }
 
     /**
-     * Generates a procedural map for endless mode based on the player's current level.
-     * The map size and number of objects increase with level, up to a maximum.
-     * Saves the generated map to a local file and loads it.
+     * Generates a procedural maze for endless mode using depth-first search and room placement.
+     * Map size and object density scale with player level, up to maximum limits.
+     *
+     * @throws IOException If the generated map file cannot be written
      */
     public void generateMap() throws IOException {
         int lvl = playerStats.getLevel();
@@ -485,55 +489,119 @@ public class GameMap {
         load("maps/endless.properties");
     }
 
+    /**
+     * Gets the map width in tiles.
+     *
+     * @return The width of the map
+     */
     public int getW() {
         return w;
     }
 
+    /**
+     * Gets the map height in tiles.
+     *
+     * @return The height of the map
+     */
     public int getH() {
         return h;
     }
 
+    /**
+     * Checks if the current map is in endless mode.
+     *
+     * @return true if the map is procedurally generated for endless mode
+     */
     public boolean isEndless() {
         return isEndless;
     }
 
+    /**
+     * Gets the entry point x-coordinate.
+     *
+     * @return The x-coordinate of the map entry
+     */
     public int getEx() {
         return ex;
     }
 
+    /**
+     * Gets the entry point y-coordinate.
+     *
+     * @return The y-coordinate of the map entry
+     */
     public int getEy() {
         return ey;
     }
 
+    /**
+     * Gets the exit object for the map.
+     *
+     * @return The Exit object
+     */
     public Exit getExit() {
         return exit;
     }
 
+    /**
+     * Gets all traps in the map.
+     *
+     * @return List of Trap objects
+     */
     public List<Trap> getTraps() {
         return traps;
     }
 
+    /**
+     * Gets all keys in the map.
+     *
+     * @return List of Key objects
+     */
     public List<Key> getKeys() {
         return keys;
     }
 
+    /**
+     * Gets all enemies in the map.
+     *
+     * @return List of Enemy objects
+     */
     public List<Enemy> getEnemies() {
         return enemies;
     }
 
+    /**
+     * Gets all powerups in the map.
+     *
+     * @return List of Powerup objects
+     */
     public List<Powerup> getPowerups() {
         return powerups;
     }
 
-
+    /**
+     * Gets the map width in tiles.
+     *
+     * @return The width of the map
+     */
     public int getWidth() {
-        return w;  // number of tiles horizontally
+        return w;
     }
 
+    /**
+     * Gets the map height in tiles.
+     *
+     * @return The height of the map
+     */
     public int getHeight() {
-        return h;  // number of tiles vertically
+        return h;
     }
 
+    /**
+     * Finds all unoccupied walkable tiles in the map.
+     *
+     * @return List of coordinate pairs [x,y] representing free positions
+     */
     public List<int[]> findFreeSpots() {
         List<int[]> freeSpots = new ArrayList<>();
 
@@ -569,6 +637,4 @@ public class GameMap {
 
         return freeSpots;
     }
-
-
 }

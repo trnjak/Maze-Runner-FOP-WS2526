@@ -16,7 +16,8 @@ import de.tum.cit.fop.maze.KeyBindings;
 import de.tum.cit.fop.maze.MazeRunnerGame;
 
 /**
- * The SettingsScreen class allows players to configure key bindings for game controls.
+ * The SettingsScreen class provides a user interface for customising keyboard controls.
+ * Allows players to remap movement, attack, and sprint keys with interactive feedback.
  */
 public class SettingsScreen implements Screen {
 
@@ -41,9 +42,9 @@ public class SettingsScreen implements Screen {
     private boolean waiting = false;
 
     /**
-     * Constructor for SettingsScreen.
+     * Constructs a new SettingsScreen for key binding configuration.
      *
-     * @param game The main game instance.
+     * @param game The main MazeRunnerGame instance for screen management
      */
     public SettingsScreen(MazeRunnerGame game) {
         this.game = game;
@@ -82,9 +83,10 @@ public class SettingsScreen implements Screen {
     }
 
     /**
-     * Generates the text displayed on each key binding button.
+     * Generates button text for a specific control index.
      *
-     * @param idx The index of the control in the items array.
+     * @param idx The index of the control in the items array
+     * @return Formatted button text showing control name and current binding
      */
     private String getButtonText(int idx) {
         if (idx == items.length - 1) return items[idx];
@@ -92,7 +94,7 @@ public class SettingsScreen implements Screen {
     }
 
     /**
-     * Updates all button texts.
+     * Updates all button texts to reflect current key bindings.
      */
     private void updateButtons() {
         for (int idx = 0; idx < items.length; idx++) {
@@ -102,6 +104,7 @@ public class SettingsScreen implements Screen {
 
     /**
      * Updates the status label based on current interaction state.
+     * Provides guidance for binding changes or navigation.
      */
     private void updateStatus() {
         if (waiting) {
@@ -113,6 +116,7 @@ public class SettingsScreen implements Screen {
 
     /**
      * Handles keyboard input for navigation and key binding changes.
+     * Manages the key capture state and applies new bindings when keys are pressed.
      */
     private void handleInput() {
         if (!waiting) {
@@ -139,10 +143,10 @@ public class SettingsScreen implements Screen {
     }
 
     /**
-     * Applies a new key binding to the specified control.
+     * Applies a new key binding to the specified control index.
      *
-     * @param i   The index of the control being modified.
-     * @param key The new key code to assign.
+     * @param i   The index of the control being modified
+     * @param key The new key code to assign
      */
     private void applyBind(int i, int key) {
         switch (i) {
@@ -156,9 +160,10 @@ public class SettingsScreen implements Screen {
     }
 
     /**
-     * Retrieves the current key binding for a specified control.
+     * Gets the current key binding for a control index.
      *
-     * @param i The index of the control.
+     * @param i The index of the control
+     * @return The current key code for the specified control
      */
     private int getCurrentBind(int i) {
         return switch (i) {
@@ -175,7 +180,7 @@ public class SettingsScreen implements Screen {
     /**
      * Renders the settings screen by processing input and drawing the stage.
      *
-     * @param delta The time in seconds since the last render.
+     * @param delta The time in seconds since the last render
      */
     @Override
     public void render(float delta) {
@@ -189,8 +194,8 @@ public class SettingsScreen implements Screen {
     /**
      * Handles screen resizing by updating the stage's viewport.
      *
-     * @param width  The new screen width.
-     * @param height The new screen height.
+     * @param width  The new screen width in pixels
+     * @param height The new screen height in pixels
      */
     @Override
     public void resize(int width, int height) {
@@ -198,21 +203,30 @@ public class SettingsScreen implements Screen {
     }
 
     /**
-     * Shows the screen and sets the input processor.
+     * Shows the screen and sets the input processor to handle UI interactions.
      */
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
     }
 
+    /**
+     * Called when the screen loses focus.
+     */
     @Override
     public void pause() {
     }
 
+    /**
+     * Called when the screen regains focus.
+     */
     @Override
     public void resume() {
     }
 
+    /**
+     * Called when the screen is no longer visible.
+     */
     @Override
     public void hide() {
     }

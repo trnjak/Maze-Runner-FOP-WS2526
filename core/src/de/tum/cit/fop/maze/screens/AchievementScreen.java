@@ -19,7 +19,8 @@ import de.tum.cit.fop.maze.MazeRunnerGame;
 import de.tum.cit.fop.maze.PlayerStats;
 
 /**
- * The AchievementScreen class displays the player's achievements and progress.
+ * The AchievementScreen class displays player achievements and progress tracking.
+ * Shows unlocked status, progress bars, and organises achievements by completion state.
  */
 public class AchievementScreen implements Screen {
     private final MazeRunnerGame game;
@@ -31,9 +32,9 @@ public class AchievementScreen implements Screen {
     private ScrollPane scrollPane;
 
     /**
-     * Constructor for AchievementScreen.
+     * Constructs a new AchievementScreen to display player accomplishments.
      *
-     * @param game The main game instance.
+     * @param game The main MazeRunnerGame instance for screen management
      */
     public AchievementScreen(MazeRunnerGame game) {
         this.game = game;
@@ -49,7 +50,8 @@ public class AchievementScreen implements Screen {
     }
 
     /**
-     * Creates the user interface layout for the achievements screen.
+     * Creates the user interface with achievement listings and navigation controls.
+     * Includes a summary header, scrollable achievement table, and back button.
      */
     private void createUI() {
         stage.addActor(game.menuImage);
@@ -88,7 +90,9 @@ public class AchievementScreen implements Screen {
     }
 
     /**
-     * Creates the table displaying all achievements.
+     * Creates a table displaying all achievements with their details.
+     * Achievements are sorted by unlocked status, then by completion progress.
+     * Each entry shows name, description, progress, and locked/unlocked status.
      */
     private void createAchievementsTable() {
         achievementsTable = new Table();
@@ -142,7 +146,8 @@ public class AchievementScreen implements Screen {
     }
 
     /**
-     * Updates the achievements display with current progress.
+     * Updates the achievements display with current progress and unlocked counts.
+     * Refreshes the table data and updates the scrollable content.
      */
     public void updateAchievements() {
         unlockedCountLabel.setText("Unlocked: " +
@@ -151,6 +156,10 @@ public class AchievementScreen implements Screen {
         scrollPane.setActor(achievementsTable);
     }
 
+    /**
+     * Called when this screen becomes visible.
+     * Refreshes achievement data and sets the input processor.
+     */
     @Override
     public void show() {
         updateAchievements();
@@ -158,9 +167,9 @@ public class AchievementScreen implements Screen {
     }
 
     /**
-     * Renders the achievements screen.
+     * Renders the achievements screen by clearing the display and drawing the stage.
      *
-     * @param delta The time in seconds since the last render.
+     * @param delta The time in seconds since the last render
      */
     @Override
     public void render(float delta) {
@@ -172,24 +181,33 @@ public class AchievementScreen implements Screen {
     }
 
     /**
-     * Handles screen resizing.
+     * Handles screen resizing by updating the stage's viewport.
      *
-     * @param width  The new screen width.
-     * @param height The new screen height.
+     * @param width  The new screen width in pixels
+     * @param height The new screen height in pixels
      */
     @Override
     public void resize(int width, int height) {
         stage.getViewport().update(width, height, true);
     }
 
+    /**
+     * Called when the screen loses focus.
+     */
     @Override
     public void pause() {
     }
 
+    /**
+     * Called when the screen regains focus.
+     */
     @Override
     public void resume() {
     }
 
+    /**
+     * Called when the screen is no longer visible.
+     */
     @Override
     public void hide() {
     }

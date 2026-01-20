@@ -8,7 +8,8 @@ import com.badlogic.gdx.utils.Array;
 import de.tum.cit.fop.maze.GameMap;
 
 /**
- * The Exit class represents the level's exit point, accessible only when a key is collected.
+ * The Exit class represents the level's exit point, which becomes accessible when a key is collected.
+ * Features an animated opening sequence that plays when unlocked.
  */
 public class Exit extends GameObj {
     private Animation<TextureRegion> openAnimation;
@@ -16,10 +17,11 @@ public class Exit extends GameObj {
     private boolean isOpen = false;
 
     /**
-     * Constructor for Exit.
+     * Constructs a new Exit at the specified coordinates.
+     * Initialises with closed state and loads opening animation frames.
      *
-     * @param x The X coordinate.
-     * @param y The Y coordinate.
+     * @param x The X coordinate
+     * @param y The Y coordinate
      */
     public Exit(int x, int y) {
         super(x, y, 3, 9);
@@ -27,7 +29,8 @@ public class Exit extends GameObj {
     }
 
     /**
-     * Opens the exit, making it passable and starting the opening animation sequence.
+     * Opens the exit, enabling passage for the player and starting the opening animation.
+     * Must be called when the player collects a key.
      */
     public void open() {
         isOpen = true;
@@ -35,9 +38,9 @@ public class Exit extends GameObj {
     }
 
     /**
-     * Updates the exit's animation state when it is open.
+     * Updates the exit's animation state when open.
      *
-     * @param delta The time in seconds since the last update.
+     * @param delta The time in seconds since the last update
      */
     public void update(float delta) {
         if (isOpen) {
@@ -46,7 +49,8 @@ public class Exit extends GameObj {
     }
 
     /**
-     * Loads the animation frames for the exit's opening sequence from the game's texture sheet.
+     * Loads the animation frames for the exit's opening sequence.
+     * Uses three frames from the game's texture sheet to create a visual transition.
      */
     private void loadOpenAnimation() {
         Array<TextureRegion> walkFrames = new Array<>(TextureRegion.class);
@@ -59,9 +63,9 @@ public class Exit extends GameObj {
     }
 
     /**
-     * Renders the exit, displaying either the static closed texture or the current frame of the opening animation.
+     * Renders the exit, displaying either the static closed texture or the current animation frame.
      *
-     * @param batch The SpriteBatch used for rendering.
+     * @param batch The SpriteBatch used for rendering
      */
     @Override
     public void render(SpriteBatch batch) {
@@ -73,6 +77,11 @@ public class Exit extends GameObj {
         }
     }
 
+    /**
+     * Gets the collision bounds of the exit for interaction detection.
+     *
+     * @return The rectangle representing the exit's collision bounds
+     */
     @Override
     public Rectangle getBounds() {
         return getBoundsStaticObj();

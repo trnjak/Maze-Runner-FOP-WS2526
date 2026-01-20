@@ -6,17 +6,18 @@ import de.tum.cit.fop.maze.objects.Player;
 
 /**
  * The PatrolEnemy class represents an enemy that patrols along a fixed axis (either horizontal or vertical).
+ * Moves continuously along its designated axis, reversing direction upon collision with walls or the player.
  */
 public class PatrolEnemy extends Enemy {
     private final boolean axis;
     private float dir = 1;
 
     /**
-     * Creates a new PatrolEnemy at the specified position with the given patrol axis.
+     * Constructs a new PatrolEnemy at the specified coordinates with a designated patrol axis.
      *
      * @param x    The x-coordinate of the enemy's starting position
      * @param y    The y-coordinate of the enemy's starting position
-     * @param axis The axis along which the enemy patrols (true for x-axis/horizontal, false for y-axis/vertical)
+     * @param axis The axis along which the enemy patrols (true for horizontal/x-axis, false for vertical/y-axis)
      */
     public PatrolEnemy(int x, int y, boolean axis) {
         super(x, y, 10, 2);
@@ -26,13 +27,12 @@ public class PatrolEnemy extends Enemy {
 
     /**
      * Updates the enemy's movement based on its patrol pattern.
-     * The enemy moves along its designated axis at a constant speed and
-     * reverses direction when it encounters walls or collides with the player.
-     * If the player enters attack range, the enemy stops moving to attack.
+     * The enemy moves along its designated axis at constant speed, reversing direction when encountering obstacles.
+     * Stops moving when the player enters attack range to initiate attacks.
      *
-     * @param delta  The time elapsed since the last frame update
-     * @param player The player character
-     * @param map    The game map
+     * @param delta  The time elapsed since the last frame update in seconds
+     * @param player The player character for range detection and collision checking
+     * @param map    The game map for wall collision detection
      */
     @Override
     protected void move(float delta, Player player, GameMap map) {

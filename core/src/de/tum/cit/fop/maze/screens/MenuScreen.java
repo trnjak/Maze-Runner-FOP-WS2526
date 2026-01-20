@@ -14,16 +14,17 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import de.tum.cit.fop.maze.MazeRunnerGame;
 
 /**
- * The MenuScreen class provides the main menu interface for the game.
+ * The MenuScreen class provides the main navigation interface for the game.
+ * Displays a grid of menu options for starting games, accessing features, and exiting.
  */
 public class MenuScreen implements Screen {
 
     private final Stage stage;
 
     /**
-     * Constructor for MenuScreen.
+     * Constructs a new MenuScreen with navigation buttons and background.
      *
-     * @param game The main game class.
+     * @param game The main MazeRunnerGame instance for screen management
      */
     public MenuScreen(MazeRunnerGame game) {
         var camera = new OrthographicCamera();
@@ -88,11 +89,10 @@ public class MenuScreen implements Screen {
     }
 
     /**
-     * Helper method to decide whether the "Start Game" button will show the story or not
-     * based on the number of points in the save file.
+     * Determines the appropriate starting screen based on player progression.
+     * New players are directed to the story screen, while returning players start endless mode.
      *
-     * @param game The main game class.
-     *
+     * @param game The main MazeRunnerGame instance for screen transitions
      */
     private void decide(MazeRunnerGame game) {
         if (BeginScreen.STATS.getScore() == 0) {
@@ -106,7 +106,7 @@ public class MenuScreen implements Screen {
     /**
      * Renders the menu screen by clearing the display and drawing the stage.
      *
-     * @param delta The time in seconds since the last render.
+     * @param delta The time in seconds since the last render
      */
     @Override
     public void render(float delta) {
@@ -120,8 +120,8 @@ public class MenuScreen implements Screen {
     /**
      * Handles screen resizing by updating the stage's viewport.
      *
-     * @param width  The new screen width.
-     * @param height The new screen height.
+     * @param width  The new screen width in pixels
+     * @param height The new screen height in pixels
      */
     @Override
     public void resize(int width, int height) {
@@ -137,21 +137,31 @@ public class MenuScreen implements Screen {
     }
 
     /**
-     * Shows the screen and sets the input processor.
+     * Shows the screen and sets the input processor to handle UI interactions.
      */
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
     }
 
+    /**
+     * Called when the screen loses focus.
+     */
     @Override
     public void pause() {
     }
 
+    /**
+     * Called when the screen regains focus.
+     */
     @Override
     public void resume() {
     }
 
+    /**
+     * Called when the screen is no longer visible.
+     */
     @Override
-    public void hide() {}
+    public void hide() {
+    }
 }

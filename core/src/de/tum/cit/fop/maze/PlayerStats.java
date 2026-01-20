@@ -5,11 +5,13 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.ObjectMap;
+import de.tum.cit.fop.maze.objects.Player;
 
 /**
- * The PlayerStats class manages the saving and loading of player files.
- * It also handles incrementing and purchasing stats and setting their price,
- * as well as managing achievements.
+ * The PlayerStats class manages persistent player data including experience, upgrades, and achievements.
+ * Handles save file operations, stat progression, and achievement tracking.
+ *
+ * @see Player
  */
 public class PlayerStats {
     private static final Json json = new Json();
@@ -29,9 +31,10 @@ public class PlayerStats {
     private ObjectMap<String, Achievement> achievements;
 
     /**
-     * Constructor for PlayerStats.
+     * Creates a new PlayerStats instance for the specified player name.
+     * Loads existing save data or initializes new statistics.
      *
-     * @param name The player's name, input in the starting screen.
+     * @param name The player's name entered on the start screen
      */
     public PlayerStats(String name) {
         this.name = name;
@@ -42,7 +45,8 @@ public class PlayerStats {
     }
 
     /**
-     * Handles file loading.
+     * Loads player statistics from the associated save file.
+     * Falls back to default values if the file doesn't exist or is corrupted.
      */
     @SuppressWarnings("unchecked")
     private void load() {
@@ -79,8 +83,7 @@ public class PlayerStats {
     }
 
     /**
-     * Initializes achievements if none are loaded from the save file.
-     * Adds default achievements to the achievements map.
+     * Initializes default achievements if no achievements are loaded from the save file.
      */
     private void initAchievements() {
         if (achievements.size == 0) {
@@ -91,7 +94,7 @@ public class PlayerStats {
     }
 
     /**
-     * Handles file saving.
+     * Saves the current player statistics to the associated save file.
      */
     public void save() {
         try {
@@ -113,11 +116,11 @@ public class PlayerStats {
     }
 
     /**
-     * Updates achievements of a specific type by adding progress.
-     * Also handles special achievement logic for the "upgrade_master" achievement.
+     * Updates achievements of a specific type and returns newly unlocked achievement names.
      *
-     * @param type   The type of achievement to update
-     * @param amount The amount of progress to add
+     * @param type   The achievement category to update (e.g., "kill", "collect", "score")
+     * @param amount The amount of progress to add to matching achievements
+     * @return Array of names for achievements that were just unlocked
      */
     public Array<String> updateAchievement(String type, int amount) {
         Array<String> newlyUnlocked = new Array<>();
@@ -154,6 +157,8 @@ public class PlayerStats {
 
     /**
      * Checks and updates score-related achievements based on current score.
+     *
+     * @return Array of names for newly unlocked score achievements
      */
     public Array<String> checkScoreAchievements() {
         return updateAchievement("score", score);
@@ -161,13 +166,17 @@ public class PlayerStats {
 
     /**
      * Checks and updates level-related achievements based on current level.
+     *
+     * @return Array of names for newly unlocked level achievements
      */
     public Array<String> checkLevelAchievements() {
         return updateAchievement("level", level);
     }
 
     /**
-     * Returns all achievements as an array.
+     * Gets all achievements as an array.
+     *
+     * @return Array containing all achievements
      */
     public Array<Achievement> getAchievements() {
         Array<Achievement> result = new Array<>();
@@ -178,7 +187,9 @@ public class PlayerStats {
     }
 
     /**
-     * Returns the count of unlocked achievements.
+     * Gets the number of unlocked achievements.
+     *
+     * @return Count of achievements that have been unlocked
      */
     public int getUnlockedAchievementsCount() {
         int count = 0;
@@ -191,10 +202,9 @@ public class PlayerStats {
     }
 
     /**
-     * Increases EXP.
+     * Adds experience points to the player.
      *
-     * @param n the amount of EXP to be added
-     *
+     * @param n The amount of experience to add
      */
     public void addExp(int n) {
         exp += n;
@@ -202,10 +212,9 @@ public class PlayerStats {
     }
 
     /**
-     * Increases the score.
+     * Adds points to the player's score.
      *
-     * @param n the amount to add to the score
-     *
+     * @param n The amount to add to the score
      */
     public void addScore(int n) {
         score += n;
@@ -213,10 +222,10 @@ public class PlayerStats {
     }
 
     /**
-     * Spends EXP. (Used for purchasing upgrades).
+     * Attempts to spend experience points for upgrades.
      *
-     * @param cost the cost of the upgrade.
-     *
+     * @param cost The experience cost of the upgrade
+     * @return true if the player had enough experience and the purchase succeeded, false otherwise
      */
     public boolean spendExp(int cost) {
         if (exp >= cost) {
@@ -228,8 +237,9 @@ public class PlayerStats {
     }
 
     /**
-     * Upgrades the player's HP
+     * Upgrades the player's maximum health level.
      *
+     * @return true if the upgrade was successful, false if insufficient experience
      */
     public boolean upgradeHp() {
         int cost = hpLvl * 2;
@@ -241,8 +251,9 @@ public class PlayerStats {
     }
 
     /**
-     * Upgrades the player's speed
+     * Upgrades the player's movement speed level.
      *
+     * @return true if the upgrade was successful, false if insufficient experience
      */
     public boolean upgradeSpeed() {
         int cost = speedLvl * 2;
@@ -254,8 +265,9 @@ public class PlayerStats {
     }
 
     /**
-     * Upgrades the player's attack
+     * Upgrades the player's attack speed level.
      *
+     * @return true if the upgrade was successful, false if insufficient experience
      */
     public boolean upgradeAtk() {
         int cost = atkLvl * 2;
@@ -267,16 +279,18 @@ public class PlayerStats {
     }
 
     /**
-     * Returns player's speed (1 + 2% of speedLvl)
+     * Gets the player's current movement speed multiplier.
      *
+     * @return Movement speed (base 1.0 + 2% per speed level)
      */
     public float getSpeed() {
         return 1f + (speedLvl - 1) * 0.02f;
     }
 
     /**
-     * Returns player's attack cooldown (0.01 is the smallest possible)
+     * Gets the player's current attack cooldown.
      *
+     * @return Attack cooldown in seconds (minimum 0.01s)
      */
     public float getAttackCooldown() {
         return Math.max(0.01f, 0.5f - (atkLvl - 1) * 0.005f);
@@ -291,36 +305,73 @@ public class PlayerStats {
     }
 
     /**
-     * Returns the player's maximum HP.
+     * Gets the player's maximum health points.
+     *
+     * @return Maximum health (base 4 + health level)
      */
     public int getMaxHp() {
         return 4 + hpLvl;
     }
 
+    /**
+     * Gets the player's name.
+     *
+     * @return The player's name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Gets the player's total score.
+     *
+     * @return The current score
+     */
     public int getScore() {
         return score;
     }
 
+    /**
+     * Gets the player's current level.
+     *
+     * @return The current level
+     */
     public int getLevel() {
         return level;
     }
 
+    /**
+     * Gets the player's current experience points.
+     *
+     * @return The current experience
+     */
     public int getExp() {
         return exp;
     }
 
+    /**
+     * Gets the player's health upgrade level.
+     *
+     * @return Current health level
+     */
     public int getHpLvl() {
         return hpLvl;
     }
 
+    /**
+     * Gets the player's speed upgrade level.
+     *
+     * @return Current speed level
+     */
     public int getSpeedLvl() {
         return speedLvl;
     }
 
+    /**
+     * Gets the player's attack upgrade level.
+     *
+     * @return Current attack level
+     */
     public int getAtkLvl() {
         return atkLvl;
     }

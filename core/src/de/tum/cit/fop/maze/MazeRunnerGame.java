@@ -16,8 +16,8 @@ import games.spooky.gdx.nativefilechooser.NativeFileChooserConfiguration;
 import java.io.IOException;
 
 /**
- * The MazeRunnerGame class represents the core of the Maze Runner game.
- * It manages the screens and global resources like SpriteBatch and Skin.
+ * The MazeRunnerGame class serves as the main entry point and screen manager for the game.
+ * It handles screen transitions, manages global resources, and coordinates the overall game flow.
  */
 public class MazeRunnerGame extends Game {
     private final NativeFileChooser fileChooser;
@@ -30,9 +30,9 @@ public class MazeRunnerGame extends Game {
     private Skin skin;
 
     /**
-     * Constructor for MazeRunnerGame.
+     * Constructs a new MazeRunnerGame instance with the specified file chooser.
      *
-     * @param fileChooser The file chooser for the game, typically used in desktop environment.
+     * @param fileChooser The native file chooser implementation for map selection
      */
     public MazeRunnerGame(NativeFileChooser fileChooser) {
         super();
@@ -40,10 +40,10 @@ public class MazeRunnerGame extends Game {
     }
 
     /**
-     * Called when the game is created. Initializes the SpriteBatch, Skin and menu music.
-     * <p>
-     * Music from: <a href="https://opengameart.org/content/mysterious-ambience-song21">LINK</a>
-     * Background image courtesy of Benedikt Jaletzke on Unsplash: <a href="https://unsplash.com/photos/brown-concrete-castle-UboDuBeLKIw">LINK</a>
+     * Initializes the game resources including SpriteBatch, UI skin, and background music.
+     * Sets the initial screen to the BeginScreen.
+     * <p>Music from: <a href="https://opengameart.org/content/mysterious-ambience-song21">Mysterious Ambience Song21</a>
+     * <p>Background image courtesy of Benedikt Jaletzke on Unsplash: <a href="https://unsplash.com/photos/brown-concrete-castle-UboDuBeLKIw">Brown Concrete Castle</a>
      */
     @Override
     public void create() {
@@ -63,7 +63,7 @@ public class MazeRunnerGame extends Game {
     }
 
     /**
-     * Switches to the menu screen.
+     * Navigates to the main menu screen and disposes the current game screen.
      */
     public void goToMenu() {
         this.setScreen(new MenuScreen(this));
@@ -74,7 +74,7 @@ public class MazeRunnerGame extends Game {
     }
 
     /**
-     * Switches to the leaderboard screen.
+     * Navigates to the leaderboard screen and disposes other screens.
      */
     public void goToLeaderboard() {
         setScreen(new LeaderboardScreen(this));
@@ -89,7 +89,7 @@ public class MazeRunnerGame extends Game {
     }
 
     /**
-     * Switches to the achievements screen
+     * Navigates to the achievements screen and pauses the current game if active.
      */
     public void goToAchievement() {
         setScreen(new AchievementScreen(this));
@@ -103,7 +103,7 @@ public class MazeRunnerGame extends Game {
     }
 
     /**
-     * Switches to the stats screen.
+     * Navigates to the statistics screen and pauses the current game if active.
      */
     public void goToStats() {
         setScreen(new StatsScreen(this));
@@ -117,7 +117,7 @@ public class MazeRunnerGame extends Game {
     }
 
     /**
-     * Switches to the story screen.
+     * Navigates to the story screen and pauses the current game if active.
      */
     public void goToStory() {
         setScreen(new StoryScreen(this));
@@ -131,8 +131,8 @@ public class MazeRunnerGame extends Game {
     }
 
     /**
-     * Switches back to the game or menu screen depending on whether the player entered the screen
-     * from the game or from the menu.
+     * Returns to the previous screen based on navigation context.
+     * Returns to the game screen if currently in-game, otherwise returns to the menu.
      */
     public void backToGameOrMenuDependingOnWhetherOrNotThePlayerEnteredTheScreenFromTheGameOrFromTheMenu() {
         if (gameScreen != null) {
@@ -142,9 +142,8 @@ public class MazeRunnerGame extends Game {
         }
     }
 
-
     /**
-     * Switches to the settings screen.
+     * Navigates to the settings screen and disposes the current game screen.
      */
     public void goToSettings() {
         this.setScreen(new SettingsScreen(this));
@@ -155,7 +154,8 @@ public class MazeRunnerGame extends Game {
     }
 
     /**
-     * Opens the native file picker to load the game map. Upon choosing, switches to the game screen.
+     * Opens a file chooser to select a custom map file and starts a new game with it.
+     * Stops menu music upon successful map selection.
      */
     public void goToGame() {
         NativeFileChooserConfiguration nfconf = new NativeFileChooserConfiguration();
@@ -188,7 +188,8 @@ public class MazeRunnerGame extends Game {
     }
 
     /**
-     * Switches to endless game screen.
+     * Starts a new endless mode game session.
+     * Stops menu music and disposes the menu screen.
      */
     public void goToEndlessGame() {
         gameScreen = new GameScreen(this);
@@ -201,7 +202,7 @@ public class MazeRunnerGame extends Game {
     }
 
     /**
-     * Cleans up resources when the game is disposed.
+     * Disposes all game resources when the application closes.
      */
     @Override
     public void dispose() {
@@ -211,10 +212,20 @@ public class MazeRunnerGame extends Game {
         skin.dispose();
     }
 
+    /**
+     * Gets the UI skin used throughout the game.
+     *
+     * @return The current Skin instance
+     */
     public Skin getSkin() {
         return skin;
     }
 
+    /**
+     * Gets the main SpriteBatch for rendering.
+     *
+     * @return The global SpriteBatch instance
+     */
     public SpriteBatch getSpriteBatch() {
         return spriteBatch;
     }

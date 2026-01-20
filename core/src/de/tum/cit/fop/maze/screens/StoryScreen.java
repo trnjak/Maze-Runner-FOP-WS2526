@@ -16,15 +16,16 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import de.tum.cit.fop.maze.MazeRunnerGame;
 
 /**
- * The StoryScreen class displays the game's story and setting.
+ * The StoryScreen class displays the game's narrative, setting, and objectives to the player.
+ * Provides a scrollable story interface with navigation options.
  */
 public class StoryScreen implements Screen {
     private final Stage stage;
 
     /**
-     * Constructor for StoryScreen.
+     * Constructs a new StoryScreen with game story and navigation controls.
      *
-     * @param game The main game class.
+     * @param game The main MazeRunnerGame instance for screen management
      */
     public StoryScreen(MazeRunnerGame game) {
         var camera = new OrthographicCamera();
@@ -99,9 +100,9 @@ public class StoryScreen implements Screen {
     }
 
     /**
-     * Renders the story screen.
+     * Renders the story screen and updates the stage.
      *
-     * @param delta The time in seconds since the last render.
+     * @param delta The time in seconds since the last render
      */
     @Override
     public void render(float delta) {
@@ -115,8 +116,8 @@ public class StoryScreen implements Screen {
     /**
      * Handles screen resizing by updating the stage's viewport.
      *
-     * @param width  The new screen width.
-     * @param height The new screen height.
+     * @param width  The new screen width in pixels
+     * @param height The new screen height in pixels
      */
     @Override
     public void resize(int width, int height) {
@@ -132,21 +133,30 @@ public class StoryScreen implements Screen {
     }
 
     /**
-     * Shows the screen and sets the input processor.
+     * Shows the screen and sets the input processor to handle UI interactions.
      */
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
     }
 
+    /**
+     * Called when the screen loses focus.
+     */
     @Override
     public void pause() {
     }
 
+    /**
+     * Called when the screen regains focus.
+     */
     @Override
     public void resume() {
     }
 
+    /**
+     * Called when the screen is no longer visible.
+     */
     @Override
     public void hide() {
     }

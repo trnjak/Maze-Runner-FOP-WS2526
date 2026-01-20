@@ -6,14 +6,15 @@ import de.tum.cit.fop.maze.GameMap;
 import de.tum.cit.fop.maze.objects.Player;
 
 /**
- * The ChaserEnemy class represents an enemy that chases the player when within line of sight and range.
- * If not within said line of sight and range, the enemy wanders randomly.
+ * The ChaserEnemy class represents an enemy that actively pursues the player when within line of sight.
+ * When the player is not visible or too far, the enemy wanders randomly with basic obstacle avoidance.
+ * Includes push-back mechanics on collision with the player.
  */
 public class ChaserEnemy extends Enemy {
     private float dx = 0, dy = 0, cd = 0;
 
     /**
-     * Creates a new ChaserEnemy at the specified position.
+     * Constructs a new ChaserEnemy at the specified coordinates.
      *
      * @param x The x-coordinate of the enemy's starting position
      * @param y The y-coordinate of the enemy's starting position
@@ -23,15 +24,14 @@ public class ChaserEnemy extends Enemy {
     }
 
     /**
-     * Updates the enemy's movement based on the player's position and game state.
-     * The enemy will chase the player when within line of sight and range,
-     * using obstacle avoidance to navigate around walls. When not chasing,
-     * the enemy moves randomly. If the enemy reaches the player, it pushes
-     * the player away and stops moving.
+     * Updates the enemy's movement based on player proximity and visibility.
+     * When the player is within chase range and line of sight, uses vector-based pathfinding with wall avoidance.
+     * When not chasing, performs random wandering with directional changes every 2 seconds.
+     * Handles player collision by pushing the player away from the enemy.
      *
-     * @param delta  The time elapsed since the last frame update
-     * @param player The player character being chased
-     * @param map    The game map containing wall collision data
+     * @param delta  The time elapsed since the last frame update in seconds
+     * @param player The player character for targeting and collision
+     * @param map    The game map for wall collision detection and pathfinding
      */
     @Override
     protected void move(float delta, Player player, GameMap map) {
@@ -145,16 +145,23 @@ public class ChaserEnemy extends Enemy {
         }
     }
 
+    /**
+     * Checks if the player is within chase range (192 pixels).
+     *
+     * @param player The player to check distance against
+     * @return true if the player is within chase range, false otherwise
+     */
     private boolean inChaseRange(Player player) {
         return distance(player) <= 192;
     }
 
     /**
-     * Checks whether the enemy has a line of sight to the player or not,
-     * used to ensure that the enemy won't try to chase a player from behind a wall.
+     * Determines if the enemy has unobstructed line of sight to the player.
+     * Uses ray casting with 4-pixel steps to check for wall collisions along the path.
      *
-     * @param player The player chased by the enemy.
-     * @param map    The game map.
+     * @param player The player being targeted
+     * @param map    The game map for wall collision checks
+     * @return true if there is a clear path to the player, false if obstructed by walls
      */
     private boolean hasLineOfSight(Player player, GameMap map) {
         Vector2 enemyPos = new Vector2(x + w / 2, y + h / 2);
@@ -179,11 +186,10 @@ public class ChaserEnemy extends Enemy {
     }
 
     /**
-     * Pushes the player away from the enemy when they collide.
-     * The push direction is calculated as the vector from the enemy to the player,
-     * normalised and scaled by a fixed strength.
+     * Pushes the player away from the enemy upon collision.
+     * Uses normalised direction vector scaled by fixed strength (10 pixels).
      *
-     * @param player The player to push.
+     * @param player The player to push away from the enemy
      */
     protected void pushPlayer(Player player) {
         Vector2 push = new Vector2(

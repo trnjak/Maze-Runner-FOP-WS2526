@@ -19,7 +19,8 @@ import de.tum.cit.fop.maze.MazeRunnerGame;
 import de.tum.cit.fop.maze.PlayerStats;
 
 /**
- * The LeaderboardScreen class displays a ranked list of all players based on their scores.
+ * The LeaderboardScreen class displays a ranked list of player statistics.
+ * Shows player rankings, scores, and levels in a scrollable table with visual distinction for top positions.
  */
 public class LeaderboardScreen implements Screen {
     private final MazeRunnerGame game;
@@ -28,9 +29,9 @@ public class LeaderboardScreen implements Screen {
     private final Array<PlayerStats> stats;
 
     /**
-     * Constructor for LeaderboardScreen.
+     * Constructs a new LeaderboardScreen to display player rankings.
      *
-     * @param game The main game instance.
+     * @param game The main MazeRunnerGame instance for screen management
      */
     public LeaderboardScreen(MazeRunnerGame game) {
         this.game = game;
@@ -46,7 +47,8 @@ public class LeaderboardScreen implements Screen {
     }
 
     /**
-     * Loads all player statistics from saved game files.
+     * Loads all player statistics from saved game files in the local directory.
+     * Filters files by naming pattern "save_*.json" and creates PlayerStats instances.
      */
     private void loadAllPlayerStats() {
         stats.clear();
@@ -72,7 +74,8 @@ public class LeaderboardScreen implements Screen {
     }
 
     /**
-     * Creates the user interface layout for the leaderboard screen.
+     * Creates the user interface with leaderboard table and navigation controls.
+     * Displays players in ranked order with visual distinction for top 3 positions.
      */
     private void createUI() {
         stage.addActor(game.menuImage);
@@ -160,7 +163,8 @@ public class LeaderboardScreen implements Screen {
     }
 
     /**
-     * Shows the screen and refreshes the leaderboard data and UI.
+     * Called when the screen becomes visible.
+     * Refreshes leaderboard data and recreates the UI to display current statistics.
      */
     @Override
     public void show() {
@@ -172,7 +176,7 @@ public class LeaderboardScreen implements Screen {
     /**
      * Renders the leaderboard screen by clearing the display and drawing the stage.
      *
-     * @param delta The time in seconds since the last render.
+     * @param delta The time in seconds since the last render
      */
     @Override
     public void render(float delta) {
@@ -186,22 +190,31 @@ public class LeaderboardScreen implements Screen {
     /**
      * Handles screen resizing by updating the stage's viewport.
      *
-     * @param width  The new screen width.
-     * @param height The new screen height.
+     * @param width  The new screen width in pixels
+     * @param height The new screen height in pixels
      */
     @Override
     public void resize(int width, int height) {
         stage.getViewport().update(width, height, true);
     }
 
+    /**
+     * Called when the screen loses focus.
+     */
     @Override
     public void pause() {
     }
 
+    /**
+     * Called when the screen regains focus.
+     */
     @Override
     public void resume() {
     }
 
+    /**
+     * Called when the screen is no longer visible.
+     */
     @Override
     public void hide() {
     }

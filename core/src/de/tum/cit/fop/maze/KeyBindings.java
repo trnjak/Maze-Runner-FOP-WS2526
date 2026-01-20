@@ -6,7 +6,8 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Json;
 
 /**
- * The KeyBindings class handles key binds, as well as saving/loading them from a file.
+ * The KeyBindings class manages customisable keyboard controls for player actions.
+ * Handles persistence of key mappings to a JSON configuration file.
  */
 public class KeyBindings {
     private static final String PATH = "keybinds.json";
@@ -18,7 +19,10 @@ public class KeyBindings {
     public int SPRINT = Input.Keys.SHIFT_LEFT;
 
     /**
-     * Loads the binds from a json file.
+     * Loads key bindings from the configuration file.
+     * Creates a new file with default bindings if none exists.
+     *
+     * @return The loaded or newly created KeyBindings instance
      */
     public static KeyBindings load() {
         FileHandle file = Gdx.files.local(PATH);
@@ -32,7 +36,7 @@ public class KeyBindings {
     }
 
     /**
-     * Saves the binds to a json file.
+     * Saves the current key bindings to the configuration file in JSON format.
      */
     public void save() {
         Json json = new Json();

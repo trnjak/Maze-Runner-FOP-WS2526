@@ -3,7 +3,8 @@ package de.tum.cit.fop.maze.objects.traps;
 import de.tum.cit.fop.maze.objects.Player;
 
 /**
- * The DamageTrap class represents a trap that damages the player.
+ * The DamageTrap class represents a trap that inflicts damage to the player at regular intervals.
+ * First damage occurs immediately upon contact, with subsequent damage at configured intervals if the player remains.
  */
 public class DamageTrap extends Trap {
     private final float interval;
@@ -11,11 +12,11 @@ public class DamageTrap extends Trap {
     private boolean active = false;
 
     /**
-     * Constructor for DamageTrap.
+     * Constructs a new DamageTrap at the specified coordinates with a damage interval.
      *
-     * @param x        The X coordinate.
-     * @param y        The Y coordinate.
-     * @param interval The time interval in seconds between damage ticks while the player is on the trap.
+     * @param x        The X coordinate
+     * @param y        The Y coordinate
+     * @param interval The time interval in seconds between damage ticks while the player remains on the trap
      */
     public DamageTrap(int x, int y, float interval) {
         super(x, y, 3, 5);
@@ -23,11 +24,11 @@ public class DamageTrap extends Trap {
     }
 
     /**
-     * Damages player when in range, first damage is immediate and if player doesn't
-     * step off the trap, subsequent damage happens every second.
+     * Updates the trap's damage application to the player.
+     * First damage occurs immediately upon collision, with subsequent damage at regular intervals.
      *
-     * @param player The player object to apply the effect to.
-     * @param delta  The time in seconds since the last update.
+     * @param player The player object to apply damage to
+     * @param delta  The time in seconds since the last update
      */
     @Override
     public void update(Player player, float delta) {

@@ -16,7 +16,8 @@ import de.tum.cit.fop.maze.MazeRunnerGame;
 import de.tum.cit.fop.maze.PlayerStats;
 
 /**
- * The StatsScreen class displays the player's statistics and upgrade options.
+ * The StatsScreen class displays player statistics and provides an interface for upgrading abilities.
+ * Shows current levels, costs, and allows spending experience points on character improvements.
  */
 public class StatsScreen implements Screen {
     private final MazeRunnerGame game;
@@ -29,9 +30,9 @@ public class StatsScreen implements Screen {
     private Label attackLabel;
 
     /**
-     * Constructor for StatsScreen.
+     * Constructs a new StatsScreen for viewing and upgrading player statistics.
      *
-     * @param game The main game instance.
+     * @param game The main MazeRunnerGame instance for screen management
      */
     public StatsScreen(MazeRunnerGame game) {
         this.game = game;
@@ -47,9 +48,9 @@ public class StatsScreen implements Screen {
     }
 
     /**
-     * Creates the user interface layout for the stats screen.
-     * Adds a title, experience display, upgradeable attributes with labels and buttons
-     * and a back button to return to the previous screen.
+     * Creates the user interface with upgrade options and current statistics display.
+     * Includes labels for experience and attribute levels, upgrade buttons with dynamic costs,
+     * and navigation controls.
      */
     private void createUI() {
         stage.addActor(game.menuImage);
@@ -120,7 +121,8 @@ public class StatsScreen implements Screen {
     }
 
     /**
-     * Updates all displayed labels with the current player statistics.
+     * Updates all displayed labels with current player statistics and upgrade costs.
+     * Called after successful upgrades to refresh the UI.
      */
     private void updateLabels() {
         expLabel.setText("EXP: " + playerStats.getExp());
@@ -129,14 +131,17 @@ public class StatsScreen implements Screen {
         attackLabel.setText("Attack Lvl: " + playerStats.getAtkLvl() + " (Cooldown: " + String.format("%.2f", playerStats.getAttackCooldown()) + "s)");
     }
 
+    /**
+     * Called when this screen becomes the current screen for the game.
+     */
     @Override
     public void show() {
     }
 
     /**
-     * Renders the stats screen by clearing the display and drawing the stage.
+     * Renders the statistics screen by clearing the display and drawing the stage.
      *
-     * @param delta The time in seconds since the last render.
+     * @param delta The time in seconds since the last render
      */
     @Override
     public void render(float delta) {
@@ -150,28 +155,37 @@ public class StatsScreen implements Screen {
     /**
      * Handles screen resizing by updating the stage's viewport.
      *
-     * @param width  The new screen width.
-     * @param height The new screen height.
+     * @param width  The new screen width in pixels
+     * @param height The new screen height in pixels
      */
     @Override
     public void resize(int width, int height) {
         stage.getViewport().update(width, height, true);
     }
 
+    /**
+     * Called when the game is paused.
+     */
     @Override
     public void pause() {
     }
 
+    /**
+     * Called when the game is resumed from pause.
+     */
     @Override
     public void resume() {
     }
 
+    /**
+     * Called when this screen is no longer the current screen for the game.
+     */
     @Override
     public void hide() {
     }
 
     /**
-     * Disposes of all resources used by the stats screen.
+     * Disposes of all resources used by the statistics screen.
      */
     @Override
     public void dispose() {
