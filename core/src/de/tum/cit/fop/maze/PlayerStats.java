@@ -83,7 +83,7 @@ public class PlayerStats {
     }
 
     /**
-     * Initializes default achievements if no achievements are loaded from the save file.
+     * Initialises default achievements if no achievements are loaded from the save file.
      */
     private void initAchievements() {
         if (achievements.size == 0) {

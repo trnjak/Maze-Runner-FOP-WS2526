@@ -101,7 +101,7 @@ public class BeginScreen implements Screen {
     }
 
     /**
-     * Renders the beginning screen by clearing the display and drawing the stage.
+     * Renders the begin screen by clearing the display and drawing the stage.
      *
      * @param delta The time in seconds since the last render
      */

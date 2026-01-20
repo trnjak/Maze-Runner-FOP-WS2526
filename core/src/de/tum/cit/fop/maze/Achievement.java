@@ -5,9 +5,10 @@ package de.tum.cit.fop.maze;
  * Tracks progress towards specific goals and automatically unlocks when targets are met.
  */
 public class Achievement {
-    private String id, name, description, type;
+    private final String id, name, description, type;
+    private final int target;
     private boolean unlocked;
-    private int progress, target;
+    private int progress;
 
     /**
      * Constructs a new Achievement with the specified parameters.
@@ -38,15 +39,6 @@ public class Achievement {
     }
 
     /**
-     * Sets the achievement's unique identifier.
-     *
-     * @param id The new achievement ID
-     */
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    /**
      * Gets the achievement's display name.
      *
      * @return The achievement name
@@ -56,30 +48,12 @@ public class Achievement {
     }
 
     /**
-     * Sets the achievement's display name.
-     *
-     * @param name The new achievement name
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
      * Gets the achievement's description.
      *
      * @return The achievement description
      */
     public String getDescription() {
         return description;
-    }
-
-    /**
-     * Sets the achievement's description.
-     *
-     * @param description The new achievement description
-     */
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     /**
@@ -128,30 +102,12 @@ public class Achievement {
     }
 
     /**
-     * Sets the target progress required to unlock the achievement.
-     *
-     * @param target The new target progress value
-     */
-    public void setTarget(int target) {
-        this.target = target;
-    }
-
-    /**
      * Gets the achievement's type/category.
      *
      * @return The achievement type
      */
     public String getType() {
         return type;
-    }
-
-    /**
-     * Sets the achievement's type/category.
-     *
-     * @param type The new achievement type
-     */
-    public void setType(String type) {
-        this.type = type;
     }
 
     /**

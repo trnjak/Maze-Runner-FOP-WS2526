@@ -119,42 +119,6 @@ public abstract class Enemy extends GameObj {
     }
 
     /**
-     * Gets the enemy's current movement speed.
-     *
-     * @return The current speed in pixels per second
-     */
-    public float getSpeed() {
-        return speed;
-    }
-
-    /**
-     * Sets the enemy's movement speed.
-     *
-     * @param speed The new speed in pixels per second
-     */
-    public void setSpeed(float speed) {
-        this.speed = speed;
-    }
-
-    /**
-     * Gets the enemy's current health points.
-     *
-     * @return The current health points
-     */
-    public int getHp() {
-        return hp;
-    }
-
-    /**
-     * Sets the enemy's health points.
-     *
-     * @param hp The new health points value
-     */
-    public void setHp(int hp) {
-        this.hp = hp;
-    }
-
-    /**
      * Checks if the enemy is currently alive.
      *
      * @return true if the enemy is alive, false if defeated

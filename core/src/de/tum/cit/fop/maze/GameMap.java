@@ -48,7 +48,7 @@ public class GameMap {
     private boolean isEndless = false;
 
     /**
-     * Loads a map from a properties file and initializes all game objects.
+     * Loads a map from a properties file and initialises all game objects.
      * Clears existing map data and parses tile values to populate the map.
      *
      * @param path The path to the map properties file
@@ -595,46 +595,5 @@ public class GameMap {
      */
     public int getHeight() {
         return h;
-    }
-
-    /**
-     * Finds all unoccupied walkable tiles in the map.
-     *
-     * @return List of coordinate pairs [x,y] representing free positions
-     */
-    public List<int[]> findFreeSpots() {
-        List<int[]> freeSpots = new ArrayList<>();
-
-        for (int i = 0; i < w; i++) {
-            for (int j = 0; j < h; j++) {
-                if (isWall(i, j)) continue;
-
-                boolean occupied = false;
-                for (Trap t : traps)
-                    if (t.getX() == i && t.getY() == j) {
-                        occupied = true;
-                        break;
-                    }
-                for (Enemy e : enemies)
-                    if (e.getX() == i && e.getY() == j) {
-                        occupied = true;
-                        break;
-                    }
-                for (Powerup p : powerups)
-                    if (p.getX() == i && p.getY() == j) {
-                        occupied = true;
-                        break;
-                    }
-                for (Key k : keys)
-                    if (k.getX() == i && k.getY() == j) {
-                        occupied = true;
-                        break;
-                    }
-
-                if (!occupied) freeSpots.add(new int[]{i, j});
-            }
-        }
-
-        return freeSpots;
     }
 }
