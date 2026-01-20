@@ -18,7 +18,7 @@ public class SludgeTrap extends Trap {
      * @param mult The speed multiplier to apply (e.g., 0.5 for 50% speed reduction)
      */
     public SludgeTrap(int x, int y, float mult) {
-        super(x, y, 3, 6);
+        super(x, y, 1, 0);
         this.mult = mult;
     }
 

@@ -35,8 +35,7 @@ public class GameMap {
     public static final TextureRegion[][] TEXTURE_REGION = TextureRegion.split(TILE_SHEET, TILE_SHEET.getWidth() / 12, TILE_SHEET.getHeight() / 11);
     private final Map<String, Integer> tiles = new HashMap<>();
     private final TextureRegion wall = TEXTURE_REGION[3][4];
-    private final TextureRegion[] floor = {TEXTURE_REGION[4][0], TEXTURE_REGION[4][1]};
-    private final TextureRegion entry = TEXTURE_REGION[4][0];
+    private final TextureRegion floor = TEXTURE_REGION[0][0];
     private final List<Trap> traps = new ArrayList<>();
     private final List<Key> keys = new ArrayList<>();
     private final List<Enemy> enemies = new ArrayList<>();
@@ -115,12 +114,12 @@ public class GameMap {
                 Integer v = tiles.get(x + "," + y);
                 TextureRegion t;
                 if (v == null) {
-                    t = floor[1];
+                    t = floor;
                 } else {
                     t = switch (v) {
                         case 0 -> wall;
-                        case 1 -> entry;
-                        default -> floor[1];
+                        case 1 -> floor;
+                        default -> floor;
                     };
                 }
                 batch.draw(t, x * GameObj.TILE, y * GameObj.TILE, GameObj.TILE, GameObj.TILE);
