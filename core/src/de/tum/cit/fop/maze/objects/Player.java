@@ -12,13 +12,24 @@ import de.tum.cit.fop.maze.objects.enemies.Enemy;
 import de.tum.cit.fop.maze.screens.BeginScreen;
 
 import java.util.List;
-
+import java.util.Random;
+/**
+ * Sounds from: <a href="https://opengameart.org/content/female-rpg-voice-starter-pack">LINK</a>
+ * */
 public class Player extends GameObj {
     private final PlayerStats playerStats;
     private final TextureRegion right, left;
-    private final Sound atkMiss = Gdx.audio.newSound(Gdx.files.internal("sounds/attack_miss.ogg")),
-            atkHit = Gdx.audio.newSound(Gdx.files.internal("sounds/attack_hit.ogg")),
-            takeDmg = Gdx.audio.newSound(Gdx.files.internal("sounds/take_dmg.ogg"));
+    private final Sound[]
+            atkHit = {
+                    Gdx.audio.newSound(Gdx.files.internal("sounds/attack1.ogg")),
+                    Gdx.audio.newSound(Gdx.files.internal("sounds/attack2.ogg")),
+                    Gdx.audio.newSound(Gdx.files.internal("sounds/attack3.ogg"))
+            },
+            takeDmg = {
+                    Gdx.audio.newSound(Gdx.files.internal("sounds/damaged1.ogg")),
+                    Gdx.audio.newSound(Gdx.files.internal("sounds/damaged2.ogg")),
+                    Gdx.audio.newSound(Gdx.files.internal("sounds/damaged3.ogg"))
+            };
     private int hp, keys = 0;
     private float tintTimer = 0, attackTimer = 0, effectTimer = 0;
     private float lookX, lookY;
@@ -90,7 +101,8 @@ public class Player extends GameObj {
 
     public void loseLife(int n) {
         hp -= n;
-        takeDmg.play(0.2f);
+        Random r = new Random();
+        takeDmg[r.nextInt(3)].play(0.8f);
         setTint(Color.PINK);
     }
 
@@ -124,7 +136,8 @@ public class Player extends GameObj {
             float vy = ey - cy;
             float d = (float) Math.sqrt(vx * vx + vy * vy);
             if (d > range) {
-                atkMiss.play(0.2f);
+                Random r = new Random();
+                atkHit[r.nextInt(3)].play(0.4f);
                 continue;
             }
 
@@ -133,7 +146,8 @@ public class Player extends GameObj {
             float dot = nx * lookX + ny * lookY;
 
             if (d == 0f || dot >= cosHalfAngle) {
-                atkHit.play(0.2f);
+                Random r = new Random();
+                atkHit[r.nextInt(3)].play(0.8f);
                 enemy.takeDamage(1);
                 hit = true;
             }
