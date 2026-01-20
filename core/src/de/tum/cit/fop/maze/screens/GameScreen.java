@@ -43,7 +43,7 @@ import java.util.Random;
  * enemy AI, collision detection, scoring, and developer console functionality.
  * <p>
  * Hud textures from: <a href="https://kenney.nl/assets/micro-roguelike">LINK</a>
- * Music from: <a href="https://opengameart.org/content/random-battle">LINK</a>
+ * Music from: <a href="https://opengameart.org/content/fantasy-good-night">LINK</a>
  * SFX from: <a href="https://kenney.nl/assets/category:Audio">LINK</a> and
  * <a href="https://opengameart.org/content/witch-cackle">LINK 2</a>
  */

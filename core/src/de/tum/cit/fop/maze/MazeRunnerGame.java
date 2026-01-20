@@ -42,7 +42,7 @@ public class MazeRunnerGame extends Game {
     /**
      * Called when the game is created. Initializes the SpriteBatch, Skin and menu music.
      * <p>
-     * Music from: <a href="https://opengameart.org/content/fantasy-good-night">LINK</a>
+     * Music from: <a href="https://opengameart.org/content/mysterious-ambience-song21">LINK</a>
      * Background image courtesy of Benedikt Jaletzke on Unsplash: <a href="https://unsplash.com/photos/brown-concrete-castle-UboDuBeLKIw">LINK</a>
      */
     @Override
