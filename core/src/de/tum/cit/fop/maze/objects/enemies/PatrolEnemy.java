@@ -11,6 +11,8 @@ import de.tum.cit.fop.maze.objects.Player;
 public class PatrolEnemy extends Enemy {
     private final boolean axis;
     private float dir = 1;
+    private boolean waiting = false;
+    private float wait = 0;
 
     /**
      * Constructs a new PatrolEnemy at the specified coordinates with a designated patrol axis.
@@ -36,10 +38,20 @@ public class PatrolEnemy extends Enemy {
      */
     @Override
     protected void move(float delta, Player player, GameMap map) {
-        float dx = 0, dy = 0;
         if (inRange(player)) {
             return;
         }
+
+        if (waiting) {
+            wait += delta;
+            if (wait >= 0.25f) {
+                waiting = false;
+            } else {
+                return;
+            }
+        }
+
+        float dx = 0, dy = 0;
         if (axis) {
             dx = dir * speed * delta;
         } else {
@@ -54,6 +66,8 @@ public class PatrolEnemy extends Enemy {
             y += dy;
         } else {
             dir *= -1f;
+            waiting = true;
+            wait = 0;
         }
 
         if (dx != 0 || dy != 0) {
