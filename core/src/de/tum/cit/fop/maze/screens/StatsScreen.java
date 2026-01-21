@@ -28,6 +28,9 @@ public class StatsScreen implements Screen {
     private Label healthLabel;
     private Label speedLabel;
     private Label attackLabel;
+    private TextButton attackButton;
+    private TextButton speedButton;
+    private TextButton healthButton;
 
     /**
      * Constructs a new StatsScreen for viewing and upgrading player statistics.
@@ -67,7 +70,7 @@ public class StatsScreen implements Screen {
         healthLabel = new Label("Health Lvl: " + playerStats.getHpLvl() + " (Max HP: " + playerStats.getMaxHp() + ")", game.getSkin());
         table.add(healthLabel).pad(10);
 
-        TextButton healthButton = new TextButton("Upgrade (" + (playerStats.getHpLvl() * 2) + " EXP)", game.getSkin());
+        healthButton = new TextButton("Upgrade (" + (playerStats.getHpLvl() * 2) + " EXP)", game.getSkin());
         healthButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -82,7 +85,7 @@ public class StatsScreen implements Screen {
         speedLabel = new Label("Speed Lvl: " + playerStats.getSpeedLvl() + " (Speed: " + String.format("%.2f", playerStats.getSpeed()) + ")", game.getSkin());
         table.add(speedLabel).pad(10);
 
-        TextButton speedButton = new TextButton("Upgrade (" + (playerStats.getSpeedLvl() * 2) + " EXP)", game.getSkin());
+        speedButton = new TextButton("Upgrade (" + (playerStats.getSpeedLvl() * 2) + " EXP)", game.getSkin());
         speedButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -97,7 +100,7 @@ public class StatsScreen implements Screen {
         attackLabel = new Label("Attack Lvl: " + playerStats.getAtkLvl() + " (Cooldown: " + String.format("%.2f", playerStats.getAttackCooldown()) + "s)", game.getSkin());
         table.add(attackLabel).pad(10);
 
-        TextButton attackButton = new TextButton("Upgrade (" + (playerStats.getAtkLvl() * 2) + " EXP)", game.getSkin());
+        attackButton = new TextButton("Upgrade (" + (playerStats.getAtkLvl() * 2) + " EXP)", game.getSkin());
         attackButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -121,14 +124,17 @@ public class StatsScreen implements Screen {
     }
 
     /**
-     * Updates all displayed labels with current player statistics and upgrade costs.
+     * Updates all displayed labels and buttons with current player statistics and upgrade costs.
      * Called after successful upgrades to refresh the UI.
      */
     private void updateLabels() {
         expLabel.setText("EXP: " + playerStats.getExp());
         healthLabel.setText("Health Lvl: " + playerStats.getHpLvl() + " (Max HP: " + playerStats.getMaxHp() + ")");
+        healthButton.setText("Upgrade (" + (playerStats.getHpLvl() * 2) + " EXP)");
         speedLabel.setText("Speed Lvl: " + playerStats.getSpeedLvl() + " (Speed: " + String.format("%.2f", playerStats.getSpeed()) + ")");
+        speedButton.setText("Upgrade (" + (playerStats.getSpeedLvl() * 2) + " EXP)");
         attackLabel.setText("Attack Lvl: " + playerStats.getAtkLvl() + " (Cooldown: " + String.format("%.2f", playerStats.getAttackCooldown()) + "s)");
+        attackButton.setText("Upgrade (" + (playerStats.getAtkLvl() * 2) + " EXP)");
     }
 
     /**
