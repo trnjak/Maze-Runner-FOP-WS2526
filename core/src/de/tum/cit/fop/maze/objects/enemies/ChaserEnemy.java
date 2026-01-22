@@ -136,13 +136,6 @@ public class ChaserEnemy extends Enemy {
             lookX = dx / len;
             lookY = dy / len;
         }
-
-        Rectangle enemyBounds = new Rectangle(x, y, w, h);
-        Rectangle playerBounds = player.getBounds();
-
-        if (enemyBounds.overlaps(playerBounds)) {
-            pushPlayer(player);
-        }
     }
 
     /**
@@ -183,26 +176,5 @@ public class ChaserEnemy extends Enemy {
             }
         }
         return true;
-    }
-
-    /**
-     * Pushes the player away from the enemy upon collision.
-     * Uses normalised direction vector scaled by fixed strength (10 pixels).
-     *
-     * @param player The player to push away from the enemy
-     */
-    protected void pushPlayer(Player player) {
-        Vector2 push = new Vector2(
-                player.getX() - x,
-                player.getY() - y
-        );
-
-        if (push.len2() > 0) {
-            push.nor().scl(10f);
-            player.setPosition(
-                    player.getX() + push.x,
-                    player.getY() + push.y
-            );
-        }
     }
 }
