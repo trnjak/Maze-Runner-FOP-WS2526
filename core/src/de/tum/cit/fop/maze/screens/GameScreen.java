@@ -620,52 +620,6 @@ public class GameScreen implements Screen {
         consoleOutputLabel.setText(consoleOutput);
     }
 
-    /**
-     * Resets the level score to zero.
-     */
-    private void resetLevelScore() {
-        score = 0;
-        scoreLabel.setText(0 + "");
-    }
-
-    /**
-     * Updates the game over screen with final calculated score and awards experience.
-     */
-    private void updateGameOverScore() {
-        int finalScore = (int) (score + time);
-        gameOverScore.setText("Final score: " + finalScore);
-        awardExp();
-        playerStats.addScore(finalScore);
-
-        Array<String> unlocked = playerStats.checkScoreAchievements();
-        if (unlocked.size > 0) {
-            showAchievement(unlocked.first());
-        }
-
-        playerStats.save();
-    }
-
-    /**
-     * Updates the victory screen with final calculated score and awards experience.
-     */
-    private void updateVictoryScore() {
-        int finalScore = (int) (score + time);
-        victoryScore.setText("Final score: " + finalScore);
-        awardExp();
-        playerStats.addScore(finalScore);
-
-        Array<String> unlocked = playerStats.checkScoreAchievements();
-        if (unlocked.size > 0) {
-            showAchievement(unlocked.first());
-        }
-
-        Array<String> levelUnlocked = playerStats.checkLevelAchievements();
-        if (levelUnlocked.size > 0) {
-            showAchievement(levelUnlocked.first());
-        }
-
-        playerStats.save();
-    }
 
     /**
      * Processes console commands entered by the user.
@@ -958,6 +912,53 @@ public class GameScreen implements Screen {
                 }
                 break;
         }
+    }
+
+    /**
+     * Resets the level score to zero.
+     */
+    private void resetLevelScore() {
+        score = 0;
+        scoreLabel.setText(0 + "");
+    }
+
+    /**
+     * Updates the game over screen with final calculated score and awards experience.
+     */
+    private void updateGameOverScore() {
+        int finalScore = (int) (score + time);
+        gameOverScore.setText("Final score: " + finalScore);
+        awardExp();
+        playerStats.addScore(finalScore);
+
+        Array<String> unlocked = playerStats.checkScoreAchievements();
+        if (unlocked.size > 0) {
+            showAchievement(unlocked.first());
+        }
+
+        playerStats.save();
+    }
+
+    /**
+     * Updates the victory screen with final calculated score and awards experience.
+     */
+    private void updateVictoryScore() {
+        int finalScore = (int) (score + time);
+        victoryScore.setText("Final score: " + finalScore);
+        awardExp();
+        playerStats.addScore(finalScore);
+
+        Array<String> unlocked = playerStats.checkScoreAchievements();
+        if (unlocked.size > 0) {
+            showAchievement(unlocked.first());
+        }
+
+        Array<String> levelUnlocked = playerStats.checkLevelAchievements();
+        if (levelUnlocked.size > 0) {
+            showAchievement(levelUnlocked.first());
+        }
+
+        playerStats.save();
     }
 
     /**
