@@ -712,33 +712,39 @@ public class GameScreen implements Screen {
         String varName = parts[1];
         String valueStr = parts[2];
 
-        try {
+        if(consoleVariables.containsKey(varName)) {
             try {
-                int intValue = Integer.parseInt(valueStr);
-                consoleVariables.put(varName, intValue);
-                applyVariableChange(varName, intValue);
-                appendConsoleOutput("\nSet " + varName + " = " + intValue);
-            } catch (NumberFormatException e) {
                 try {
-                    float floatValue = Float.parseFloat(valueStr);
-                    consoleVariables.put(varName, floatValue);
-                    applyVariableChange(varName, floatValue);
-                    appendConsoleOutput("\nSet " + varName + " = " + floatValue);
-                } catch (NumberFormatException e2) {
-                    if (valueStr.equalsIgnoreCase("true") || valueStr.equalsIgnoreCase("false")) {
-                        boolean boolValue = Boolean.parseBoolean(valueStr);
-                        consoleVariables.put(varName, boolValue);
-                        applyVariableChange(varName, boolValue);
-                        appendConsoleOutput("\nSet " + varName + " = " + boolValue);
-                    } else {
-                        consoleVariables.put(varName, valueStr);
-                        appendConsoleOutput("\nSet " + varName + " = \"" + valueStr + "\"");
+                    int intValue = Integer.parseInt(valueStr);
+                    consoleVariables.put(varName, intValue);
+                    applyVariableChange(varName, intValue);
+                    appendConsoleOutput("\nSet " + varName + " = " + intValue);
+                } catch (NumberFormatException e) {
+                    try {
+                        float floatValue = Float.parseFloat(valueStr);
+                        consoleVariables.put(varName, floatValue);
+                        applyVariableChange(varName, floatValue);
+                        appendConsoleOutput("\nSet " + varName + " = " + floatValue);
+                    } catch (NumberFormatException e2) {
+                        if (valueStr.equalsIgnoreCase("true") || valueStr.equalsIgnoreCase("false")) {
+                            boolean boolValue = Boolean.parseBoolean(valueStr);
+                            consoleVariables.put(varName, boolValue);
+                            applyVariableChange(varName, boolValue);
+                            appendConsoleOutput("\nSet " + varName + " = " + boolValue);
+                        } else {
+                            consoleVariables.put(varName, valueStr);
+                            appendConsoleOutput("\nSet " + varName + " = \"" + valueStr + "\"");
+                        }
                     }
                 }
+            } catch (Exception e) {
+                appendConsoleOutput("\nError setting variable: " + e.getMessage());
             }
-        } catch (Exception e) {
-            appendConsoleOutput("\nError setting variable: " + e.getMessage());
         }
+        else {
+            appendConsoleOutput("\nVariable doesn't exist. Type 'list' to see all available variables.");
+        }
+
     }
 
     /**
