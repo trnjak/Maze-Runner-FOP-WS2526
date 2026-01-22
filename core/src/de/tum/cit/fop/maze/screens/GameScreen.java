@@ -934,7 +934,7 @@ public class GameScreen implements Screen {
     private void updateGameOverScore() {
         int finalScore = (int) (score + time);
         gameOverScore.setText("Final score: " + finalScore);
-        awardExp();
+        awardExp(finalScore);
         playerStats.addScore(finalScore);
 
         Array<String> unlocked = playerStats.checkScoreAchievements();
@@ -951,7 +951,7 @@ public class GameScreen implements Screen {
     private void updateVictoryScore() {
         int finalScore = (int) (score + time);
         victoryScore.setText("Final score: " + finalScore);
-        awardExp();
+        awardExp(finalScore);
         playerStats.addScore(finalScore);
 
         Array<String> unlocked = playerStats.checkScoreAchievements();
@@ -968,14 +968,14 @@ public class GameScreen implements Screen {
     }
 
     /**
-     * Awards experience points to the player based on their score and saves the updated stats.
+     * Awards experience points by choosing a random number between 1 and 3
+     * and adding additional experience based on the player's score.
      */
-    private void awardExp() {
-        int plusExp = (int) Math.ceil(score / 500);
-        if (plusExp > 0) {
-            playerStats.addExp(plusExp);
-            playerStats.save();
-        }
+    private void awardExp(int finalScore) {
+        Random r = new Random();
+        int plusExp = r.nextInt(3)+1+(finalScore/500);
+        playerStats.addExp(plusExp);
+        playerStats.save();
     }
 
     /**

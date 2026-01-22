@@ -44,7 +44,7 @@ public class StoryScreen implements Screen {
                         In the distant, unkempt Castle of Zoloft,
                         Princess Hayley wakes up to find herself trapped.
                         \s
-                        The witch has been jealous of the Princess's courage and charisma for a long time
+                        The witch has been jealous of the Princess' courage and charisma for a long time
                         and when the perfect opportunity struck, she cast a sleep spell on her.
                         \s
                         Hayley now has to manoeuvre her way through the castle to try and escape,

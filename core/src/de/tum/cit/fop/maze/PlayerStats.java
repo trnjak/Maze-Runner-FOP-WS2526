@@ -21,7 +21,6 @@ public class PlayerStats {
         add(new Achievement("key_collector", "Key Collector", "Collect 20 keys", 20, "collect"));
         add(new Achievement("score_master", "Score Master", "Reach 5000 total score", 5000, "score"));
         add(new Achievement("survivor", "Survivor", "Complete 10 levels", 10, "level"));
-        add(new Achievement("speedrunner", "Speedrunner", "Complete a level in under 60 seconds", 1, "time"));
         add(new Achievement("upgrade_master", "Upgrade Master", "Reach level 10 in all upgrades", 30, "upgrade"));
     }};
     private final String SAVE_FILE;

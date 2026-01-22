@@ -35,7 +35,7 @@ public class MenuScreen implements Screen {
         mainTable.setFillParent(true);
         stage.addActor(mainTable);
 
-        Label title = new Label("Hailey's Curse", game.getSkin(), "title");
+        Label title = new Label("Hayley's Curse", game.getSkin(), "title");
         mainTable.add(title).padBottom(80).row();
         Table gridTable = new Table();
         gridTable.defaults().pad(10);
