@@ -59,7 +59,7 @@ public class AchievementScreen implements Screen {
         mainTable.setFillParent(true);
         stage.addActor(mainTable);
 
-        Label title = new Label("ACHIEVEMENTS", game.getSkin(), "title");
+        Label title = new Label("Achievements", game.getSkin(), "title");
         mainTable.add(title).padBottom(30).colspan(2).row();
 
         Table statsTable = new Table();

@@ -36,20 +36,25 @@ public class StoryScreen implements Screen {
         mainTable.setFillParent(true);
         stage.addActor(mainTable);
 
-        Label title = new Label("STORY", game.getSkin(), "title");
+        Label title = new Label("Story", game.getSkin(), "title");
         mainTable.add(title).padBottom(40).row();
 
         String story =
                 """
-                        In the shadow-haunted Castle of Zoloft, Princess Hayley finds herself trapped by an evil witch.
+                        In the distant, unkempt Castle of Zoloft,
+                        Princess Hayley wakes up to find herself trapped.
                         \s
-                        The witch, jealous of the princess's courage, has woven a powerful curse upon Hayley's castle:
+                        The witch has been jealous of the Princess's courage and charisma for a long time
+                        and when the perfect opportunity struck, she cast a sleep spell on her.
+                        \s
+                        Hayley now has to manoeuvre her way through the castle to try and escape,
+                        but the witch has strategically placed obstacles to make the escape harder:
                         \s
                         > GHOSTS chasing anyone that dares to cross their path
                         > GIANT SPIDERS patrolling the premises
                         > SPIKE TRAPS making the escape painful
                         \s
-                        But, the cruelest trick of all: THE EXIT DOOR changes location every 30 seconds!
+                        And, the cruelest trick of all: THE EXIT DOOR changes location every 30 seconds!
                         \s
                         Princess Hayley, armed with only her wits and unwavering determination, must navigate this ever-changing labyrinth, \
                         avoid the witch's minions, and find the exit before it moves again. \

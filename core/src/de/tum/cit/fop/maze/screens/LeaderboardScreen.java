@@ -85,7 +85,7 @@ public class LeaderboardScreen implements Screen {
 
         table.pad(30);
 
-        Label title = new Label("LEADERBOARDS", game.getSkin(), "title");
+        Label title = new Label("Leaderboards", game.getSkin(), "title");
         table.add(title).padBottom(40).colspan(1).center().row();
 
         stats.sort((p1, p2) -> Integer.compare(p2.getScore(), p1.getScore()));

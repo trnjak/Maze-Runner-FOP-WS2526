@@ -61,7 +61,7 @@ public class StatsScreen implements Screen {
         table.setFillParent(true);
         stage.addActor(table);
 
-        Label title = new Label("UPGRADES", game.getSkin(), "title");
+        Label title = new Label("Upgrades", game.getSkin(), "title");
         table.add(title).padBottom(80).colspan(2).row();
 
         expLabel = new Label("EXP: " + playerStats.getExp(), game.getSkin());
