@@ -1,10 +1,10 @@
 # Hayley's Curse
 
-**Hayley's Curse** is a Java-based 2D maze traversal application developed using the **LibGDX** framework. This project demonstrates the implementation of procedural content generation, object-oriented design patterns, and persistent state management. The application requires players to navigate dynamic grid-based environments, manage character statistics, and utilise algorithmic pathfinding strategies to overcome autonomous agents.
+**Hayley's Curse** is a Java-based 2D maze runner game developed using the **LibGDX** framework. This project demonstrates the implementation of procedural content generation, object-oriented design patterns, and persistent state management. The application requires players to navigate dynamic grid-based environments, manage character statistics, and utilise algorithmic pathfinding strategies to overcome autonomous agents.
 
 ## UML Diagrams [[PDF]](./UML/uml-diagram.pdf)
 
-## 1. Narrative Context
+## Narrative Context
 
 As defined in the `StoryScreen` class, the application presents a narrative centered on "Princess Hayley," who is imprisoned within the "Castle of Zoloft." The gameplay simulates an escape attempt where the user must navigate a labyrinthine environment.
 
@@ -14,7 +14,7 @@ Key mechanics derived from the narrative include:
 * **Adversarial Agents:** The player encounters "Ghosts" (Chaser logic) and "Giant Spiders" (Patrol logic).
 * **Environmental Hazards:** The grid contains spikes and sludge traps that hinder movement or deplete health.
 
-## 2. Core Architecture (`de.tum.cit.fop.maze`)
+## Core Architecture (`de.tum.cit.fop.maze`)
 
 This package contains the foundational classes responsible for application lifecycle management, global state, and data persistence.
 
@@ -24,7 +24,7 @@ This package contains the foundational classes responsible for application lifec
 * **`Achievement`**: Represents individual progression milestones. It encapsulates logic to monitor specific metrics and automatically update the `unlocked` boolean state when criteria are met.
 * **`KeyBindings`**: Manages input configuration. It maps abstract user actions (e.g., "Attack," "Move Up") to specific hardware key codes, allowing for runtime remapping via the `SettingsScreen`.
 
-## 3. Entity Hierarchy (`de.tum.cit.fop.maze.objects`)
+## Entity Hierarchy (`de.tum.cit.fop.maze.objects`)
 
 The application utilises a strict inheritance hierarchy to manage game entities.
 
@@ -45,7 +45,7 @@ The application utilises a strict inheritance hierarchy to manage game entities.
 * **Traps**: Abstract base for hazards. Includes `DamageTrap` (applies damage via a timer) and `SludgeTrap` (applies a velocity reduction coefficient).
 * **Powerups**: Abstract base for beneficial items. Includes `Hpup` (restores health) and `Speedup` (temporarily increases velocity).
 
-## 4. User Interface Layer (`de.tum.cit.fop.maze.screens`)
+## User Interface Layer (`de.tum.cit.fop.maze.screens`)
 
 The UI layer is decoupled from the game logic, handling rendering and user input.
 
@@ -55,7 +55,7 @@ The UI layer is decoupled from the game logic, handling rendering and user input
 * **`StatsScreen`**: A functional upgrade menu allowing users to exchange accumulated EXP for permanent variable adjustments (e.g., `maxHp`, movement speed).
 * **`SettingsScreen`**: Provides an interface for modifying `KeyBindings`, capturing raw keyboard input to update the configuration map.
 
-## 5. Map Architecture and File I/O
+## Map Architecture and File I/O
 
 The application utilises a property-based system for world definition, managed by the `GameMap` class. Maps are stored in the `/maps` directory.
 
@@ -76,7 +76,7 @@ The parser interprets integer values mapped to specific object types:
 * **Static Maps**: Pre-defined configuration files (`level-1.properties` through `level-5.properties`).
 * **Procedural Maps**: `endless.properties`. This file is dynamically overwritten by the DFS generation algorithm at runtime before being loaded into memory.
 
-## 6. Asset Management
+## Asset Management
 
 Assets are centralised to ensure memory efficiency.
 
@@ -84,9 +84,26 @@ Assets are centralised to ensure memory efficiency.
 * **Audio**: Separates looping background music (`menu_bg.mp3`, `game_bg.mp3`) from event-triggered sound effects (combat noises, victory/failure cues, and the `witch_cackle.ogg` spatial cue).
 * **UI Skinning**: Utilizes `craftacular-ui.json` to define global styles for fonts, buttons, and window elements.
 
----
+## Controls & Navigation
 
-### Deployment
+Default key bindings are managed by the `KeyBindings` class. While movement and combat keys can be remapped via the Settings menu, the default configuration is as follows:
+
+### Movement & Combat
+
+* **Move Up**: `Arrow Up`
+* **Move Down**: `Arrow Down`
+* **Move Left**: `Arrow Left`
+* **Move Right**: `Arrow Right`
+* **Sprint**: `Left Shift` (Hold to increase velocity)
+* **Attack**: `Space` (Deals damage in the direction faced)
+
+### Camera & Debug
+
+* **Zoom In**: `=` (Equal Sign)
+* **Zoom Out**: `-` (Minus Sign)
+* **Dev Console**: `F1`
+
+## Deployment
 
 1. Clone the repository.
 2. Import the directory as a Gradle project.
