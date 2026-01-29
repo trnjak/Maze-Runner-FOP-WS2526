@@ -21,7 +21,7 @@ import java.io.IOException;
  */
 public class MazeRunnerGame extends Game {
     private final NativeFileChooser fileChooser;
-    public float WIDTH = 1024, HEIGHT = 768;
+    public float WIDTH = 1280, HEIGHT = 720;
     public Music menuMusic;
     public Image menuImage;
     private MenuScreen menuScreen;
@@ -56,7 +56,7 @@ public class MazeRunnerGame extends Game {
         menuMusic.play();
 
         menuImage = new Image(new Texture("background.gif"));
-        menuImage.setSize(WIDTH, HEIGHT);
+        menuImage.setFillParent(true);
         menuImage.setPosition(0, 0);
 
         setScreen(new BeginScreen(this));

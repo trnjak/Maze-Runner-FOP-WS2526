@@ -18,7 +18,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import de.tum.cit.fop.maze.GameMap;
 import de.tum.cit.fop.maze.KeyBindings;
@@ -91,7 +90,7 @@ public class GameScreen implements Screen {
         viewport = new ExtendViewport(game.WIDTH, game.HEIGHT, camera);
 
         hudCam = new OrthographicCamera();
-        hudVp = new FitViewport(game.WIDTH, game.HEIGHT, hudCam);
+        hudVp = new ExtendViewport(game.WIDTH, game.HEIGHT, hudCam);
 
         map = new GameMap();
         map.load(path);
@@ -123,7 +122,7 @@ public class GameScreen implements Screen {
         viewport = new ExtendViewport(game.WIDTH, game.HEIGHT, camera);
 
         hudCam = new OrthographicCamera();
-        hudVp = new FitViewport(game.WIDTH, game.HEIGHT, hudCam);
+        hudVp = new ExtendViewport(game.WIDTH, game.HEIGHT, hudCam);
 
         map = new GameMap();
 
@@ -290,7 +289,7 @@ public class GameScreen implements Screen {
         if (exit != null) {
             float arrowRotation = computeArrow(player.getX(), player.getY(), exit.getX() * GameObj.TILE, exit.getY() * GameObj.TILE);
             if (arrowRotation >= 0) {
-                float arrowX = 20, arrowY = game.HEIGHT - 80;
+                float arrowX = 20, arrowY = hudVp.getWorldHeight() - 80;
                 float originX = (float) GameObj.TILE / 2, originY = (float) GameObj.TILE / 2;
                 game.getSpriteBatch().draw(TEXTURE_REGION[6][3], arrowX, arrowY, originX, originY, GameObj.TILE, GameObj.TILE, 1, 1, arrowRotation);
             }
@@ -712,7 +711,7 @@ public class GameScreen implements Screen {
         String varName = parts[1];
         String valueStr = parts[2];
 
-        if(consoleVariables.containsKey(varName)) {
+        if (consoleVariables.containsKey(varName)) {
             try {
                 try {
                     int intValue = Integer.parseInt(valueStr);
@@ -740,8 +739,7 @@ public class GameScreen implements Screen {
             } catch (Exception e) {
                 appendConsoleOutput("\nError setting variable: " + e.getMessage());
             }
-        }
-        else {
+        } else {
             appendConsoleOutput("\nVariable doesn't exist. Type 'list' to see all available variables.");
         }
 
@@ -965,7 +963,7 @@ public class GameScreen implements Screen {
      */
     private void awardExp(int finalScore) {
         Random r = new Random();
-        int plusExp = r.nextInt(3)+1+(finalScore/500);
+        int plusExp = r.nextInt(3) + 1 + (finalScore / 500);
         playerStats.addExp(plusExp);
         playerStats.save();
     }

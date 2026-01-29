@@ -11,7 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import de.tum.cit.fop.maze.KeyBindings;
 import de.tum.cit.fop.maze.MazeRunnerGame;
 
@@ -49,7 +49,7 @@ public class SettingsScreen implements Screen {
     public SettingsScreen(MazeRunnerGame game) {
         this.game = game;
         var camera = new OrthographicCamera();
-        stage = new Stage(new FitViewport(game.WIDTH, game.HEIGHT, camera), game.getSpriteBatch());
+        stage = new Stage(new ExtendViewport(game.WIDTH, game.HEIGHT, camera), game.getSpriteBatch());
         stage.addActor(game.menuImage);
 
         Table table = new Table();
