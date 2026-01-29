@@ -168,7 +168,7 @@ public class GameScreen implements Screen {
 
             for (Enemy e : map.getEnemies()) {
                 e.update(delta, player, map);
-                if (!player.isAlive()) {
+                if (!player.isAlive() && !gameOver) {
                     gameOver = true;
                     updateGameOverScore();
                 }
@@ -176,7 +176,7 @@ public class GameScreen implements Screen {
 
             for (Trap t : map.getTraps()) {
                 t.update(player, delta);
-                if (!player.isAlive()) {
+                if (!player.isAlive() && !gameOver) {
                     gameOver = true;
                     updateGameOverScore();
                 }
@@ -244,7 +244,7 @@ public class GameScreen implements Screen {
             centerCameraOnPlayer();
         }
 
-        if (time <= 0) {
+        if (time <= 0 && !gameOver) {
             gameOver = true;
             updateGameOverScore();
         }
@@ -935,14 +935,6 @@ public class GameScreen implements Screen {
         int finalScore = (int) (score + time);
         gameOverScore.setText("Final score: " + finalScore);
         awardExp(finalScore);
-        playerStats.addScore(finalScore);
-
-        Array<String> unlocked = playerStats.checkScoreAchievements();
-        if (unlocked.size > 0) {
-            showAchievement(unlocked.first());
-        }
-
-        playerStats.save();
     }
 
     /**

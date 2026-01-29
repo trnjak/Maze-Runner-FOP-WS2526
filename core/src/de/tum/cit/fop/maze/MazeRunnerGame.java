@@ -43,6 +43,7 @@ public class MazeRunnerGame extends Game {
      * Initializes the game resources including SpriteBatch, UI skin, and background music.
      * Sets the initial screen to the BeginScreen.
      * <p>Music from: <a href="https://opengameart.org/content/mysterious-ambience-song21">Mysterious Ambience Song21</a>
+     * <p>Background image from: <a href="https://opengameart.org/content/castle-in-the-dark">Castle in the Dark</a></p>
      */
     @Override
     public void create() {
@@ -54,7 +55,7 @@ public class MazeRunnerGame extends Game {
         menuMusic.setVolume(0.2f);
         menuMusic.play();
 
-        menuImage = new Image(new Texture("background.jpeg"));
+        menuImage = new Image(new Texture("background.gif"));
         menuImage.setSize(WIDTH, HEIGHT);
         menuImage.setPosition(0, 0);
 
