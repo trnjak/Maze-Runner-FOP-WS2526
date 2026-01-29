@@ -1,12 +1,12 @@
 # Hayley's Curse
 
-**Hayley's Curse** is a Java-based 2D maze runner game developed using the **LibGDX** framework. This project demonstrates the implementation of procedural content generation, object-oriented design patterns, and persistent state management. The application requires players to navigate dynamic grid-based environments, manage character statistics, and utilise algorithmic pathfinding strategies to overcome autonomous agents.
+**Hayley's Curse** is a Java-based 2D maze runner game developed using the **LibGDX** framework. This project demonstrates the implementation of procedural content generation, object-oriented design patterns, and persistent state management. It requires players to navigate dynamic grid-based environments, manage character statistics, and utilise algorithmic pathfinding strategies to overcome autonomous agents.
 
 ## UML Diagrams [[PDF]](./UML/uml-diagram.pdf)
 
 ## Narrative Context
 
-As defined in the `StoryScreen` class, the application presents a narrative centered on "Princess Hayley," who is imprisoned within the "Castle of Zoloft." The gameplay simulates an escape attempt where the user must navigate a labyrinthine environment.
+As defined in the `StoryScreen` class, the game presents a narrative centered on "Princess Hayley," who is imprisoned within the "Castle of Zoloft." The gameplay simulates an escape attempt where the user must navigate a labyrinthine environment.
 
 Key mechanics derived from the narrative include:
 
@@ -26,7 +26,7 @@ This package contains the foundational classes responsible for application lifec
 
 ## Entity Hierarchy (`de.tum.cit.fop.maze.objects`)
 
-The application utilises a strict inheritance hierarchy to manage game entities.
+The game utilises a strict inheritance hierarchy to manage entities.
 
 * **`GameObj` (Abstract Base)**: Defines the fundamental properties of all physical entities, including coordinate position (`x`, `y`), dimensions, and a `Rectangle` hitbox for collision detection. It enforces a standard 32-pixel tile rendering implementation.
 * **`Player`**: Implements the user-controlled entity. This class handles complex locomotion logic (sprinting, deceleration via sludge), health state, and a Directional Combat System that calculates an attack vector based on the entity's orientation.
