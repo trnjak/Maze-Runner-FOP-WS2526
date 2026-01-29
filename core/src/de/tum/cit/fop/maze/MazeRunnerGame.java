@@ -134,7 +134,7 @@ public class MazeRunnerGame extends Game {
      * Returns to the previous screen based on navigation context.
      * Returns to the game screen if currently in-game, otherwise returns to the menu.
      */
-    public void backToGameOrMenuDependingOnWhetherOrNotThePlayerEnteredTheScreenFromTheGameOrFromTheMenu() {
+    public void back() {
         if (gameScreen != null) {
             setScreen(gameScreen);
         } else {
