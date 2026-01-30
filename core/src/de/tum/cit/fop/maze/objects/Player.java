@@ -175,8 +175,6 @@ public class Player extends GameObj {
             float vy = ey - cy;
             float d = (float) Math.sqrt(vx * vx + vy * vy);
             if (d > range) {
-                Random r = new Random();
-                atkHit[r.nextInt(3)].play(0.4f);
                 continue;
             }
 
@@ -185,16 +183,17 @@ public class Player extends GameObj {
             float dot = nx * lookX + ny * lookY;
 
             if (d == 0f || dot >= cosHalfAngle) {
-                Random r = new Random();
-                atkHit[r.nextInt(3)].play(0.8f);
                 enemy.takeDamage(1);
                 hit = true;
             }
         }
 
+        Random r = new Random();
         if (hit) {
+            atkHit[r.nextInt(3)].play(0.8f);
             setTint(Color.YELLOW);
         } else {
+            atkHit[r.nextInt(3)].play(0.2f);
             setTint(Color.ORANGE);
         }
 
