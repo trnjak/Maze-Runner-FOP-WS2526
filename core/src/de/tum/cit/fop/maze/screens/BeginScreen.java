@@ -9,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import de.tum.cit.fop.maze.MazeRunnerGame;
 import de.tum.cit.fop.maze.PlayerStats;
 
@@ -31,7 +31,7 @@ public class BeginScreen implements Screen {
     public BeginScreen(MazeRunnerGame game) {
         this.game = game;
         var camera = new OrthographicCamera();
-        stage = new Stage(new FitViewport(game.WIDTH, game.HEIGHT, camera), game.getSpriteBatch());
+        stage = new Stage(new ExtendViewport(game.WIDTH, game.HEIGHT, camera), game.getSpriteBatch());
 
         Table table = new Table();
         table.setFillParent(true);
