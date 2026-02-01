@@ -944,12 +944,12 @@ public class GameScreen implements Screen {
         awardExp(finalScore);
         playerStats.addScore(finalScore);
 
-        Array<String> unlocked = playerStats.checkScoreAchievements();
+        Array<String> unlocked = playerStats.updateAchievement("score",  finalScore);
         if (unlocked.size > 0) {
             showAchievement(unlocked.first());
         }
 
-        Array<String> levelUnlocked = playerStats.checkLevelAchievements();
+        Array<String> levelUnlocked = playerStats.updateAchievement("level",  1);
         if (levelUnlocked.size > 0) {
             showAchievement(levelUnlocked.first());
         }

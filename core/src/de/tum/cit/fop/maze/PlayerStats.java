@@ -155,24 +155,6 @@ public class PlayerStats {
     }
 
     /**
-     * Checks and updates score-related achievements based on current score.
-     *
-     * @return Array of names for newly unlocked score achievements
-     */
-    public Array<String> checkScoreAchievements() {
-        return updateAchievement("score", score);
-    }
-
-    /**
-     * Checks and updates level-related achievements based on current level.
-     *
-     * @return Array of names for newly unlocked level achievements
-     */
-    public Array<String> checkLevelAchievements() {
-        return updateAchievement("level", level);
-    }
-
-    /**
      * Gets all achievements as an array.
      *
      * @return Array containing all achievements
