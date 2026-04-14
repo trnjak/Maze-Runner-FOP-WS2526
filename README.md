@@ -2,6 +2,8 @@
 
 **Hayley's Curse** is a Java-based 2D maze runner game developed using the **LibGDX** framework. This project demonstrates the implementation of procedural content generation, object-oriented design patterns, and persistent state management. It requires players to navigate dynamic grid-based environments, manage character statistics, and utilise algorithmic pathfinding strategies to overcome autonomous agents.
 
+## Screencast [[YouTube Link]](https://youtu.be/Vcs3JvkrP9Y)
+
 ## UML Diagram
 ![UML Diagram](uml-diagram.png)
 
